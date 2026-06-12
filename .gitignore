@@ -141,3 +141,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Local-only platform-paid overlay link (hosted deploy host only; never in OSS checkouts)
+pnpm-workspace.local.yaml

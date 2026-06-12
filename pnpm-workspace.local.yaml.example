@@ -1,0 +1,10 @@
+# Copy to pnpm-workspace.local.yaml on the hosted deploy host to enable the
+# platform-paid overlay. OSS self-host clones must NOT have this file — the
+# overlay is closed-source and absent from public checkouts.
+#
+# When present, the hosted build resolves ../platform-paid as a workspace
+# sibling so next.config can import platform-paid/src/register.ts at load
+# time, replacing the no-op ExtensionRegistry providers with real ones.
+packages:
+  - .
+  - "../platform-paid"
