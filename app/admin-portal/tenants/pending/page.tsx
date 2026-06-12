@@ -1,7 +1,9 @@
 import { prismaGlobal } from "@/lib/db";
+import { requirePlatformAdmin } from "@/lib/platform-admin";
 import { DecideButtons } from "./decide-buttons";
 
 export default async function PendingTenantsPage() {
+  await requirePlatformAdmin();
   const rows = await prismaGlobal.pendingTenant.findMany({
     where: { status: "PENDING" },
     orderBy: { createdAt: "asc" },

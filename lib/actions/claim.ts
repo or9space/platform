@@ -21,14 +21,30 @@ export async function claimFounderSeat(input: z.infer<typeof ClaimSchema>): Prom
   const { tenantSlug, token, email, password, username } = parsed.data;
   const normalizedEmail = email.trim().toLowerCase();
 
+  const tokenHash = hashClaimToken(token);
+
   try {
     await prismaGlobal.$transaction(async (tx) => {
-      const tenant = await tx.tenant.findUnique({ where: { slug: tenantSlug } });
-      if (!tenant?.founderClaimTokenHash) throw new ClaimError("This org has already been claimed");
-      if (tenant.founderClaimTokenHash !== hashClaimToken(token)) throw new ClaimError("Invalid claim link");
-      if (tenant.founderClaimExpiresAt && tenant.founderClaimExpiresAt < new Date()) {
+      // Surface a precise message before the atomic burn (best-effort UX).
+      const peek = await tx.tenant.findUnique({ where: { slug: tenantSlug } });
+      if (!peek?.founderClaimTokenHash) throw new ClaimError("This org has already been claimed");
+      if (peek.founderClaimTokenHash !== tokenHash) throw new ClaimError("Invalid claim link");
+      if (peek.founderClaimExpiresAt && peek.founderClaimExpiresAt < new Date()) {
         throw new ClaimError("Claim link expired — contact support for a fresh one");
       }
+
+      // ATOMIC check-and-burn: only the request that flips the hash to null wins.
+      // Two concurrent valid submissions both pass the peek above, but exactly
+      // one updateMany matches the (still-set) hash → count 1; the loser gets 0.
+      const burn = await tx.tenant.updateMany({
+        where: {
+          slug: tenantSlug,
+          founderClaimTokenHash: tokenHash,
+          OR: [{ founderClaimExpiresAt: null }, { founderClaimExpiresAt: { gt: new Date() } }],
+        },
+        data: { founderClaimTokenHash: null, founderClaimExpiresAt: null },
+      });
+      if (burn.count !== 1) throw new ClaimError("This org has already been claimed");
 
       const existing = await tx.account.findUnique({
         where: { email: normalizedEmail },
@@ -43,11 +59,7 @@ export async function claimFounderSeat(input: z.infer<typeof ClaimSchema>): Prom
           data: { email: normalizedEmail, passwordHash: await hashPassword(password) },
         }));
       await tx.membership.create({
-        data: { accountId: account.id, tenantId: tenant.id, username, tier: "COMMAND" },
-      });
-      await tx.tenant.update({
-        where: { id: tenant.id },
-        data: { founderClaimTokenHash: null, founderClaimExpiresAt: null },
+        data: { accountId: account.id, tenantId: peek.id, username, tier: "COMMAND" },
       });
     });
     return { ok: true };

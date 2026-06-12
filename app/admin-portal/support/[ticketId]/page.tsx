@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prismaGlobal } from "@/lib/db";
+import { requirePlatformAdmin } from "@/lib/platform-admin";
 import { AdminReplyForm } from "./admin-reply-form";
 
 export default async function AdminTicketPage({
@@ -7,6 +8,9 @@ export default async function AdminTicketPage({
 }: {
   params: Promise<{ ticketId: string }>;
 }) {
+  // Defense in depth: the admin-portal layout already gates, but never run a
+  // tenant-spanning query without an independent admin check on the page too.
+  await requirePlatformAdmin();
   const { ticketId } = await params;
   const ticket = await prismaGlobal.supportTicket.findUnique({
     where: { id: ticketId },

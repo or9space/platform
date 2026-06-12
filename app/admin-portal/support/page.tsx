@@ -1,6 +1,8 @@
 import { prismaGlobal } from "@/lib/db";
+import { requirePlatformAdmin } from "@/lib/platform-admin";
 
 export default async function AdminSupportPage() {
+  await requirePlatformAdmin();
   const tickets = await prismaGlobal.supportTicket.findMany({
     where: { status: { not: "CLOSED" } },
     orderBy: { createdAt: "asc" },

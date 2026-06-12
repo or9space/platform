@@ -52,6 +52,23 @@ describe("claimFounderSeat", () => {
     expect(again.ok).toBe(false);
   });
 
+  it("atomic burn: two concurrent valid claims yield exactly one COMMAND founder", async () => {
+    const [a, b] = await Promise.all([
+      claimFounderSeat({
+        tenantSlug: "it-claim", token: claimToken,
+        email: "race1@it-test.example", password: "longenoughpw", username: "racer1",
+      }),
+      claimFounderSeat({
+        tenantSlug: "it-claim", token: claimToken,
+        email: "race2@it-test.example", password: "longenoughpw", username: "racer2",
+      }),
+    ]);
+    const winners = [a, b].filter((r) => r.ok).length;
+    expect(winners).toBe(1);
+    const founders = await testPrisma.membership.count({ where: { tenantId, tier: "COMMAND" } });
+    expect(founders).toBe(1);
+  });
+
   it("rejects an expired token", async () => {
     await testPrisma.tenant.update({
       where: { id: tenantId },

@@ -3,9 +3,13 @@ import { db } from "../lib/db";
 import { makeTenantContext } from "../lib/tenant";
 
 /**
- * Tenant-leak fuzzer. Seeds two tenants with marker data, then reads every
- * tenant-scoped model through db(ctx) for tenant A and asserts no tenant-B
- * marker appears anywhere in the serialized result. Exits 1 on any leak.
+ * Tenant-leak fuzzer — validates the APPLICATION-INJECTION layer (the db(ctx)
+ * where-injection proxy). It runs as the DB owner with RLS_ENABLED unset, so
+ * Postgres RLS is NOT exercised here — that layer is covered separately by
+ * tests/integration/rls-policy.test.ts (which connects as the non-BYPASSRLS
+ * app_user role). Seeds two tenants with marker data, reads every tenant-scoped
+ * model through db(ctx) for tenant A, and asserts no tenant-B marker appears in
+ * the serialized result. Exits 1 on any leak.
  *
  * Run: pnpm fuzz:leak  (uses DATABASE_URL)
  */
