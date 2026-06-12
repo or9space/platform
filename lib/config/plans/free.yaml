@@ -1,0 +1,5 @@
+features:
+  ads: true
+  fleet: false
+  tournaments: false
+  "discord.bot": false

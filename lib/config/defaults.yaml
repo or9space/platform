@@ -1,0 +1,33 @@
+branding:
+  name: "or9.space tenant"
+  preset: tactical-dark
+  fontHeading: Oswald
+  fontBody: Lora
+labels:
+  memberSingular: Member
+  memberPlural: Members
+  branchSingular: Branch
+  branchPlural: Branches
+  handbookNoun: Field Handbook
+  currencyCode: aUEC
+features:
+  forums: true
+  handbook: true
+  loot: true
+  inventory: true
+  treasury: true
+  fleet: false
+  tournaments: false
+  "calendar.googleIntegration": true
+  "discord.bot": false
+  ads: true
+integrations:
+  discord: null
+  googleCalendar: null
+customFields: {}
+domains:
+  customDomain: null
+  customDomainStatus: null
+ads:
+  slots: ["sidebar-bottom"]
+  fallbackHouseAd: true
