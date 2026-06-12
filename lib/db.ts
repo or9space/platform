@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import type { TenantContext } from "./tenant";
+import { withTenantRls } from "./rls";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
@@ -54,7 +55,8 @@ function injectTenantId(
 }
 
 export function db(ctx: TenantContext) {
-  return new Proxy(prisma as any, {
+  const target = process.env.RLS_ENABLED === "1" ? withTenantRls(prisma, ctx.tenantId) : prisma;
+  return new Proxy(target as any, {
     get(target, modelKey: ModelName) {
       const model = target[modelKey];
       if (!model || typeof model !== "object") return model;
