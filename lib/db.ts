@@ -15,7 +15,7 @@ export const GLOBAL_TABLES = [
   "accountOauth",
   "tenant",
   "pendingTenant",
-  "tenantConfig",
+  "tenantConfigOverride",
   "tenantFeatureFlag",
   "supportTicket",
   "supportMessage",

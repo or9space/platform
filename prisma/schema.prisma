@@ -19,7 +19,8 @@ model Account {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  memberships  Membership[]
+  memberships    Membership[]
+  supportTickets SupportTicket[]
 
   @@map("accounts")
 }
@@ -38,27 +39,37 @@ enum TenantPlan {
 }
 
 model Tenant {
-  id           String       @id @default(cuid())
-  slug         String       @unique @db.VarChar(60)
-  name         String       @db.VarChar(120)
-  plan         TenantPlan   @default(FREE)
-  status       TenantStatus @default(LIVE)
-  customDomain String?      @unique @map("custom_domain") @db.VarChar(200)
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
+  id                    String       @id @default(cuid())
+  slug                  String       @unique @db.VarChar(60)
+  name                  String       @db.VarChar(120)
+  plan                  TenantPlan   @default(FREE)
+  status                TenantStatus @default(LIVE)
+  customDomain          String?      @unique @map("custom_domain") @db.VarChar(200)
+  founderClaimTokenHash String?      @map("founder_claim_token_hash") @db.VarChar(64)
+  founderClaimExpiresAt DateTime?    @map("founder_claim_expires_at")
+  createdAt             DateTime     @default(now()) @map("created_at")
+  updatedAt             DateTime     @updatedAt @map("updated_at")
 
   memberships  Membership[]
 
   @@map("tenants")
 }
 
+enum RankTier {
+  ENLISTED
+  NCO
+  OFFICER
+  COMMAND
+}
+
 model Membership {
-  id           String   @id @default(cuid())
-  accountId    String   @map("account_id")
-  tenantId     String   @map("tenant_id")
-  username     String   @db.VarChar(60)
-  displayName  String?  @map("display_name") @db.VarChar(120)
-  createdAt    DateTime @default(now()) @map("created_at")
+  id          String    @id @default(cuid())
+  accountId   String    @map("account_id")
+  tenantId    String    @map("tenant_id")
+  username    String    @db.VarChar(60)
+  displayName String?   @map("display_name") @db.VarChar(120)
+  tier        RankTier  @default(ENLISTED)
+  createdAt   DateTime  @default(now()) @map("created_at")
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -67,4 +78,91 @@ model Membership {
   @@unique([accountId, tenantId])
   @@index([tenantId])
   @@map("memberships")
+}
+
+enum PendingTenantStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SupportTicketStatus {
+  OPEN
+  ANSWERED
+  CLOSED
+}
+
+model PendingTenant {
+  id             String              @id @default(cuid())
+  slug           String              @db.VarChar(60)
+  name           String              @db.VarChar(120)
+  requestedEmail String              @map("requested_email") @db.VarChar(200)
+  description    String              @db.VarChar(500)
+  status         PendingTenantStatus @default(PENDING)
+  createdAt      DateTime            @default(now()) @map("created_at")
+  decidedAt      DateTime?           @map("decided_at")
+
+  @@index([status, createdAt])
+  @@map("pending_tenants")
+}
+
+model TenantConfigOverride {
+  tenantId  String   @id @map("tenant_id")
+  json      Json     @default("{}")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("tenant_config_overrides")
+}
+
+model TenantFeatureFlag {
+  id       String  @id @default(cuid())
+  tenantId String  @map("tenant_id")
+  key      String  @db.VarChar(60)
+  enabled  Boolean
+
+  @@unique([tenantId, key])
+  @@map("tenant_feature_flags")
+}
+
+model SupportTicket {
+  id              String              @id @default(cuid())
+  accountId       String              @map("account_id")
+  tenantContextId String?             @map("tenant_context_id")
+  subject         String              @db.VarChar(200)
+  status          SupportTicketStatus @default(OPEN)
+  createdAt       DateTime            @default(now()) @map("created_at")
+  closedAt        DateTime?           @map("closed_at")
+
+  account  Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  messages SupportMessage[]
+
+  @@index([status, createdAt])
+  @@index([accountId])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id           String   @id @default(cuid())
+  ticketId     String   @map("ticket_id")
+  accountId    String   @map("account_id")
+  body         String   @db.VarChar(5000)
+  isAdminReply Boolean  @default(false) @map("is_admin_reply")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
+  @@map("support_messages")
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  tenantId       String   @map("tenant_id")
+  actorAccountId String   @map("actor_account_id")
+  action         String   @db.VarChar(80)
+  detail         Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([tenantId, createdAt])
+  @@map("audit_logs")
 }
