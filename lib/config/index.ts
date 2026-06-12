@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import yaml from "js-yaml";
 import { ConfigSchema, resolveConfigFromValues, type TenantConfig } from "./schema";
-import type { TenantPlan } from "../db";
+import { prismaGlobal, type TenantPlan } from "../db";
 
 const CONFIG_DIR = path.join(process.cwd(), "lib", "config");
 
@@ -42,4 +42,10 @@ export async function resolveTenantConfig(
   ]);
   const merged = resolveConfigFromValues(platform, planDefaults, dbOverrides);
   return ConfigSchema.parse(merged);
+}
+
+/** The tenant's admin-edited config overrides (deepest layer). */
+export async function getTenantDbOverrides(tenantId: string): Promise<Record<string, unknown>> {
+  const row = await prismaGlobal.tenantConfigOverride.findUnique({ where: { tenantId } });
+  return (row?.json as Record<string, unknown>) ?? {};
 }
