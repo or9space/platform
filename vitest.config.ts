@@ -10,6 +10,9 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     setupFiles: ["./vitest.setup.ts"],
     testTimeout: 20000,
+    // Integration suites share one Postgres; parallel workers cross-contaminate
+    // via resetDb(). The whole suite runs in ~2s, so serialize files.
+    fileParallelism: false,
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
