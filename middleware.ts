@@ -7,7 +7,7 @@ export function middleware(req: NextRequest) {
 
   if (cls.kind === "admin" || cls.kind === "support") {
     const url = req.nextUrl.clone();
-    const prefix = cls.kind === "admin" ? "/_admin" : "/_support";
+    const prefix = cls.kind === "admin" ? "/admin-portal" : "/support-portal";
     // Don't double-rewrite API/auth routes
     if (!url.pathname.startsWith("/api/") && !url.pathname.startsWith(prefix)) {
       url.pathname = `${prefix}${url.pathname === "/" ? "" : url.pathname}`;
