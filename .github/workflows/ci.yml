@@ -51,6 +51,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Lint
+        run: pnpm lint && pnpm lint:rule-test
+
       - name: Test
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/platform_test

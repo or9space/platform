@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import yaml from "js-yaml";
 import { ConfigSchema, resolveConfigFromValues, type TenantConfig } from "./schema";
-import type { TenantPlan } from "@prisma/client";
+import type { TenantPlan } from "../db";
 
 const CONFIG_DIR = path.join(process.cwd(), "lib", "config");
 
