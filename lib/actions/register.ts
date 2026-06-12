@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prismaGlobal } from "../db";
 import { hashPassword } from "../password";
 import { checkRateLimit, SIGNUP_LIMIT } from "../rate-limit";
+import { setTenantContext, accountMembershipCount } from "../rls";
 
 const RegisterSchema = z.object({
   tenantId: z.string().min(1),
@@ -36,13 +37,17 @@ export async function registerAccountWithMembership(
 
   try {
     const accountId = await prismaGlobal.$transaction(async (tx) => {
+      // RLS: this transaction reads + writes the tenant-scoped `memberships`
+      // table; set the context so it passes under app_user + FORCE RLS.
+      await setTenantContext(tx, tenantId);
       const existing = await tx.account.findUnique({
         where: { email: normalizedEmail },
-        include: { memberships: { select: { id: true } } },
       });
       if (existing) {
-        // Q13 v1: one membership per account, app-layer guard.
-        if (existing.memberships.length > 0) {
+        // Q13 v1: one membership per account. This is a CROSS-tenant check —
+        // RLS hides other tenants' memberships, so use the SECURITY DEFINER
+        // count rather than a relation include (which would only see this tenant).
+        if ((await accountMembershipCount(tx, existing.id)) > 0) {
           throw new GuardError("This email is already a member of an org on or9.space");
         }
         if (!existing.passwordHash) {

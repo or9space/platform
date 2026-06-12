@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { prismaGlobal } from "./db";
 import { sendEmail } from "./email";
+import { setTenantContext } from "./rls";
 
 const CLAIM_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -33,6 +34,8 @@ export async function provisionApprovedTenant(pendingId: string): Promise<Provis
     const tenantId = await prismaGlobal.$transaction(async (tx) => {
       const existing = await tx.tenant.findUnique({ where: { slug: pending.slug } });
       if (existing) {
+        // RLS: the membership.count below is scoped to this tenant; set context.
+        await setTenantContext(tx, existing.id);
         const claimed =
           existing.founderClaimTokenHash === null &&
           existing.founderClaimExpiresAt === null &&
