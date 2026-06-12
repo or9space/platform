@@ -12,6 +12,9 @@ export default async function HomePage() {
           <p className="text-neutral-400">
             The org HQ for serious Star Citizen crews. Coming soon.
           </p>
+          <a href="/start-org" className="inline-block rounded bg-neutral-100 px-4 py-2 font-semibold text-neutral-900">
+            Start your org
+          </a>
         </div>
       </main>
     );
