@@ -1,5 +1,5 @@
 import { getCurrentTenant } from "@/lib/server/get-tenant";
-import { resolveTenantConfig } from "@/lib/config";
+import { resolveTenantConfig, getTenantDbOverrides } from "@/lib/config";
 
 export default async function HomePage() {
   const tenant = await getCurrentTenant();
@@ -12,12 +12,15 @@ export default async function HomePage() {
           <p className="text-neutral-400">
             The org HQ for serious Star Citizen crews. Coming soon.
           </p>
+          <a href="/start-org" className="inline-block rounded bg-neutral-100 px-4 py-2 font-semibold text-neutral-900">
+            Start your org
+          </a>
         </div>
       </main>
     );
   }
 
-  const cfg = await resolveTenantConfig(tenant.plan);
+  const cfg = await resolveTenantConfig(tenant.plan, await getTenantDbOverrides(tenant.id));
 
   return (
     <main className="flex min-h-screen items-center justify-center p-8">
@@ -27,7 +30,7 @@ export default async function HomePage() {
           Tenant: <code>{tenant.slug}</code> · Plan: <code>{tenant.plan}</code>
         </p>
         <p className="text-sm text-neutral-500">
-          Phase 0 — platform skeleton. Phase 1 starts soon.
+          Phase 1 — tenant lifecycle live. <a className="underline" href="/login">Sign in</a> · <a className="underline" href="/register">Join</a>
         </p>
       </div>
     </main>

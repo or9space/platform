@@ -53,3 +53,12 @@ The closed-source `platform-paid` overlay is not available for self-host. To rep
 - Custom-domain automation: roll your own CF API client.
 
 If you build these and want to keep using upstream `platform`, ensure your overlay implements the `AdProvider` / `BillingProvider` / `DomainAttachProvider` interfaces (`lib/extensions/*-provider.ts`) and registers via `ExtensionRegistry.register(...)` at module-load time.
+
+## Row-level security (production)
+
+After running migrations, apply RLS roles + policies:
+
+    APP_USER_PASSWORD=<strong-password> pnpm db:setup-rls
+
+Then point the app's `DATABASE_URL` at the `app_user` role and set `RLS_ENABLED=1`.
+Keep `DIRECT_URL` on the superuser/owner role for migrations.

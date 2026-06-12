@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { tierRank, hasTier, type RankTier } from "@/lib/permissions";
+import { tierRank, hasTier } from "@/lib/permissions";
 
 describe("tier helpers", () => {
   it("ranks tiers in the correct order", () => {

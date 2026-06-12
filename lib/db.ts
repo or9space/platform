@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
+export type { TenantPlan } from "@prisma/client";
 import type { TenantContext } from "./tenant";
+import { withTenantRls } from "./rls";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
@@ -15,7 +17,7 @@ export const GLOBAL_TABLES = [
   "accountOauth",
   "tenant",
   "pendingTenant",
-  "tenantConfig",
+  "tenantConfigOverride",
   "tenantFeatureFlag",
   "supportTicket",
   "supportMessage",
@@ -34,27 +36,45 @@ const READ_OPS: Operation[] = [
 ];
 const WRITE_DATA_OPS: Operation[] = ["create", "createMany", "upsert"];
 
+function withTenant(obj: unknown, tenantId: string): Record<string, unknown> {
+  return { ...((obj as Record<string, unknown>) ?? {}), tenantId };
+}
+
 function injectTenantId(
   op: Operation,
   args: Record<string, unknown> | undefined,
   tenantId: string,
 ): Record<string, unknown> {
-  const a = args ?? {};
+  const a = { ...(args ?? {}) };
+
+  // upsert is special: it carries BOTH a `where` (scope the match) AND
+  // `create`/`update` payloads. Inject into all three so the created row
+  // never lands without a tenant_id (which would violate NOT NULL / RLS).
+  if (op === "upsert") {
+    return {
+      ...a,
+      where: withTenant(a.where, tenantId),
+      create: withTenant(a.create, tenantId),
+      update: a.update ?? {},
+    };
+  }
+
   if (READ_OPS.includes(op)) {
-    return { ...a, where: { ...(a.where as object ?? {}), tenantId } };
+    return { ...a, where: withTenant(a.where, tenantId) };
   }
   if (WRITE_DATA_OPS.includes(op)) {
     const data = a.data as Record<string, unknown> | undefined;
     if (Array.isArray(data)) {
       return { ...a, data: data.map((d) => ({ ...d, tenantId })) };
     }
-    return { ...a, data: { ...(data ?? {}), tenantId } };
+    return { ...a, data: withTenant(data, tenantId) };
   }
   return a;
 }
 
 export function db(ctx: TenantContext) {
-  return new Proxy(prisma as any, {
+  const target = process.env.RLS_ENABLED === "1" ? withTenantRls(prisma, ctx.tenantId) : prisma;
+  return new Proxy(target as any, {
     get(target, modelKey: ModelName) {
       const model = target[modelKey];
       if (!model || typeof model !== "object") return model;

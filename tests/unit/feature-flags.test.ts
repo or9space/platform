@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { FEATURE_FLAGS, isValidFlagKey, type FeatureFlagKey } from "@/lib/feature-flags";
+import { FEATURE_FLAGS, isValidFlagKey } from "@/lib/feature-flags";
 
 describe("feature flag registry", () => {
   it("declares all 10 v1 flags", () => {

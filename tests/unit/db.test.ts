@@ -4,16 +4,17 @@ import { describe, it, expect, vi } from "vitest";
 // vi.mock factory runs during the hoisted import phase — before normal
 // top-level `const` declarations execute. vi.hoisted() lifts the mock fns
 // alongside vi.mock so they exist when the factory references them.
-const { findManyMock, createMock } = vi.hoisted(() => ({
+const { findManyMock, createMock, upsertMock } = vi.hoisted(() => ({
   findManyMock: vi.fn(async () => [{ id: "x" }]),
   createMock: vi.fn(async (args: { data: Record<string, unknown> }) => args.data),
+  upsertMock: vi.fn(async (args: Record<string, unknown>) => args),
 }));
 
 // PrismaClient is invoked with `new`. The mock uses a regular function that
 // assigns model accessors to `this`, making it constructable under Vitest 4.
 vi.mock("@prisma/client", () => ({
   PrismaClient: vi.fn(function (this: Record<string, unknown>) {
-    this.membership = { findMany: findManyMock, create: createMock };
+    this.membership = { findMany: findManyMock, create: createMock, upsert: upsertMock };
     this.account = { findMany: findManyMock, create: createMock };
   }),
 }));
@@ -39,6 +40,20 @@ describe("db tenant indirection", () => {
     } as never);
     expect(createMock).toHaveBeenCalledWith({
       data: { accountId: "a1", username: "joe", displayName: "Joe", tenantId: "alpha" },
+    });
+  });
+
+  it("injects tenant_id into upsert where AND create (so created rows are scoped)", async () => {
+    const tenantCtx = { tenantId: "alpha" };
+    await db(tenantCtx).membership.upsert({
+      where: { tenantId_username: { tenantId: "alpha", username: "joe" } },
+      create: { accountId: "a1", username: "joe" },
+      update: { displayName: "Joe" },
+    } as never);
+    expect(upsertMock).toHaveBeenCalledWith({
+      where: { tenantId_username: { tenantId: "alpha", username: "joe" }, tenantId: "alpha" },
+      create: { accountId: "a1", username: "joe", tenantId: "alpha" },
+      update: { displayName: "Joe" },
     });
   });
 

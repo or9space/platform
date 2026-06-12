@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "lint:rule-test": "node tests/eslint/no-untenanted-query.test.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -15,30 +16,39 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --skip-seed",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "db:setup-rls": "tsx scripts/db-setup-rls.ts",
+    "fuzz:leak": "tsx scripts/tenant-leak-fuzzer.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
     "js-yaml": "^4.2.0",
     "next": "^16.2.9",
+    "next-auth": "5.0.0-beta.31",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.3.0",
+    "@types/bcryptjs": "^3.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.9.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.8",
+    "dotenv": "^17.4.2",
+    "eslint": "^10.4.1",
     "happy-dom": "^20.10.2",
     "postcss": "^8.5.15",
     "prisma": "^6.19.3",
     "tailwindcss": "^4.0.0",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.0",
     "vitest": "^4.1.8"
   }
 }
