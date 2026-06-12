@@ -1,7 +1,22 @@
+/**
+ * Edge proxy (Next 16 `proxy` convention; formerly middleware.ts).
+ *
+ * SECURITY CONTRACT — tenant identity is derived ONLY from the Host header.
+ * The inbound `x-or9-tenant` / `x-or9-host-kind` request headers are STRIPPED
+ * on every path before forwarding, because a client can set arbitrary request
+ * headers and a forged x-or9-tenant would poison app.tenant_id, defeating both
+ * the db(ctx) where-injection AND the Postgres RLS layers (they key off the
+ * same value). See the Phase 1 holistic review.
+ *
+ * FUTURE (CF Worker): if an edge Worker ever needs to inject tenant identity
+ * authoritatively (e.g. for custom domains), it MUST sign the value — e.g. set
+ * `x-or9-tenant-signed: <slug>.<hmac>` with a shared secret, and this proxy
+ * MUST verify the HMAC before trusting it. Never trust a plaintext header.
+ */
 import { NextResponse, type NextRequest } from "next/server";
 import { classifyHost } from "@/lib/host-classifier";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const cls = classifyHost(req.headers.get("host"));
 
   // SECURITY: tenant identity is derived ONLY from the Host header (the edge's
