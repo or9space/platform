@@ -1,0 +1,45 @@
+name: Nightly tenant-leak fuzz
+
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: platform_fuzz
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.3
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Generate + migrate
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/platform_fuzz
+          DIRECT_URL: postgres://postgres:postgres@localhost:5432/platform_fuzz
+        run: |
+          pnpm exec prisma generate
+          pnpm exec prisma migrate deploy
+      - name: Fuzz
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/platform_fuzz
+          DIRECT_URL: postgres://postgres:postgres@localhost:5432/platform_fuzz
+        run: pnpm fuzz:leak
