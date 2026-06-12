@@ -38,8 +38,15 @@ jobs:
         run: |
           pnpm exec prisma generate
           pnpm exec prisma migrate deploy
+      - name: Setup RLS role
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/platform_fuzz
+          DIRECT_URL: postgres://postgres:postgres@localhost:5432/platform_fuzz
+          APP_USER_PASSWORD: ci-fuzz-app-pw
+        run: pnpm db:setup-rls
       - name: Fuzz
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/platform_fuzz
           DIRECT_URL: postgres://postgres:postgres@localhost:5432/platform_fuzz
+          APP_USER_PASSWORD: ci-fuzz-app-pw
         run: pnpm fuzz:leak
