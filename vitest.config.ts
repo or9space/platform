@@ -8,6 +8,8 @@ export default defineConfig({
     environment: "happy-dom",
     globals: false,
     include: ["tests/**/*.test.ts"],
+    setupFiles: ["./vitest.setup.ts"],
+    testTimeout: 20000,
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],

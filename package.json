@@ -33,6 +33,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.8",
+    "dotenv": "^17.4.2",
     "happy-dom": "^20.10.2",
     "postcss": "^8.5.15",
     "prisma": "^6.19.3",
