@@ -16,3 +16,27 @@ DROP POLICY IF EXISTS tenant_isolation ON audit_logs;
 CREATE POLICY tenant_isolation ON audit_logs
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+-- Controlled cross-tenant read. The Q13 "one membership per account" guard is
+-- inherently cross-tenant (it asks: does this account belong to ANY org?), which
+-- RLS would otherwise hide. This SECURITY DEFINER function runs as the owner
+-- (bypassing RLS) and exposes ONLY a single integer keyed by account_id — no row
+-- data, no tenant enumeration. EXECUTE is granted to app_user only.
+CREATE OR REPLACE FUNCTION account_membership_count(p_account_id text)
+RETURNS integer
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT count(*)::int FROM memberships WHERE account_id = p_account_id;
+$$;
+
+REVOKE ALL ON FUNCTION account_membership_count(text) FROM PUBLIC;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_user') THEN
+    GRANT EXECUTE ON FUNCTION account_membership_count(text) TO app_user;
+  END IF;
+END
+$$;

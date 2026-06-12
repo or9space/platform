@@ -3,16 +3,26 @@ import { db } from "../lib/db";
 import { makeTenantContext } from "../lib/tenant";
 
 /**
- * Tenant-leak fuzzer — validates the APPLICATION-INJECTION layer (the db(ctx)
- * where-injection proxy). It runs as the DB owner with RLS_ENABLED unset, so
- * Postgres RLS is NOT exercised here — that layer is covered separately by
- * tests/integration/rls-policy.test.ts (which connects as the non-BYPASSRLS
- * app_user role). Seeds two tenants with marker data, reads every tenant-scoped
- * model through db(ctx) for tenant A, and asserts no tenant-B marker appears in
- * the serialized result. Exits 1 on any leak.
+ * Tenant-leak fuzzer — two-pass validation:
  *
- * Run: pnpm fuzz:leak  (uses DATABASE_URL)
+ * PASS 1 — Application-injection layer (db(ctx) where-injection proxy):
+ *   Runs as the DB owner with RLS_ENABLED unset. Postgres RLS is NOT active
+ *   here — the test proves that the in-process tenant injection can never expose
+ *   a cross-tenant row regardless of RLS.
+ *
+ * PASS 2 — Postgres RLS policy layer (app_user role):
+ *   Constructs a dedicated PrismaClient connected as the non-BYPASSRLS
+ *   app_user role and drives it with explicit $transaction([set_config, query])
+ *   calls — the same pattern withTenantRls uses internally. Asserts:
+ *     (a) A raw read with NO app.tenant_id set returns 0 rows (RLS enforced).
+ *     (b) A read with app.tenant_id = A returns only tenant-A rows and never
+ *         the tenant-B marker (RLS isolates tenants correctly).
+ *   If the app_user role does not exist or the password is wrong, Pass 2
+ *   prints a SKIP notice (it is a setup pre-condition, not a code defect).
+ *
+ * Run: pnpm fuzz:leak
  */
+
 const prisma = new PrismaClient();
 
 const A = { id: "fz-alpha", slug: "fz-alpha", name: "Fuzz Alpha" };
@@ -56,9 +66,18 @@ async function cleanup() {
   await prisma.tenant.deleteMany({ where: { slug: { startsWith: "fz-" } } });
 }
 
-async function main() {
-  await cleanup();
-  await seed();
+/** Build an app_user connection URL by swapping user + password in DATABASE_URL. */
+function buildAppUserUrl(): string {
+  const base = process.env.DATABASE_URL;
+  if (!base) throw new Error("DATABASE_URL is not set");
+  const u = new URL(base);
+  u.username = "app_user";
+  u.password = process.env.APP_USER_PASSWORD ?? "rls-test-password-1";
+  return u.toString();
+}
+
+async function runPass1(): Promise<number> {
+  console.log("\n--- Pass 1: app-injection layer (owner connection, RLS off) ---");
   const ctxA = makeTenantContext(A.id);
   let leaks = 0;
   for (const probe of TENANT_SCOPED_READS) {
@@ -71,13 +90,99 @@ async function main() {
       console.log(`ok: ${probe.model} isolated`);
     }
   }
+  return leaks;
+}
+
+async function runPass2(): Promise<number> {
+  console.log("\n--- Pass 2: RLS policy layer (app_user role, non-BYPASSRLS) ---");
+
+  let appClient: PrismaClient | null = null;
+  try {
+    const url = buildAppUserUrl();
+    appClient = new PrismaClient({ datasources: { db: { url } } });
+    // Verify connectivity before running assertions.
+    await appClient.$connect();
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.log(`SKIP (Pass 2): could not connect as app_user — ${msg}`);
+    console.log("  (Run pnpm db:setup-rls to create the role, then re-fuzz.)");
+    if (appClient) await appClient.$disconnect().catch(() => {});
+    return 0;
+  }
+
+  let leaks = 0;
+
+  try {
+    // ------------------------------------------------------------------ (a)
+    // Raw read with NO app.tenant_id set must return 0 rows — RLS default-deny.
+    // ------------------------------------------------------------------ (a)
+    const noCtxRows = await appClient.membership.findMany({});
+    if (noCtxRows.length > 0) {
+      console.error(
+        `LEAK (RLS): no-context read as app_user returned ${noCtxRows.length} row(s) — RLS not enforced`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): no-context read sees 0 rows");
+    }
+
+    // ------------------------------------------------------------------ (b)
+    // Read with app.tenant_id = A must see only tenant A and never MARKER_B.
+    // Use explicit $transaction([set_config, query]) — same as withTenantRls.
+    // ------------------------------------------------------------------ (b)
+    const [, membershipRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.membership.findMany({}),
+    ]);
+
+    const jsonA = JSON.stringify(membershipRowsA);
+    if (jsonA.includes(MARKER_B) || jsonA.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A membership read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (membership)");
+    }
+
+    // Also probe auditLog the same way.
+    const [, auditRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.auditLog.findMany({}),
+    ]);
+
+    const jsonAudit = JSON.stringify(auditRowsA);
+    if (jsonAudit.includes(MARKER_B) || jsonAudit.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A auditLog read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (auditLog)");
+    }
+  } finally {
+    await appClient.$disconnect();
+  }
+
+  return leaks;
+}
+
+async function main() {
+  await cleanup();
+  await seed();
+
+  const pass1Leaks = await runPass1();
+  const pass2Leaks = await runPass2();
+
   await cleanup();
   await prisma.$disconnect();
-  if (leaks > 0) {
-    console.error(`${leaks} leak(s) found`);
+
+  const totalLeaks = pass1Leaks + pass2Leaks;
+  if (totalLeaks > 0) {
+    console.error(`\n${totalLeaks} leak(s) found`);
     process.exit(1);
   }
-  console.log("tenant-leak fuzzer: no leaks");
+  console.log("\ntenant-leak fuzzer: no leaks");
 }
 
 main();

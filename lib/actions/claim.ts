@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prismaGlobal } from "../db";
 import { hashClaimToken } from "../provisioning";
 import { hashPassword } from "../password";
+import { setTenantContext, accountMembershipCount } from "../rls";
 
 const ClaimSchema = z.object({
   tenantSlug: z.string().min(1),
@@ -46,11 +47,13 @@ export async function claimFounderSeat(input: z.infer<typeof ClaimSchema>): Prom
       });
       if (burn.count !== 1) throw new ClaimError("This org has already been claimed");
 
+      // RLS context for the membership write below (peek.id is this tenant).
+      await setTenantContext(tx, peek.id);
+
       const existing = await tx.account.findUnique({
         where: { email: normalizedEmail },
-        include: { memberships: { select: { id: true } } },
       });
-      if (existing && existing.memberships.length > 0) {
+      if (existing && (await accountMembershipCount(tx, existing.id)) > 0) {
         throw new ClaimError("This email is already a member of an org — contact support");
       }
       const account =

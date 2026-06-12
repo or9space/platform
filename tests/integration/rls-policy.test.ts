@@ -80,4 +80,34 @@ describe("RLS tenant isolation (app_user role)", () => {
       ]),
     ).rejects.toThrow();
   });
+
+  it("CAN insert a membership when app.tenant_id matches (bootstrap-write path)", async () => {
+    const acc = await testPrisma.account.create({ data: { email: "boot@it-test.example" } });
+    // Mirrors what register/claim do: set context, then write — as app_user.
+    await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${TENANT_A.id}, TRUE)`,
+      appClient.membership.create({
+        data: { accountId: acc.id, tenantId: TENANT_A.id, username: "bootuser" },
+      }),
+    ]);
+    const created = await testPrisma.membership.findFirst({ where: { username: "bootuser" } });
+    expect(created?.tenantId).toBe(TENANT_A.id);
+  });
+
+  it("account_membership_count bypasses RLS to count across tenants (SECURITY DEFINER)", async () => {
+    // The probe account already has memberships in BOTH tenant A and B (seeded
+    // in beforeAll). As app_user with NO tenant context, a normal membership
+    // read sees 0 — but the SECURITY DEFINER function must still return 2.
+    const acc = await testPrisma.account.findFirstOrThrow({
+      where: { email: "rls@it-test.example" },
+    });
+    const rows = await appClient.$queryRaw<Array<{ count: number | bigint }>>`
+      SELECT account_membership_count(${acc.id}) AS count
+    `;
+    expect(Number(rows[0].count)).toBe(2);
+    // And a direct RLS-gated read with no context sees nothing — proving the
+    // function is the ONLY way app_user learns the cross-tenant fact.
+    const direct = await appClient.membership.findMany({ where: { accountId: acc.id } });
+    expect(direct.length).toBe(0);
+  });
 });
