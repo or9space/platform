@@ -62,3 +62,14 @@ After running migrations, apply RLS roles + policies:
 
 Then point the app's `DATABASE_URL` at the `app_user` role and set `RLS_ENABLED=1`.
 Keep `DIRECT_URL` on the superuser/owner role for migrations.
+
+## Scheduled jobs (cron)
+
+The platform has one recurring maintenance job. On the VPS, add a daily crontab
+entry that runs it inside the app image (so it shares the same env + DB):
+
+    # /etc/cron.d/or9-pending-cleanup  (runs 03:11 daily)
+    11 3 * * * or9 cd /opt/platform && docker run --rm --network platform_default --env-file .env platform-builder:latest sh -c "pnpm cron:pending" >> /var/log/or9-cron.log 2>&1
+
+It auto-rejects org requests left pending >30 days and emails you a digest of
+requests aged past 7 days.
