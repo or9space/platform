@@ -131,3 +131,10 @@ DROP POLICY IF EXISTS tenant_isolation ON inventory_holdings;
 CREATE POLICY tenant_isolation ON inventory_holdings
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE fleet_ships ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fleet_ships FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON fleet_ships;
+CREATE POLICY tenant_isolation ON fleet_ships
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
