@@ -2,7 +2,7 @@ import { z } from "zod";
 import { prismaGlobal } from "../db";
 import { requireTier } from "../authz";
 import { ForbiddenError } from "../permissions";
-import { isFlagAllowedForPlan } from "../paywall";
+import { isFlagAllowedForPlan, isConfigPathAllowedForPlan } from "../paywall";
 import { isValidFlagKey, FEATURE_FLAGS } from "../feature-flags";
 import { isCustomFieldEligible } from "../content-types";
 
@@ -143,5 +143,39 @@ export async function deleteCustomFieldDefCore(
     update: { json: json as never },
     create: { tenantId, json: json as never },
   });
+  return { ok: true };
+}
+
+const IntegrationsInputSchema = z.object({
+  discordGuildId: z.string().trim().max(40).nullable().optional(),
+  discordBotToken: z.string().trim().max(120).nullable().optional(),
+  calendarId: z.string().trim().max(120).nullable().optional(),
+}).strict();
+
+export async function updateIntegrationsCore(
+  tenantId: string, accountId: string, input: z.infer<typeof IntegrationsInputSchema>,
+): Promise<Result> {
+  const g = await guardCommand(tenantId, accountId); if (!g.ok) return g;
+  const parsed = IntegrationsInputSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid" };
+
+  // SECURITY: plan read server-side from the tenant row (never a client arg).
+  const tenant = await prismaGlobal.tenant.findUnique({ where: { id: tenantId }, select: { plan: true } });
+  if (!tenant) return { ok: false, error: "Org not found" };
+
+  if (parsed.data.discordBotToken != null && parsed.data.discordBotToken !== ""
+      && !isConfigPathAllowedForPlan(tenant.plan, "integrations.discord.botToken")) {
+    return { ok: false, error: "The Discord bot token requires a paid plan" };
+  }
+
+  const discord: Record<string, unknown> = {};
+  if (parsed.data.discordGuildId !== undefined) discord.guildId = parsed.data.discordGuildId;
+  if (parsed.data.discordBotToken !== undefined) discord.botToken = parsed.data.discordBotToken;
+  const integrations: Record<string, unknown> = {};
+  if (Object.keys(discord).length) integrations.discord = discord;
+  if (parsed.data.calendarId !== undefined) integrations.googleCalendar = { calendarId: parsed.data.calendarId };
+  if (!Object.keys(integrations).length) return { ok: false, error: "No changes specified" };
+
+  await patchOverrides(tenantId, { integrations });
   return { ok: true };
 }
