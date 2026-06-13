@@ -48,6 +48,8 @@ const TENANT_SCOPED_READS: Array<{ model: string; read: (ctx: any) => Promise<un
   { model: "inventoryItem", read: (ctx) => db(ctx).inventoryItem.findMany({}) },
   { model: "inventoryHolding", read: (ctx) => db(ctx).inventoryHolding.findMany({}) },
   { model: "fleetShip", read: (ctx) => db(ctx).fleetShip.findMany({}) },
+  { model: "tournament", read: (ctx) => db(ctx).tournament.findMany({}) },
+  { model: "tournamentEntry", read: (ctx) => db(ctx).tournamentEntry.findMany({}) },
 ];
 
 async function seed() {
@@ -210,6 +212,25 @@ async function seed() {
       isPublic: true,
     },
   });
+
+  // Seed tournament rows in tenant B so the tournament probes have a real marker to detect.
+  const tournamentB = await prisma.tournament.create({
+    data: {
+      tenantId: B.id,
+      name: MARKER_B,
+      status: "OPEN",
+      createdByMembershipId: membershipB.id,
+    },
+  });
+
+  await prisma.tournamentEntry.create({
+    data: {
+      tenantId: B.id,
+      tournamentId: tournamentB.id,
+      participantMembershipId: membershipB.id,
+      displayName: MARKER_B,
+    },
+  });
 }
 
 async function cleanup() {
@@ -232,6 +253,9 @@ async function cleanup() {
   await prisma.inventoryItem.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   // Fleet FK: fleetShip references membership.ownerMembershipId — delete before membership.
   await prisma.fleetShip.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  // Tournament FK order: tournamentEntry before tournament; both before membership.
+  await prisma.tournamentEntry.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.tournament.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.membership.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.account.deleteMany({ where: { email: { contains: "@fz-test." } } });
   await prisma.tenant.deleteMany({ where: { slug: { startsWith: "fz-" } } });
@@ -554,6 +578,38 @@ async function runPass2(): Promise<number> {
       leaks++;
     } else {
       console.log("ok (RLS): tenant A isolated (fleetShip)");
+    }
+
+    // Probe tournament via RLS.
+    const [, tournamentRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.tournament.findMany({}),
+    ]);
+
+    const jsonTournament = JSON.stringify(tournamentRowsA);
+    if (jsonTournament.includes(MARKER_B) || jsonTournament.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A tournament read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (tournament)");
+    }
+
+    // Probe tournamentEntry via RLS.
+    const [, tournamentEntryRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.tournamentEntry.findMany({}),
+    ]);
+
+    const jsonTournamentEntry = JSON.stringify(tournamentEntryRowsA);
+    if (jsonTournamentEntry.includes(MARKER_B) || jsonTournamentEntry.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A tournamentEntry read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (tournamentEntry)");
     }
   } finally {
     await appClient.$disconnect();
