@@ -21,6 +21,11 @@ export function MarketingNav() {
               About
             </a>
           </li>
+          <li>
+            <a href="/orgs" className="transition-colors hover:text-white">
+              Orgs
+            </a>
+          </li>
         </ul>
         <a
           href="/start-org"
