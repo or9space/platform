@@ -66,6 +66,10 @@ const LabelsSchema = z.object({
   branchPlural: z.string().max(40).optional(),
   handbookNoun: z.string().max(40).optional(),
   currencyCode: z.string().max(20).optional(),
+  rankEnlisted: z.string().max(40).optional(),
+  rankNco: z.string().max(40).optional(),
+  rankOfficer: z.string().max(40).optional(),
+  rankCommand: z.string().max(40).optional(),
 }).strict();
 
 export async function updateLabelsCore(

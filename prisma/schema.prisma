@@ -68,6 +68,8 @@ model Membership {
   tenantId    String    @map("tenant_id")
   username    String    @db.VarChar(60)
   displayName String?   @map("display_name") @db.VarChar(120)
+  bio         String?   @db.VarChar(500)
+  avatarUrl   String?   @map("avatar_url") @db.VarChar(500)
   tier        RankTier  @default(ENLISTED)
   createdAt   DateTime  @default(now()) @map("created_at")
 
