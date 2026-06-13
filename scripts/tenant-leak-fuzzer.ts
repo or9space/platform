@@ -45,6 +45,8 @@ const TENANT_SCOPED_READS: Array<{ model: string; read: (ctx: any) => Promise<un
   { model: "handbook", read: (ctx) => db(ctx).handbook.findMany({}) },
   { model: "handbookSection", read: (ctx) => db(ctx).handbookSection.findMany({}) },
   { model: "handbookAcknowledgement", read: (ctx) => db(ctx).handbookAcknowledgement.findMany({}) },
+  { model: "inventoryItem", read: (ctx) => db(ctx).inventoryItem.findMany({}) },
+  { model: "inventoryHolding", read: (ctx) => db(ctx).inventoryHolding.findMany({}) },
 ];
 
 async function seed() {
@@ -177,6 +179,25 @@ async function seed() {
       versionRead: 1,
     },
   });
+
+  // Seed inventory rows in tenant B so the inventory probes have a real marker to detect.
+  const inventoryItemB = await prisma.inventoryItem.create({
+    data: {
+      tenantId: B.id,
+      name: MARKER_B,
+      category: "WEAPON",
+      kind: "UNIQUE",
+    },
+  });
+
+  await prisma.inventoryHolding.create({
+    data: {
+      tenantId: B.id,
+      itemId: inventoryItemB.id,
+      quantity: 9,
+      state: "ACTIVE",
+    },
+  });
 }
 
 async function cleanup() {
@@ -194,6 +215,9 @@ async function cleanup() {
   await prisma.handbookAcknowledgement.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.handbookSection.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.handbook.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  // Inventory FK order: inventoryHolding before inventoryItem.
+  await prisma.inventoryHolding.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.inventoryItem.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.membership.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.account.deleteMany({ where: { email: { contains: "@fz-test." } } });
   await prisma.tenant.deleteMany({ where: { slug: { startsWith: "fz-" } } });
@@ -468,6 +492,38 @@ async function runPass2(): Promise<number> {
       leaks++;
     } else {
       console.log("ok (RLS): tenant A isolated (handbookAcknowledgement)");
+    }
+
+    // Probe inventoryItem via RLS.
+    const [, inventoryItemRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.inventoryItem.findMany({}),
+    ]);
+
+    const jsonInventoryItem = JSON.stringify(inventoryItemRowsA);
+    if (jsonInventoryItem.includes(MARKER_B) || jsonInventoryItem.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A inventoryItem read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (inventoryItem)");
+    }
+
+    // Probe inventoryHolding via RLS.
+    const [, inventoryHoldingRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.inventoryHolding.findMany({}),
+    ]);
+
+    const jsonInventoryHolding = JSON.stringify(inventoryHoldingRowsA);
+    if (jsonInventoryHolding.includes(MARKER_B) || jsonInventoryHolding.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A inventoryHolding read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (inventoryHolding)");
     }
   } finally {
     await appClient.$disconnect();
