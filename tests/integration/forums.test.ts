@@ -111,12 +111,12 @@ describe("forum write actions", () => {
 
   it("createThread rejects a category from another tenant", async () => {
     const catB = await testPrisma.forumCategory.create({ data: { tenantId: TENANT_B.id, name: "B", slug: "bcat" } });
-    const r = await createThreadCore(TENANT_A.id, mA, { categoryId: catB.id, title: "x", content: "y" });
+    const r = await createThreadCore(TENANT_A.id, mA, { categoryId: catB.id, title: "xx", content: "y" });
     expect(r.ok).toBe(false);
   });
 
   it("createPost appends; dupe guard collapses identical", async () => {
-    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "T", content: "op" });
+    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "TT", content: "op" });
     if (!th.ok) throw new Error();
     const p1 = await createPostCore(TENANT_A.id, mA, { threadId: th.threadId, content: "reply" });
     const p2 = await createPostCore(TENANT_A.id, mA, { threadId: th.threadId, content: "reply" });
@@ -126,7 +126,7 @@ describe("forum write actions", () => {
   });
 
   it("createPost rejected on a locked thread", async () => {
-    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "L", content: "op" });
+    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "LL", content: "op" });
     if (!th.ok) throw new Error();
     await testPrisma.forumThread.update({ where: { id: th.threadId }, data: { isLocked: true } });
     const r = await createPostCore(TENANT_A.id, mA, { threadId: th.threadId, content: "no" });
@@ -134,7 +134,7 @@ describe("forum write actions", () => {
   });
 
   it("editPost only by author", async () => {
-    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "E", content: "op" });
+    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "EE", content: "op" });
     if (!th.ok) throw new Error();
     const post = await testPrisma.forumPost.findFirst({ where: { threadId: th.threadId } });
     const ok = await editPostCore(TENANT_A.id, mA, post!.id, "edited");
@@ -146,7 +146,7 @@ describe("forum write actions", () => {
   });
 
   it("deletePost: author can delete a reply, but not the OP", async () => {
-    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "D", content: "op" });
+    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "DD", content: "op" });
     if (!th.ok) throw new Error();
     await createPostCore(TENANT_A.id, mA, { threadId: th.threadId, content: "reply" });
     const replyRow = await testPrisma.forumPost.findFirst({ where: { threadId: th.threadId, content: "reply" } });
@@ -158,7 +158,7 @@ describe("forum write actions", () => {
   });
 
   it("pin/lock requires OFFICER+", async () => {
-    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "P", content: "op" });
+    const th = await createThreadCore(TENANT_A.id, mA, { categoryId: catId, title: "PP", content: "op" });
     if (!th.ok) throw new Error();
     const denied = await setThreadPinLockCore(TENANT_A.id, "ENLISTED", th.threadId, { isPinned: true });
     expect(denied.ok).toBe(false);

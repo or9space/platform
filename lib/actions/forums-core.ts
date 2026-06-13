@@ -10,7 +10,7 @@ const DUPE_WINDOW_MS = 15_000;
 
 const ThreadSchema = z.object({
   categoryId: z.string().min(1),
-  title: z.string().min(1).max(200),
+  title: z.string().min(2).max(200),
   content: z.string().min(1).max(20000),
 });
 
@@ -115,21 +115,21 @@ export async function createPostCore(
   return { ok: true, postId: post.id };
 }
 
+const EditContentSchema = z.string().trim().min(1).max(20000);
+
 export async function editPostCore(
   tenantId: string,
   membershipId: string,
   postId: string,
   content: string,
 ): Promise<Result> {
-  if (content.trim().length < 1 || content.length > 20000) return { ok: false, error: "Invalid content" };
+  const parsed = EditContentSchema.safeParse(content);
+  if (!parsed.success) return { ok: false, error: "Invalid content" };
   const ctx = makeTenantContext(tenantId);
-  const post = await db(ctx).forumPost.findFirst({
-    where: { id: postId },
-    select: { authorMembershipId: true },
-  });
+  const post = await db(ctx).forumPost.findFirst({ where: { id: postId }, select: { authorMembershipId: true } });
   if (!post) return { ok: false, error: "Post not found" };
   if (post.authorMembershipId !== membershipId) return { ok: false, error: "You can only edit your own posts" };
-  await db(ctx).forumPost.update({ where: { id: postId }, data: { content: content.trim(), isEdited: true } });
+  await db(ctx).forumPost.update({ where: { id: postId }, data: { content: parsed.data, isEdited: true } });
   return { ok: true };
 }
 
@@ -146,13 +146,13 @@ export async function deletePostCore(
   });
   if (!post) return { ok: false, error: "Post not found" };
 
-  // Never allow deleting the original (first) post — delete the thread instead
-  const first = await db(ctx).forumPost.findFirst({
-    where: { threadId: post.threadId },
-    orderBy: { createdAt: "asc" },
-    select: { id: true },
+  // The original post is the oldest in the thread; it can never be deleted
+  // here (delete the thread instead). Counting older posts is invariant-safe:
+  // the genuine OP always has zero older posts.
+  const olderCount = await db(ctx).forumPost.count({
+    where: { threadId: post.threadId, createdAt: { lt: post.createdAt } },
   });
-  if (first?.id === postId) {
+  if (olderCount === 0) {
     return { ok: false, error: "Cannot delete the original post — delete the thread instead" };
   }
 
@@ -171,6 +171,9 @@ export async function setThreadPinLockCore(
   patch: { isPinned?: boolean; isLocked?: boolean },
 ): Promise<Result> {
   if (!hasTier(viewerTier, "OFFICER")) return { ok: false, error: "Requires OFFICER" };
+  if (patch.isPinned === undefined && patch.isLocked === undefined) {
+    return { ok: false, error: "No changes specified" };
+  }
   const ctx = makeTenantContext(tenantId);
   const thread = await db(ctx).forumThread.findFirst({
     where: { id: threadId },
