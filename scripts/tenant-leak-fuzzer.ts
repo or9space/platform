@@ -37,6 +37,7 @@ const TENANT_SCOPED_READS: Array<{ model: string; read: (ctx: any) => Promise<un
   { model: "forumCategory", read: (ctx) => db(ctx).forumCategory.findMany({}) },
   { model: "forumThread", read: (ctx) => db(ctx).forumThread.findMany({}) },
   { model: "forumPost", read: (ctx) => db(ctx).forumPost.findMany({}) },
+  { model: "treasuryEntry", read: (ctx) => db(ctx).treasuryEntry.findMany({}) },
 ];
 
 async function seed() {
@@ -92,12 +93,24 @@ async function seed() {
       content: MARKER_B,
     },
   });
+
+  await prisma.treasuryEntry.create({
+    data: {
+      tenantId: B.id,
+      authorMembershipId: membershipB.id,
+      type: "INCOME",
+      category: "DONATION",
+      amount: 999,
+      description: MARKER_B,
+    },
+  });
 }
 
 async function cleanup() {
   await prisma.forumPost.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.forumThread.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.forumCategory.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.treasuryEntry.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.auditLog.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.membership.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.account.deleteMany({ where: { email: { contains: "@fz-test." } } });
@@ -245,6 +258,22 @@ async function runPass2(): Promise<number> {
       leaks++;
     } else {
       console.log("ok (RLS): tenant A isolated (forumPost)");
+    }
+
+    // Probe treasuryEntry via RLS.
+    const [, treasuryRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.treasuryEntry.findMany({}),
+    ]);
+
+    const jsonTreasury = JSON.stringify(treasuryRowsA);
+    if (jsonTreasury.includes(MARKER_B) || jsonTreasury.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A treasuryEntry read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (treasuryEntry)");
     }
   } finally {
     await appClient.$disconnect();
