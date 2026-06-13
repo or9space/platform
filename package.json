@@ -19,7 +19,8 @@
     "db:seed": "tsx scripts/seed.ts",
     "db:setup-rls": "tsx scripts/db-setup-rls.ts",
     "fuzz:leak": "tsx scripts/tenant-leak-fuzzer.ts",
-    "cron:pending": "tsx scripts/cron-pending-cleanup.ts"
+    "cron:pending": "tsx scripts/cron-pending-cleanup.ts",
+    "migrate:fg": "tsx scripts/migrate-fg.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
