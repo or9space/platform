@@ -82,6 +82,7 @@ model Membership {
   lootMember      LootMember[]  @relation("lootMember")
   handbookAcks    HandbookAcknowledgement[] @relation("handbookAcks")
   heldInventory   InventoryHolding[] @relation("heldInventory")
+  fleetShips      FleetShip[]   @relation("fleetShips")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])
@@ -465,4 +466,26 @@ model HandbookAcknowledgement {
   @@unique([handbookId, membershipId])
   @@index([tenantId, membershipId])
   @@map("handbook_acknowledgements")
+}
+
+// === Tenant-scoped: Fleet ===
+
+model FleetShip {
+  id                String   @id @default(cuid())
+  tenantId          String   @map("tenant_id")
+  ownerMembershipId String   @map("owner_membership_id")
+  shipName          String   @db.VarChar(160)
+  manufacturer      String?  @db.VarChar(120)
+  imageUrl          String?  @db.VarChar(500)
+  notes             String?  @db.VarChar(500)
+  quantity          Int      @default(1)
+  isPublic          Boolean  @default(true) @map("is_public")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  owner Membership @relation("fleetShips", fields: [ownerMembershipId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, isPublic])
+  @@index([tenantId, ownerMembershipId])
+  @@map("fleet_ships")
 }
