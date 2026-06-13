@@ -96,3 +96,24 @@ DROP POLICY IF EXISTS tenant_isolation ON loot_transactions;
 CREATE POLICY tenant_isolation ON loot_transactions
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE handbooks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE handbooks FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON handbooks;
+CREATE POLICY tenant_isolation ON handbooks
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE handbook_sections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE handbook_sections FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON handbook_sections;
+CREATE POLICY tenant_isolation ON handbook_sections
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE handbook_acknowledgements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE handbook_acknowledgements FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON handbook_acknowledgements;
+CREATE POLICY tenant_isolation ON handbook_acknowledgements
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

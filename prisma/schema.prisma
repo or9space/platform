@@ -80,6 +80,7 @@ model Membership {
   authoredPosts   ForumPost[]   @relation("postAuthor")
   treasuryEntries TreasuryEntry[] @relation("treasuryAuthor")
   lootMember      LootMember[]  @relation("lootMember")
+  handbookAcks    HandbookAcknowledgement[] @relation("handbookAcks")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])
@@ -346,4 +347,61 @@ model LootTransaction {
 
   @@index([tenantId, memberId, createdAt])
   @@map("loot_transactions")
+}
+
+// === Tenant-scoped: Handbook ===
+
+enum HandbookStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Handbook {
+  id        String         @id @default(cuid())
+  tenantId  String         @map("tenant_id")
+  slug      String         @db.VarChar(60)
+  title     String         @db.VarChar(160)
+  subtitle  String?        @db.VarChar(300)
+  version   Int            @default(1)
+  status    HandbookStatus @default(DRAFT)
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  sections         HandbookSection[]
+  acknowledgements HandbookAcknowledgement[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, status])
+  @@map("handbooks")
+}
+
+model HandbookSection {
+  id         String  @id @default(cuid())
+  tenantId   String  @map("tenant_id")
+  handbookId String  @map("handbook_id")
+  title      String  @db.VarChar(200)
+  body       String  @db.Text
+  orderIndex Int     @map("order_index")
+
+  handbook Handbook @relation(fields: [handbookId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, handbookId, orderIndex])
+  @@map("handbook_sections")
+}
+
+model HandbookAcknowledgement {
+  id             String   @id @default(cuid())
+  tenantId       String   @map("tenant_id")
+  handbookId     String   @map("handbook_id")
+  membershipId   String   @map("membership_id")
+  versionRead    Int      @map("version_read")
+  acknowledgedAt DateTime @default(now()) @map("acknowledged_at")
+
+  handbook   Handbook   @relation(fields: [handbookId], references: [id], onDelete: Cascade)
+  membership Membership @relation("handbookAcks", fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([handbookId, membershipId])
+  @@index([tenantId, membershipId])
+  @@map("handbook_acknowledgements")
 }
