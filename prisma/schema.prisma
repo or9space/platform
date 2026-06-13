@@ -81,6 +81,7 @@ model Membership {
   treasuryEntries TreasuryEntry[] @relation("treasuryAuthor")
   lootMember      LootMember[]  @relation("lootMember")
   handbookAcks    HandbookAcknowledgement[] @relation("handbookAcks")
+  heldInventory   InventoryHolding[] @relation("heldInventory")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])
@@ -347,6 +348,66 @@ model LootTransaction {
 
   @@index([tenantId, memberId, createdAt])
   @@map("loot_transactions")
+}
+
+// === Tenant-scoped: Inventory ===
+
+enum InventoryCategory {
+  WEAPON
+  ARMOR
+  SHIP_COMPONENT
+  CONSUMABLE
+  AMMO
+  ATTACHMENT
+  CONTAINER
+  MISC
+}
+
+enum InventoryKind {
+  UNIQUE
+  FUNGIBLE
+}
+
+enum HoldingState {
+  ACTIVE
+  LOST
+  DESTROYED
+  RETIRED
+}
+
+model InventoryItem {
+  id          String            @id @default(cuid())
+  tenantId    String            @map("tenant_id")
+  name        String            @db.VarChar(160)
+  category    InventoryCategory @default(MISC)
+  kind        InventoryKind     @default(UNIQUE)
+  description String?           @db.VarChar(1000)
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  holdings InventoryHolding[]
+
+  @@index([tenantId, category])
+  @@index([tenantId, name])
+  @@map("inventory_items")
+}
+
+model InventoryHolding {
+  id                    String       @id @default(cuid())
+  tenantId              String       @map("tenant_id")
+  itemId                String       @map("item_id")
+  custodianMembershipId String?      @map("custodian_membership_id")
+  quantity              Int          @default(1)
+  state                 HoldingState @default(ACTIVE)
+  notes                 String?      @db.VarChar(500)
+  createdAt             DateTime     @default(now()) @map("created_at")
+  updatedAt             DateTime     @updatedAt @map("updated_at")
+
+  item      InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  custodian Membership?   @relation("heldInventory", fields: [custodianMembershipId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, itemId])
+  @@index([tenantId, state])
+  @@map("inventory_holdings")
 }
 
 // === Tenant-scoped: Handbook ===

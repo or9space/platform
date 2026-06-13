@@ -117,3 +117,17 @@ DROP POLICY IF EXISTS tenant_isolation ON handbook_acknowledgements;
 CREATE POLICY tenant_isolation ON handbook_acknowledgements
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE inventory_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inventory_items FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON inventory_items;
+CREATE POLICY tenant_isolation ON inventory_items
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE inventory_holdings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inventory_holdings FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON inventory_holdings;
+CREATE POLICY tenant_isolation ON inventory_holdings
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
