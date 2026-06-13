@@ -4,6 +4,7 @@ import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { isFeatureEnabled } from "@/lib/features";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
+import { TenantNav } from "@/components/tenant-nav";
 
 export default async function FleetLayout({ children }: { children: ReactNode }) {
   const ctx = await getFullTenantContext();
@@ -15,15 +16,7 @@ export default async function FleetLayout({ children }: { children: ReactNode })
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-neutral-800 p-4">
-        <nav className="flex gap-6 text-sm">
-          <a href="/fleet" className="font-bold">
-            Fleet
-          </a>
-          <a href="/members" className="text-neutral-400 hover:text-neutral-100">Members</a>
-          <a href="/forums" className="text-neutral-400 hover:text-neutral-100">Forums</a>
-        </nav>
-      </header>
+      <TenantNav active="fleet" />
       {children}
     </div>
   );
