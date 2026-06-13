@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, afterAll } from "vitest";
 import { makeTenantContext } from "@/lib/tenant";
 import { listItems, getItem, listHoldings, listHoldingsByItem } from "@/lib/queries/inventory";
 import { testPrisma, seedTwoTenants, resetDb, closeDb, TENANT_A, TENANT_B } from "./setup";
+import {
+  createItemCore, updateItemCore, deleteItemCore,
+  createHoldingCore, updateHoldingCore,
+} from "@/lib/actions/inventory-core";
 
 const ctxA = makeTenantContext(TENANT_A.id);
 
@@ -78,5 +82,90 @@ describe("inventory queries", () => {
     const rows = await listHoldingsByItem(ctxA, i1.id);
     expect(rows).toHaveLength(1);
     expect(rows[0].quantity).toBe(2);
+  });
+});
+
+describe("inventory write actions", () => {
+  beforeEach(async () => {
+    await resetDb();
+    await testPrisma.inventoryHolding.deleteMany({});
+    await testPrisma.inventoryItem.deleteMany({});
+    await seedTwoTenants();
+  });
+  afterAll(async () => { await resetDb(); await closeDb(); });
+
+  it("OFFICER creates an item; ENLISTED cannot", async () => {
+    const denied = await createItemCore(TENANT_A.id, "x", "ENLISTED", { name: "Gun", category: "WEAPON", kind: "UNIQUE" });
+    expect(denied.ok).toBe(false);
+    const ok = await createItemCore(TENANT_A.id, "x", "OFFICER", { name: "Gun", category: "WEAPON", kind: "UNIQUE" });
+    expect(ok.ok).toBe(true);
+  });
+
+  it("createItem rejects an invalid category/kind", async () => {
+    expect((await createItemCore(TENANT_A.id, "x", "OFFICER", { name: "Gun", category: "LASER" as never, kind: "UNIQUE" })).ok).toBe(false);
+    expect((await createItemCore(TENANT_A.id, "x", "OFFICER", { name: "Gun", category: "WEAPON", kind: "INFINITE" as never })).ok).toBe(false);
+  });
+
+  it("updateItem changes fields (OFFICER)", async () => {
+    const i = await mkItem(TENANT_A.id, "Gun");
+    const r = await updateItemCore(TENANT_A.id, "x", "OFFICER", i.id, { name: "Big Gun", category: "ARMOR" });
+    expect(r.ok).toBe(true);
+    const row = await testPrisma.inventoryItem.findUnique({ where: { id: i.id } });
+    expect(row?.name).toBe("Big Gun");
+    expect(row?.category).toBe("ARMOR");
+  });
+
+  it("deleteItem requires COMMAND + writes audit (cascades holdings)", async () => {
+    const i = await mkItem(TENANT_A.id, "Gun");
+    await mkHolding(TENANT_A.id, i.id, 2);
+    const denied = await deleteItemCore(TENANT_A.id, "x", "acc-x", "OFFICER", i.id);
+    expect(denied.ok).toBe(false);
+    const ok = await deleteItemCore(TENANT_A.id, "x", "acc-x", "COMMAND", i.id);
+    expect(ok.ok).toBe(true);
+    expect(await testPrisma.inventoryItem.count({ where: { tenantId: TENANT_A.id } })).toBe(0);
+    expect(await testPrisma.inventoryHolding.count({ where: { tenantId: TENANT_A.id } })).toBe(0);
+    const audit = await testPrisma.auditLog.findFirst({ where: { tenantId: TENANT_A.id, action: "inventory.item.delete" } });
+    expect(audit).not.toBeNull();
+  });
+
+  it("createHolding OFFICER+; quantity positive; default ACTIVE", async () => {
+    const i = await mkItem(TENANT_A.id, "Gun");
+    const bad = await createHoldingCore(TENANT_A.id, "x", "OFFICER", { itemId: i.id, quantity: 0 });
+    expect(bad.ok).toBe(false);
+    const r = await createHoldingCore(TENANT_A.id, "x", "OFFICER", { itemId: i.id, quantity: 3 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) throw new Error();
+    const h = await testPrisma.inventoryHolding.findUnique({ where: { id: r.holdingId } });
+    expect(h?.quantity).toBe(3);
+    expect(h?.state).toBe("ACTIVE");
+  });
+
+  it("createHolding rejects a custodian from another tenant", async () => {
+    const i = await mkItem(TENANT_A.id, "Gun");
+    const bMember = await mkMembership(TENANT_B.id, "bguy");
+    const r = await createHoldingCore(TENANT_A.id, "x", "OFFICER", { itemId: i.id, quantity: 1, custodianMembershipId: bMember.id });
+    expect(r.ok).toBe(false);
+  });
+
+  it("createHolding rejects an item from another tenant", async () => {
+    const bItem = await mkItem(TENANT_B.id, "BRAVO");
+    const r = await createHoldingCore(TENANT_A.id, "x", "OFFICER", { itemId: bItem.id, quantity: 1 });
+    expect(r.ok).toBe(false);
+  });
+
+  it("updateHolding changes quantity/state (OFFICER)", async () => {
+    const i = await mkItem(TENANT_A.id, "Gun");
+    const h = await mkHolding(TENANT_A.id, i.id, 1);
+    const r = await updateHoldingCore(TENANT_A.id, "x", "OFFICER", h.id, { quantity: 5, state: "LOST" });
+    expect(r.ok).toBe(true);
+    const row = await testPrisma.inventoryHolding.findUnique({ where: { id: h.id } });
+    expect(row?.quantity).toBe(5);
+    expect(row?.state).toBe("LOST");
+  });
+
+  it("cannot update an item in another tenant", async () => {
+    const bItem = await mkItem(TENANT_B.id, "BRAVO");
+    const r = await updateItemCore(TENANT_A.id, "x", "OFFICER", bItem.id, { name: "hijack" });
+    expect(r.ok).toBe(false);
   });
 });
