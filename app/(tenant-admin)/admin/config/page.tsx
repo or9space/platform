@@ -1,5 +1,8 @@
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { notFound } from "next/navigation";
+import { getSessionAccountId } from "@/lib/auth";
+import { getViewerMembership } from "@/lib/authz";
+import { hasTier } from "@/lib/permissions";
 import { FEATURE_FLAGS } from "@/lib/feature-flags";
 import { CUSTOM_FIELD_ELIGIBLE_TYPES } from "@/lib/content-types";
 import { BrandingForm } from "./branding-form";
@@ -11,6 +14,13 @@ export default async function ConfigPage() {
   const ctx = await getFullTenantContext();
   if (!ctx) notFound();
   const { tenant, config, features } = ctx;
+
+  // The layout already shows the COMMAND wall, but this page is a separate
+  // server component whose config data would otherwise stream into the RSC
+  // payload for non-COMMAND members. Guard here so it never runs for them.
+  const m = await getViewerMembership(tenant.id, await getSessionAccountId());
+  if (!m || !hasTier(m.tier, "COMMAND")) return null;
+
   return (
     <div className="space-y-10">
       <section>
