@@ -4,7 +4,7 @@ import { revalidateTag } from "next/cache";
 import { getSessionAccountId } from "../auth";
 import {
   updateBrandingCore, updateLabelsCore, setFeatureFlagCore,
-  upsertCustomFieldDefCore, deleteCustomFieldDefCore,
+  upsertCustomFieldDefCore, deleteCustomFieldDefCore, updateIntegrationsCore,
 } from "./tenant-config-core";
 
 async function acct(): Promise<string | null> { return getSessionAccountId(); }
@@ -31,4 +31,8 @@ export async function upsertCustomFieldDefAction(tenantId: string, typeName: str
 export async function deleteCustomFieldDefAction(tenantId: string, typeName: string, key: string) {
   const a = await acct(); if (!a) return { ok: false as const, error: "Sign in required" };
   const r = await deleteCustomFieldDefCore(tenantId, a, typeName, key); if (r.ok) bust(tenantId); return r;
+}
+export async function updateIntegrationsAction(tenantId: string, input: { discordGuildId?: string | null; discordBotToken?: string | null; calendarId?: string | null }) {
+  const a = await acct(); if (!a) return { ok: false as const, error: "Sign in required" };
+  const r = await updateIntegrationsCore(tenantId, a, input as never); if (r.ok) bust(tenantId); return r;
 }

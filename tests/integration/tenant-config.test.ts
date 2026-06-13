@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterAll } from "vitest";
 import {
-  updateBrandingCore, setFeatureFlagCore, upsertCustomFieldDefCore,
+  updateBrandingCore, setFeatureFlagCore, upsertCustomFieldDefCore, updateIntegrationsCore,
 } from "@/lib/actions/tenant-config-core";
 import { testPrisma, seedTwoTenants, resetDb, closeDb, TENANT_A } from "./setup";
 
@@ -101,6 +101,48 @@ describe("tenant-config write actions", () => {
   it("custom field def: rejects an ineligible type (forum_post)", async () => {
     const cmd = await commandAccount(TENANT_A.id);
     const r = await upsertCustomFieldDefCore(TENANT_A.id, cmd, "forum_post" as any, { key: "x", label: "X", kind: "text" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("COMMAND sets discord.guildId + calendarId (any plan)", async () => {
+    const cmd = await commandAccount(TENANT_A.id);
+    const r = await updateIntegrationsCore(TENANT_A.id, cmd, { discordGuildId: "123", calendarId: "cal@grp" });
+    expect(r.ok).toBe(true);
+    const row = await testPrisma.tenantConfigOverride.findUnique({ where: { tenantId: TENANT_A.id } });
+    expect((row?.json as any).integrations.discord.guildId).toBe("123");
+    expect((row?.json as any).integrations.googleCalendar.calendarId).toBe("cal@grp");
+  });
+
+  it("integrations: ENLISTED is rejected", async () => {
+    const enl = await enlistedAccount(TENANT_A.id);
+    const r = await updateIntegrationsCore(TENANT_A.id, enl, { discordGuildId: "x" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("FREE tenant cannot set discord.botToken (paywall); PAID can", async () => {
+    const cmd = await commandAccount(TENANT_A.id);
+    const denied = await updateIntegrationsCore(TENANT_A.id, cmd, { discordBotToken: "secret-token" });
+    expect(denied.ok).toBe(false);
+    expect(denied.error).toMatch(/paid/i);
+    await testPrisma.tenant.update({ where: { id: TENANT_A.id }, data: { plan: "PAID" } });
+    const ok = await updateIntegrationsCore(TENANT_A.id, cmd, { discordBotToken: "secret-token" });
+    expect(ok.ok).toBe(true);
+    const row = await testPrisma.tenantConfigOverride.findUnique({ where: { tenantId: TENANT_A.id } });
+    expect((row?.json as any).integrations.discord.botToken).toBe("secret-token");
+  });
+
+  it("integrations: deep-merge preserves a previously-set guildId when later setting only calendarId", async () => {
+    const cmd = await commandAccount(TENANT_A.id);
+    await updateIntegrationsCore(TENANT_A.id, cmd, { discordGuildId: "keep-me" });
+    await updateIntegrationsCore(TENANT_A.id, cmd, { calendarId: "cal2" });
+    const row = await testPrisma.tenantConfigOverride.findUnique({ where: { tenantId: TENANT_A.id } });
+    expect((row?.json as any).integrations.discord.guildId).toBe("keep-me");
+    expect((row?.json as any).integrations.googleCalendar.calendarId).toBe("cal2");
+  });
+
+  it("integrations: rejects an over-long guildId", async () => {
+    const cmd = await commandAccount(TENANT_A.id);
+    const r = await updateIntegrationsCore(TENANT_A.id, cmd, { discordGuildId: "x".repeat(200) });
     expect(r.ok).toBe(false);
   });
 });
