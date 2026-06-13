@@ -42,6 +42,9 @@ const TENANT_SCOPED_READS: Array<{ model: string; read: (ctx: any) => Promise<un
   { model: "lootSession", read: (ctx) => db(ctx).lootSession.findMany({}) },
   { model: "lootAttendance", read: (ctx) => db(ctx).lootAttendance.findMany({}) },
   { model: "lootTransaction", read: (ctx) => db(ctx).lootTransaction.findMany({}) },
+  { model: "handbook", read: (ctx) => db(ctx).handbook.findMany({}) },
+  { model: "handbookSection", read: (ctx) => db(ctx).handbookSection.findMany({}) },
+  { model: "handbookAcknowledgement", read: (ctx) => db(ctx).handbookAcknowledgement.findMany({}) },
 ];
 
 async function seed() {
@@ -145,6 +148,35 @@ async function seed() {
       createdByMembershipId: membershipB.id,
     },
   });
+
+  // Seed handbook rows in tenant B so the handbook probes have a real marker to detect.
+  const handbookB = await prisma.handbook.create({
+    data: {
+      tenantId: B.id,
+      slug: "marker-b",
+      title: "MARKER_B",
+      status: "PUBLISHED",
+    },
+  });
+
+  await prisma.handbookSection.create({
+    data: {
+      tenantId: B.id,
+      handbookId: handbookB.id,
+      title: "MARKER_B",
+      body: "x",
+      orderIndex: 1,
+    },
+  });
+
+  await prisma.handbookAcknowledgement.create({
+    data: {
+      tenantId: B.id,
+      handbookId: handbookB.id,
+      membershipId: membershipB.id,
+      versionRead: 1,
+    },
+  });
 }
 
 async function cleanup() {
@@ -158,6 +190,10 @@ async function cleanup() {
   await prisma.lootSession.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.lootMember.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.auditLog.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  // Handbook FK order: handbookAcknowledgement + handbookSection before handbook, then membership.
+  await prisma.handbookAcknowledgement.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.handbookSection.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.handbook.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.membership.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.account.deleteMany({ where: { email: { contains: "@fz-test." } } });
   await prisma.tenant.deleteMany({ where: { slug: { startsWith: "fz-" } } });
@@ -384,6 +420,54 @@ async function runPass2(): Promise<number> {
       leaks++;
     } else {
       console.log("ok (RLS): tenant A isolated (lootTransaction)");
+    }
+
+    // Probe handbook via RLS.
+    const [, handbookRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.handbook.findMany({}),
+    ]);
+
+    const jsonHandbook = JSON.stringify(handbookRowsA);
+    if (jsonHandbook.includes(MARKER_B) || jsonHandbook.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A handbook read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (handbook)");
+    }
+
+    // Probe handbookSection via RLS.
+    const [, handbookSectionRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.handbookSection.findMany({}),
+    ]);
+
+    const jsonHandbookSection = JSON.stringify(handbookSectionRowsA);
+    if (jsonHandbookSection.includes(MARKER_B) || jsonHandbookSection.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A handbookSection read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (handbookSection)");
+    }
+
+    // Probe handbookAcknowledgement via RLS.
+    const [, handbookAckRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.handbookAcknowledgement.findMany({}),
+    ]);
+
+    const jsonHandbookAck = JSON.stringify(handbookAckRowsA);
+    if (jsonHandbookAck.includes(MARKER_B) || jsonHandbookAck.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A handbookAcknowledgement read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (handbookAcknowledgement)");
     }
   } finally {
     await appClient.$disconnect();
