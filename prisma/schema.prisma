@@ -44,6 +44,8 @@ model Tenant {
   name                  String       @db.VarChar(120)
   plan                  TenantPlan   @default(FREE)
   status                TenantStatus @default(LIVE)
+  isListed              Boolean      @default(false) @map("is_listed")
+  tagline               String?      @db.VarChar(200)
   customDomain          String?      @unique @map("custom_domain") @db.VarChar(200)
   founderClaimTokenHash String?      @map("founder_claim_token_hash") @db.VarChar(64)
   founderClaimExpiresAt DateTime?    @map("founder_claim_expires_at")
