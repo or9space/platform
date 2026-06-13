@@ -47,6 +47,7 @@ const TENANT_SCOPED_READS: Array<{ model: string; read: (ctx: any) => Promise<un
   { model: "handbookAcknowledgement", read: (ctx) => db(ctx).handbookAcknowledgement.findMany({}) },
   { model: "inventoryItem", read: (ctx) => db(ctx).inventoryItem.findMany({}) },
   { model: "inventoryHolding", read: (ctx) => db(ctx).inventoryHolding.findMany({}) },
+  { model: "fleetShip", read: (ctx) => db(ctx).fleetShip.findMany({}) },
 ];
 
 async function seed() {
@@ -198,6 +199,17 @@ async function seed() {
       state: "ACTIVE",
     },
   });
+
+  // Seed fleet row in tenant B so the fleetShip probe has a real marker to detect.
+  await prisma.fleetShip.create({
+    data: {
+      tenantId: B.id,
+      ownerMembershipId: membershipB.id,
+      shipName: "MARKER_B",
+      quantity: 1,
+      isPublic: true,
+    },
+  });
 }
 
 async function cleanup() {
@@ -218,6 +230,8 @@ async function cleanup() {
   // Inventory FK order: inventoryHolding before inventoryItem.
   await prisma.inventoryHolding.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.inventoryItem.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  // Fleet FK: fleetShip references membership.ownerMembershipId — delete before membership.
+  await prisma.fleetShip.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.membership.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.account.deleteMany({ where: { email: { contains: "@fz-test." } } });
   await prisma.tenant.deleteMany({ where: { slug: { startsWith: "fz-" } } });
@@ -524,6 +538,22 @@ async function runPass2(): Promise<number> {
       leaks++;
     } else {
       console.log("ok (RLS): tenant A isolated (inventoryHolding)");
+    }
+
+    // Probe fleetShip via RLS.
+    const [, fleetShipRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.fleetShip.findMany({}),
+    ]);
+
+    const jsonFleetShip = JSON.stringify(fleetShipRowsA);
+    if (jsonFleetShip.includes(MARKER_B) || jsonFleetShip.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A fleetShip read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (fleetShip)");
     }
   } finally {
     await appClient.$disconnect();
