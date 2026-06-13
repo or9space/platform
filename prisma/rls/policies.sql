@@ -138,3 +138,17 @@ DROP POLICY IF EXISTS tenant_isolation ON fleet_ships;
 CREATE POLICY tenant_isolation ON fleet_ships
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE tournaments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tournaments FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON tournaments;
+CREATE POLICY tenant_isolation ON tournaments
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE tournament_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tournament_entries FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON tournament_entries;
+CREATE POLICY tenant_isolation ON tournament_entries
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
