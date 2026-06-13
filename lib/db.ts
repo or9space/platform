@@ -72,6 +72,16 @@ function injectTenantId(
   return a;
 }
 
+/**
+ * Tenant-scoped Prisma accessor. Auto-injects `tenant_id` into the TOP-LEVEL
+ * where/data/create payloads of each operation.
+ *
+ * SECURITY — nested writes are NOT covered: a nested relation create such as
+ * `forumThread.create({ data: { posts: { create: {...} } } })` only gets
+ * tenant_id injected on the top-level row. Callers MUST set `tenantId`
+ * explicitly inside every nested `create` payload, or the row lands without a
+ * tenant and (when RLS_ENABLED=1) is rejected by the Postgres WITH CHECK.
+ */
 export function db(ctx: TenantContext) {
   const target = process.env.RLS_ENABLED === "1" ? withTenantRls(prisma, ctx.tenantId) : prisma;
   return new Proxy(target as any, {

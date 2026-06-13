@@ -34,6 +34,9 @@ const MARKER_B = "FZMARKER_BRAVO_SECRET";
 const TENANT_SCOPED_READS: Array<{ model: string; read: (ctx: any) => Promise<unknown> }> = [
   { model: "membership", read: (ctx) => db(ctx).membership.findMany({}) },
   { model: "auditLog", read: (ctx) => db(ctx).auditLog.findMany({}) },
+  { model: "forumCategory", read: (ctx) => db(ctx).forumCategory.findMany({}) },
+  { model: "forumThread", read: (ctx) => db(ctx).forumThread.findMany({}) },
+  { model: "forumPost", read: (ctx) => db(ctx).forumPost.findMany({}) },
 ];
 
 async function seed() {
@@ -57,9 +60,44 @@ async function seed() {
   await prisma.auditLog.create({
     data: { tenantId: B.id, actorAccountId: acc.id, action: MARKER_B, detail: {} },
   });
+
+  // Seed forum rows in tenant B so the forum probes have a real marker to detect.
+  const membershipB = await prisma.membership.findUniqueOrThrow({
+    where: { tenantId_username: { tenantId: B.id, username: MARKER_B } },
+  });
+
+  const categoryB = await prisma.forumCategory.create({
+    data: {
+      tenantId: B.id,
+      name: MARKER_B,
+      slug: "fz-marker-bravo",
+      sortOrder: 0,
+    },
+  });
+
+  const threadB = await prisma.forumThread.create({
+    data: {
+      tenantId: B.id,
+      categoryId: categoryB.id,
+      authorMembershipId: membershipB.id,
+      title: MARKER_B,
+    },
+  });
+
+  await prisma.forumPost.create({
+    data: {
+      tenantId: B.id,
+      threadId: threadB.id,
+      authorMembershipId: membershipB.id,
+      content: MARKER_B,
+    },
+  });
 }
 
 async function cleanup() {
+  await prisma.forumPost.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.forumThread.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.forumCategory.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.auditLog.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.membership.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.account.deleteMany({ where: { email: { contains: "@fz-test." } } });
@@ -159,6 +197,54 @@ async function runPass2(): Promise<number> {
       leaks++;
     } else {
       console.log("ok (RLS): tenant A isolated (auditLog)");
+    }
+
+    // Probe forumCategory via RLS.
+    const [, categoryRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.forumCategory.findMany({}),
+    ]);
+
+    const jsonCategory = JSON.stringify(categoryRowsA);
+    if (jsonCategory.includes(MARKER_B) || jsonCategory.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A forumCategory read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (forumCategory)");
+    }
+
+    // Probe forumThread via RLS.
+    const [, threadRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.forumThread.findMany({}),
+    ]);
+
+    const jsonThread = JSON.stringify(threadRowsA);
+    if (jsonThread.includes(MARKER_B) || jsonThread.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A forumThread read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (forumThread)");
+    }
+
+    // Probe forumPost via RLS.
+    const [, postRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.forumPost.findMany({}),
+    ]);
+
+    const jsonPost = JSON.stringify(postRowsA);
+    if (jsonPost.includes(MARKER_B) || jsonPost.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A forumPost read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (forumPost)");
     }
   } finally {
     await appClient.$disconnect();
