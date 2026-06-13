@@ -40,3 +40,24 @@ BEGIN
   END IF;
 END
 $$;
+
+ALTER TABLE forum_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE forum_categories FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON forum_categories;
+CREATE POLICY tenant_isolation ON forum_categories
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE forum_threads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE forum_threads FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON forum_threads;
+CREATE POLICY tenant_isolation ON forum_threads
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE forum_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE forum_posts FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON forum_posts;
+CREATE POLICY tenant_isolation ON forum_posts
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

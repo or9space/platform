@@ -74,6 +74,9 @@ model Membership {
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
+  authoredThreads ForumThread[] @relation("threadAuthor")
+  authoredPosts   ForumPost[]   @relation("postAuthor")
+
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])
   @@index([tenantId])
@@ -165,4 +168,61 @@ model AuditLog {
 
   @@index([tenantId, createdAt])
   @@map("audit_logs")
+}
+
+// === Tenant-scoped: Forums ===
+
+model ForumCategory {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  name        String   @db.VarChar(120)
+  slug        String   @db.VarChar(60)
+  description String?  @db.VarChar(500)
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  threads ForumThread[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, sortOrder])
+  @@map("forum_categories")
+}
+
+model ForumThread {
+  id                 String    @id @default(cuid())
+  tenantId           String    @map("tenant_id")
+  categoryId         String    @map("category_id")
+  authorMembershipId String    @map("author_membership_id")
+  title              String    @db.VarChar(200)
+  isPinned           Boolean   @default(false) @map("is_pinned")
+  isLocked           Boolean   @default(false) @map("is_locked")
+  viewCount          Int       @default(0) @map("view_count")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  lastPostAt         DateTime? @map("last_post_at")
+
+  category ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  author   Membership    @relation("threadAuthor", fields: [authorMembershipId], references: [id], onDelete: Cascade)
+  posts    ForumPost[]
+
+  @@index([tenantId, categoryId])
+  @@index([tenantId, lastPostAt(sort: Desc)])
+  @@map("forum_threads")
+}
+
+model ForumPost {
+  id                 String   @id @default(cuid())
+  tenantId           String   @map("tenant_id")
+  threadId           String   @map("thread_id")
+  authorMembershipId String   @map("author_membership_id")
+  content            String   @db.VarChar(20000)
+  isEdited           Boolean  @default(false) @map("is_edited")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  thread ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author Membership  @relation("postAuthor", fields: [authorMembershipId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, threadId, createdAt])
+  @@map("forum_posts")
 }
