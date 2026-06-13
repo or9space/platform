@@ -13,7 +13,7 @@ export function FeatureToggles({ tenantId, plan, flags }: { tenantId: string; pl
     if (pending) return; setMsg(null);
     const next = !state[f.key];
     start(async () => {
-      const r = await setFeatureFlagAction(tenantId, plan, f.key, next);
+      const r = await setFeatureFlagAction(tenantId, f.key, next);
       if (r.ok) setState((s) => ({ ...s, [f.key]: next })); else setMsg(`${f.label}: ${r.error}`);
     });
   }

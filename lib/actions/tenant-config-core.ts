@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prismaGlobal, type TenantPlan } from "../db";
+import { prismaGlobal } from "../db";
 import { requireTier } from "../authz";
 import { ForbiddenError } from "../permissions";
 import { isFlagAllowedForPlan } from "../paywall";
@@ -79,12 +79,17 @@ export async function updateLabelsCore(
 }
 
 export async function setFeatureFlagCore(
-  tenantId: string, accountId: string, plan: TenantPlan, key: string, enabled: boolean,
+  tenantId: string, accountId: string, key: string, enabled: boolean,
 ): Promise<Result> {
   const g = await guardCommand(tenantId, accountId); if (!g.ok) return g;
   if (!isValidFlagKey(key)) return { ok: false, error: "Unknown feature" };
   if (PLATFORM_CONTROLLED.has(key)) return { ok: false, error: "That feature is managed by or9.space" };
-  if (enabled && !isFlagAllowedForPlan(plan, key)) return { ok: false, error: "That feature requires a paid plan" };
+  // SECURITY: the plan is read server-side from the tenant row — NEVER from a
+  // client argument — so a FREE tenant cannot spoof plan="PAID" to unlock a
+  // paid-only flag (discord.bot).
+  const tenant = await prismaGlobal.tenant.findUnique({ where: { id: tenantId }, select: { plan: true } });
+  if (!tenant) return { ok: false, error: "Org not found" };
+  if (enabled && !isFlagAllowedForPlan(tenant.plan, key)) return { ok: false, error: "That feature requires a paid plan" };
   await prismaGlobal.tenantFeatureFlag.upsert({
     where: { tenantId_key: { tenantId, key } },
     update: { enabled },
@@ -99,7 +104,7 @@ const CustomFieldDefSchema = z.object({
   kind: z.enum(["text", "number", "enum", "datetime"]),
   enumValues: z.array(z.string()).max(20).optional(),
   required: z.boolean().optional(),
-});
+}).strict();
 
 export async function upsertCustomFieldDefCore(
   tenantId: string, accountId: string, typeName: string, input: z.infer<typeof CustomFieldDefSchema>,

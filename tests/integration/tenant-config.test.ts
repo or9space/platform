@@ -50,22 +50,31 @@ describe("tenant-config write actions", () => {
 
   it("COMMAND can toggle a feature flag (fleet on)", async () => {
     const cmd = await commandAccount(TENANT_A.id);
-    const r = await setFeatureFlagCore(TENANT_A.id, cmd, "FREE", "fleet", true);
+    const r = await setFeatureFlagCore(TENANT_A.id, cmd, "fleet", true);
     expect(r.ok).toBe(true);
     const ff = await testPrisma.tenantFeatureFlag.findUnique({ where: { tenantId_key: { tenantId: TENANT_A.id, key: "fleet" } } });
     expect(ff?.enabled).toBe(true);
   });
 
-  it("FREE tenant cannot enable a paid-only flag (discord.bot)", async () => {
+  it("FREE tenant cannot enable a paid-only flag (discord.bot) — plan read server-side, not spoofable", async () => {
+    // TENANT_A is seeded FREE. The core reads the plan from the tenant row, so
+    // there is no param a client could forge to fake "PAID".
     const cmd = await commandAccount(TENANT_A.id);
-    const r = await setFeatureFlagCore(TENANT_A.id, cmd, "FREE", "discord.bot", true);
+    const r = await setFeatureFlagCore(TENANT_A.id, cmd, "discord.bot", true);
     expect(r.ok).toBe(false);
     expect(r.error).toMatch(/paid/i);
   });
 
+  it("PAID tenant CAN enable discord.bot", async () => {
+    await testPrisma.tenant.update({ where: { id: TENANT_A.id }, data: { plan: "PAID" } });
+    const cmd = await commandAccount(TENANT_A.id);
+    const r = await setFeatureFlagCore(TENANT_A.id, cmd, "discord.bot", true);
+    expect(r.ok).toBe(true);
+  });
+
   it("cannot toggle platform-controlled ads", async () => {
     const cmd = await commandAccount(TENANT_A.id);
-    const r = await setFeatureFlagCore(TENANT_A.id, cmd, "FREE", "ads", false);
+    const r = await setFeatureFlagCore(TENANT_A.id, cmd, "ads", false);
     expect(r.ok).toBe(false);
   });
 
