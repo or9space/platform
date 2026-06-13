@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterAll } from "vitest";
 import { makeTenantContext } from "@/lib/tenant";
 import { listMembers, getMemberByUsername, countCommandMemberships } from "@/lib/queries/members";
+import { updateOwnProfileCore } from "@/lib/actions/members-core";
 import { testPrisma, seedTwoTenants, resetDb, closeDb, TENANT_A, TENANT_B } from "./setup";
 
 const ctxA = makeTenantContext(TENANT_A.id);
@@ -53,5 +54,31 @@ describe("member queries", () => {
     await mk(TENANT_A.id, "e1", "ENLISTED");
     await mk(TENANT_B.id, "cb", "COMMAND");
     expect(await countCommandMemberships(ctxA)).toBe(2);
+  });
+});
+
+describe("member self-profile edit", () => {
+  beforeEach(async () => { await resetDb(); await seedTwoTenants(); });
+  afterAll(async () => { await resetDb(); await closeDb(); });
+
+  it("updates own displayName + bio", async () => {
+    const m = await mk(TENANT_A.id, "self", "ENLISTED", "Self");
+    const r = await updateOwnProfileCore(TENANT_A.id, m.id, { displayName: "New Name", bio: "hi there" });
+    expect(r.ok).toBe(true);
+    const row = await testPrisma.membership.findUnique({ where: { id: m.id } });
+    expect(row?.displayName).toBe("New Name");
+    expect(row?.bio).toBe("hi there");
+  });
+
+  it("rejects an over-long bio", async () => {
+    const m = await mk(TENANT_A.id, "self2", "ENLISTED");
+    const r = await updateOwnProfileCore(TENANT_A.id, m.id, { bio: "x".repeat(501) });
+    expect(r.ok).toBe(false);
+  });
+
+  it("rejects a non-http avatarUrl", async () => {
+    const m = await mk(TENANT_A.id, "self3", "ENLISTED");
+    const r = await updateOwnProfileCore(TENANT_A.id, m.id, { avatarUrl: "javascript:alert(1)" });
+    expect(r.ok).toBe(false);
   });
 });
