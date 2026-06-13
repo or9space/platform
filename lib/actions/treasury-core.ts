@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { db } from "../db";
+import { db, prismaGlobal } from "../db";
 import { makeTenantContext } from "../tenant";
 import { hasTier, type RankTier } from "../permissions";
-import { writeAudit } from "../audit";
+import { setTenantContext } from "../rls";
 import { TREASURY_TYPES, TREASURY_CATEGORIES } from "../treasury";
 
 type Result<T extends Record<string, unknown> = Record<string, unknown>> =
@@ -44,9 +44,14 @@ export async function deleteTreasuryEntryCore(
     where: { id: entryId }, select: { id: true, type: true, amount: true, category: true },
   });
   if (!e) return { ok: false, error: "Entry not found" };
-  await db(ctx).treasuryEntry.delete({ where: { id: entryId } });
-  await writeAudit(ctx, actorAccountId, "treasury.entry.delete", {
-    entryId, type: e.type, amount: e.amount, category: e.category,
+  // Atomic: delete + audit in one tx so a money deletion can never land without
+  // its audit row (and vice-versa). setTenantContext scopes RLS inside the tx.
+  await prismaGlobal.$transaction(async (tx) => {
+    await setTenantContext(tx, tenantId);
+    await tx.treasuryEntry.delete({ where: { id: entryId } });
+    await tx.auditLog.create({
+      data: { tenantId, actorAccountId, action: "treasury.entry.delete", detail: { entryId, type: e.type, amount: e.amount, category: e.category } as never },
+    });
   });
   return { ok: true };
 }

@@ -42,13 +42,11 @@ export async function listTreasuryEntries(
 }
 
 export async function getTreasuryBalance(ctx: TenantContext): Promise<number> {
-  const rows = await db(ctx).treasuryEntry.findMany({
-    select: { type: true, amount: true },
-  });
-  return rows.reduce(
-    (bal, r) => bal + (r.type === "INCOME" ? r.amount : -r.amount),
-    0,
-  );
+  const [inc, exp] = await Promise.all([
+    db(ctx).treasuryEntry.aggregate({ _sum: { amount: true }, where: { type: "INCOME" } }),
+    db(ctx).treasuryEntry.aggregate({ _sum: { amount: true }, where: { type: "EXPENSE" } }),
+  ]);
+  return (inc._sum.amount ?? 0) - (exp._sum.amount ?? 0);
 }
 
 export interface TreasurySummary {
@@ -59,6 +57,7 @@ export interface TreasurySummary {
 }
 
 export async function getTreasurySummary(ctx: TenantContext): Promise<TreasurySummary> {
+  // Scans all entries for per-category grouping; fine at org scale. Revisit with a materialized total if volumes grow large.
   const rows = await db(ctx).treasuryEntry.findMany({
     select: { type: true, category: true, amount: true },
   });
@@ -71,7 +70,7 @@ export async function getTreasurySummary(ctx: TenantContext): Promise<TreasurySu
     } else {
       totalExpense += r.amount;
     }
-    byCategory[r.category] = (byCategory[r.category] ?? 0) + r.amount;
+    byCategory[r.category] = (byCategory[r.category] ?? 0) + (r.type === "INCOME" ? r.amount : -r.amount);
   }
   return { totalIncome, totalExpense, balance: totalIncome - totalExpense, byCategory };
 }

@@ -60,6 +60,9 @@ describe("treasury queries", () => {
     expect(s.totalIncome).toBe(1000);
     expect(s.totalExpense).toBe(200);
     expect(s.byCategory.MINING).toBe(1000);
+    await entry(TENANT_A.id, mA.id, "EXPENSE", "MINING", 100);
+    const s2 = await getTreasurySummary(ctxA);
+    expect(s2.byCategory.MINING).toBe(900);  // 700 + 300 - 100 (signed)
   });
 
   it("balance is 0 with no entries", async () => {
@@ -91,6 +94,9 @@ describe("treasury write actions", () => {
     expect((await createTreasuryEntryCore(TENANT_A.id, m.id, "OFFICER", { type: "INCOME", category: "MINING", amount: 0, description: "x" })).ok).toBe(false);
     expect((await createTreasuryEntryCore(TENANT_A.id, m.id, "OFFICER", { type: "INCOME", category: "MINING", amount: -5, description: "x" })).ok).toBe(false);
     expect((await createTreasuryEntryCore(TENANT_A.id, m.id, "OFFICER", { type: "INCOME", category: "MINING", amount: 1.5, description: "x" })).ok).toBe(false);
+    expect((await createTreasuryEntryCore(TENANT_A.id, m.id, "OFFICER", { type: "INCOME", category: "MINING", amount: NaN, description: "x" })).ok).toBe(false);
+    expect((await createTreasuryEntryCore(TENANT_A.id, m.id, "OFFICER", { type: "INCOME", category: "MINING", amount: Infinity, description: "x" })).ok).toBe(false);
+    expect((await createTreasuryEntryCore(TENANT_A.id, m.id, "OFFICER", { type: "INCOME", category: "MINING", amount: 1_000_000_001, description: "x" })).ok).toBe(false);
   });
 
   it("rejects an invalid category/type", async () => {
@@ -127,5 +133,13 @@ describe("treasury write actions", () => {
     const r = await deleteTreasuryEntryCore(TENANT_A.id, cmdAcc.id, "COMMAND", e.id);
     expect(r.ok).toBe(false);
     expect(await testPrisma.treasuryEntry.count({ where: { tenantId: TENANT_B.id } })).toBe(1);
+  });
+
+  it("create always lands in the core's tenant (no cross-tenant write)", async () => {
+    const m = await mkMember(TENANT_A.id, "off");
+    const r = await createTreasuryEntryCore(TENANT_A.id, m.id, "OFFICER", { type: "INCOME", category: "DONATION", amount: 42, description: "scoped" });
+    expect(r.ok).toBe(true);
+    expect(await testPrisma.treasuryEntry.count({ where: { tenantId: TENANT_B.id, description: "scoped" } })).toBe(0);
+    expect(await testPrisma.treasuryEntry.count({ where: { tenantId: TENANT_A.id, description: "scoped" } })).toBe(1);
   });
 });
