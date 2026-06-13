@@ -78,6 +78,7 @@ model Membership {
 
   authoredThreads ForumThread[] @relation("threadAuthor")
   authoredPosts   ForumPost[]   @relation("postAuthor")
+  treasuryEntries TreasuryEntry[] @relation("treasuryAuthor")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])
@@ -210,6 +211,42 @@ model ForumThread {
   @@index([tenantId, categoryId])
   @@index([tenantId, lastPostAt(sort: Desc)])
   @@map("forum_threads")
+}
+
+// === Tenant-scoped: Treasury ===
+
+enum TreasuryType {
+  INCOME
+  EXPENSE
+}
+
+enum TreasuryCategory {
+  MINING
+  TRADING
+  BOUNTY
+  SALVAGE
+  DONATION
+  PURCHASE
+  PAYOUT
+  EVENT
+  OTHER
+}
+
+model TreasuryEntry {
+  id                 String           @id @default(cuid())
+  tenantId           String           @map("tenant_id")
+  authorMembershipId String           @map("author_membership_id")
+  type               TreasuryType
+  category           TreasuryCategory
+  amount             Int
+  description        String           @db.VarChar(500)
+  createdAt          DateTime         @default(now()) @map("created_at")
+
+  author Membership @relation("treasuryAuthor", fields: [authorMembershipId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, type])
+  @@map("treasury_entries")
 }
 
 model ForumPost {
