@@ -28,6 +28,10 @@ const LabelsSchema = z.object({
   branchPlural: z.string().max(40).default("Branches"),
   handbookNoun: z.string().max(40).default("Field Handbook"),
   currencyCode: z.string().max(20).default("aUEC"),
+  rankEnlisted: z.string().max(40).default("Enlisted"),
+  rankNco:      z.string().max(40).default("NCO"),
+  rankOfficer:  z.string().max(40).default("Officer"),
+  rankCommand:  z.string().max(40).default("Command"),
 });
 
 const FeaturesSchema = z.object({
