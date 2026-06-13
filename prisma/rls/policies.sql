@@ -61,3 +61,10 @@ DROP POLICY IF EXISTS tenant_isolation ON forum_posts;
 CREATE POLICY tenant_isolation ON forum_posts
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE treasury_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE treasury_entries FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON treasury_entries;
+CREATE POLICY tenant_isolation ON treasury_entries
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
