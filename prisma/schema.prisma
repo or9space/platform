@@ -83,6 +83,7 @@ model Membership {
   handbookAcks    HandbookAcknowledgement[] @relation("handbookAcks")
   heldInventory   InventoryHolding[] @relation("heldInventory")
   fleetShips      FleetShip[]   @relation("fleetShips")
+  tournamentEntries TournamentEntry[] @relation("tournamentEntries")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])
@@ -488,4 +489,49 @@ model FleetShip {
   @@index([tenantId, isPublic])
   @@index([tenantId, ownerMembershipId])
   @@map("fleet_ships")
+}
+
+// === Tenant-scoped: Tournaments ===
+
+enum TournamentStatus {
+  DRAFT
+  OPEN
+  IN_PROGRESS
+  COMPLETE
+}
+
+model Tournament {
+  id          String           @id @default(cuid())
+  tenantId    String           @map("tenant_id")
+  name        String           @db.VarChar(160)
+  description String?          @db.VarChar(2000)
+  format      String?          @db.VarChar(80)
+  status      TournamentStatus @default(DRAFT)
+  startsAt    DateTime?        @map("starts_at")
+  createdByMembershipId String  @map("created_by_membership_id")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  entries TournamentEntry[]
+
+  @@index([tenantId, status])
+  @@map("tournaments")
+}
+
+model TournamentEntry {
+  id                      String   @id @default(cuid())
+  tenantId                String   @map("tenant_id")
+  tournamentId            String   @map("tournament_id")
+  participantMembershipId String?  @map("participant_membership_id")
+  displayName             String   @db.VarChar(120)
+  seed                    Int?
+  placement               Int?
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  tournament  Tournament  @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  participant Membership? @relation("tournamentEntries", fields: [participantMembershipId], references: [id], onDelete: SetNull)
+
+  @@unique([tournamentId, participantMembershipId])
+  @@index([tenantId, tournamentId])
+  @@map("tournament_entries")
 }
