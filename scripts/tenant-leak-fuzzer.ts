@@ -38,6 +38,10 @@ const TENANT_SCOPED_READS: Array<{ model: string; read: (ctx: any) => Promise<un
   { model: "forumThread", read: (ctx) => db(ctx).forumThread.findMany({}) },
   { model: "forumPost", read: (ctx) => db(ctx).forumPost.findMany({}) },
   { model: "treasuryEntry", read: (ctx) => db(ctx).treasuryEntry.findMany({}) },
+  { model: "lootMember", read: (ctx) => db(ctx).lootMember.findMany({}) },
+  { model: "lootSession", read: (ctx) => db(ctx).lootSession.findMany({}) },
+  { model: "lootAttendance", read: (ctx) => db(ctx).lootAttendance.findMany({}) },
+  { model: "lootTransaction", read: (ctx) => db(ctx).lootTransaction.findMany({}) },
 ];
 
 async function seed() {
@@ -104,6 +108,43 @@ async function seed() {
       description: MARKER_B,
     },
   });
+
+  // Seed loot rows in tenant B so the loot probes have a real marker to detect.
+  const lootMemberB = await prisma.lootMember.create({
+    data: {
+      tenantId: B.id,
+      membershipId: membershipB.id,
+      displayName: MARKER_B,
+    },
+  });
+
+  const lootSessionB = await prisma.lootSession.create({
+    data: {
+      tenantId: B.id,
+      label: MARKER_B,
+      sessionDate: new Date(),
+      createdByMembershipId: membershipB.id,
+    },
+  });
+
+  await prisma.lootAttendance.create({
+    data: {
+      tenantId: B.id,
+      sessionId: lootSessionB.id,
+      memberId: lootMemberB.id,
+      status: "PRESENT",
+    },
+  });
+
+  await prisma.lootTransaction.create({
+    data: {
+      tenantId: B.id,
+      memberId: lootMemberB.id,
+      amountTenths: 999,
+      type: "ADJUST",
+      createdByMembershipId: membershipB.id,
+    },
+  });
 }
 
 async function cleanup() {
@@ -111,6 +152,11 @@ async function cleanup() {
   await prisma.forumThread.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.forumCategory.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.treasuryEntry.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  // Loot FK order: lootTransaction + lootAttendance before lootSession + lootMember.
+  await prisma.lootTransaction.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.lootAttendance.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.lootSession.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
+  await prisma.lootMember.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.auditLog.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.membership.deleteMany({ where: { tenantId: { in: [A.id, B.id] } } });
   await prisma.account.deleteMany({ where: { email: { contains: "@fz-test." } } });
@@ -274,6 +320,70 @@ async function runPass2(): Promise<number> {
       leaks++;
     } else {
       console.log("ok (RLS): tenant A isolated (treasuryEntry)");
+    }
+
+    // Probe lootMember via RLS.
+    const [, lootMemberRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.lootMember.findMany({}),
+    ]);
+
+    const jsonLootMember = JSON.stringify(lootMemberRowsA);
+    if (jsonLootMember.includes(MARKER_B) || jsonLootMember.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A lootMember read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (lootMember)");
+    }
+
+    // Probe lootSession via RLS.
+    const [, lootSessionRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.lootSession.findMany({}),
+    ]);
+
+    const jsonLootSession = JSON.stringify(lootSessionRowsA);
+    if (jsonLootSession.includes(MARKER_B) || jsonLootSession.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A lootSession read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (lootSession)");
+    }
+
+    // Probe lootAttendance via RLS.
+    const [, lootAttendanceRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.lootAttendance.findMany({}),
+    ]);
+
+    const jsonLootAttendance = JSON.stringify(lootAttendanceRowsA);
+    if (jsonLootAttendance.includes(MARKER_B) || jsonLootAttendance.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A lootAttendance read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (lootAttendance)");
+    }
+
+    // Probe lootTransaction via RLS.
+    const [, lootTransactionRowsA] = await appClient.$transaction([
+      appClient.$executeRaw`SELECT set_config('app.tenant_id', ${A.id}, TRUE)`,
+      appClient.lootTransaction.findMany({}),
+    ]);
+
+    const jsonLootTransaction = JSON.stringify(lootTransactionRowsA);
+    if (jsonLootTransaction.includes(MARKER_B) || jsonLootTransaction.includes(B.id)) {
+      console.error(
+        `LEAK (RLS): tenant A lootTransaction read exposed tenant B data under app_user`,
+      );
+      leaks++;
+    } else {
+      console.log("ok (RLS): tenant A isolated (lootTransaction)");
     }
   } finally {
     await appClient.$disconnect();

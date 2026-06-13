@@ -79,6 +79,7 @@ model Membership {
   authoredThreads ForumThread[] @relation("threadAuthor")
   authoredPosts   ForumPost[]   @relation("postAuthor")
   treasuryEntries TreasuryEntry[] @relation("treasuryAuthor")
+  lootMember      LootMember[]  @relation("lootMember")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])
@@ -264,4 +265,85 @@ model ForumPost {
 
   @@index([tenantId, threadId, createdAt])
   @@map("forum_posts")
+}
+
+// === Tenant-scoped: Loot ===
+
+enum LootAttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+}
+
+enum LootTxnType {
+  SPEND
+  TRANSFER_IN
+  TRANSFER_OUT
+  ADJUST
+}
+
+model LootMember {
+  id           String   @id @default(cuid())
+  tenantId     String   @map("tenant_id")
+  membershipId String?  @map("membership_id")
+  displayName  String   @db.VarChar(120)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  membership   Membership?       @relation("lootMember", fields: [membershipId], references: [id], onDelete: SetNull)
+  attendance   LootAttendance[]
+  transactions LootTransaction[] @relation("lootTxnMember")
+  relatedTxns  LootTransaction[] @relation("lootTxnRelated")
+
+  @@unique([tenantId, membershipId])
+  @@index([tenantId])
+  @@map("loot_members")
+}
+
+model LootSession {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  label       String   @db.VarChar(160)
+  sessionDate DateTime @map("session_date")
+  notes       String?  @db.VarChar(500)
+  createdByMembershipId String @map("created_by_membership_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  attendance LootAttendance[]
+
+  @@index([tenantId, sessionDate])
+  @@map("loot_sessions")
+}
+
+model LootAttendance {
+  id        String               @id @default(cuid())
+  tenantId  String               @map("tenant_id")
+  sessionId String               @map("session_id")
+  memberId  String               @map("member_id")
+  status    LootAttendanceStatus @default(PRESENT)
+  updatedAt DateTime             @updatedAt @map("updated_at")
+
+  session LootSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  member  LootMember  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, memberId])
+  @@index([tenantId, memberId])
+  @@map("loot_attendance")
+}
+
+model LootTransaction {
+  id              String      @id @default(cuid())
+  tenantId        String      @map("tenant_id")
+  memberId        String      @map("member_id")
+  amountTenths    Int         @map("amount_tenths")
+  type            LootTxnType
+  note            String?     @db.VarChar(500)
+  relatedMemberId String?     @map("related_member_id")
+  createdByMembershipId String @map("created_by_membership_id")
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  member        LootMember  @relation("lootTxnMember", fields: [memberId], references: [id], onDelete: Cascade)
+  relatedMember LootMember? @relation("lootTxnRelated", fields: [relatedMemberId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, memberId, createdAt])
+  @@map("loot_transactions")
 }

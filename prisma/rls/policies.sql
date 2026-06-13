@@ -68,3 +68,31 @@ DROP POLICY IF EXISTS tenant_isolation ON treasury_entries;
 CREATE POLICY tenant_isolation ON treasury_entries
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE loot_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE loot_members FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON loot_members;
+CREATE POLICY tenant_isolation ON loot_members
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE loot_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE loot_sessions FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON loot_sessions;
+CREATE POLICY tenant_isolation ON loot_sessions
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE loot_attendance ENABLE ROW LEVEL SECURITY;
+ALTER TABLE loot_attendance FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON loot_attendance;
+CREATE POLICY tenant_isolation ON loot_attendance
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE loot_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE loot_transactions FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON loot_transactions;
+CREATE POLICY tenant_isolation ON loot_transactions
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
