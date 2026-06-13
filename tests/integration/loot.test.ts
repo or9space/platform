@@ -186,7 +186,7 @@ describe("loot write actions", () => {
 
   it("transfer moves points atomically; rejects overdraw and self-transfer", async () => {
     const cmd = await membership(TENANT_A.id, "cmd", "COMMAND");
-    const a = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "A" });
+    const a = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "A", membershipId: cmd.id });
     const b = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "B" });
     if (!a.ok || !b.ok) throw new Error();
     await adjustLootCore(TENANT_A.id, cmd.id, cmd.accountId, "COMMAND", { memberId: a.memberId, amountTenths: 30, note: "seed" });
@@ -207,7 +207,7 @@ describe("loot write actions", () => {
 
   it("transfer concurrent: balance can never go negative", async () => {
     const cmd = await membership(TENANT_A.id, "cmd", "COMMAND");
-    const a = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "A" });
+    const a = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "A", membershipId: cmd.id });
     const b = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "B" });
     if (!a.ok || !b.ok) throw new Error();
     await adjustLootCore(TENANT_A.id, cmd.id, cmd.accountId, "COMMAND", { memberId: a.memberId, amountTenths: 30, note: "seed" });
@@ -224,11 +224,28 @@ describe("loot write actions", () => {
 
   it("cannot transfer to another tenant's member", async () => {
     const cmd = await membership(TENANT_A.id, "cmd", "COMMAND");
-    const a = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "A" });
+    const a = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "A", membershipId: cmd.id });
     if (!a.ok) throw new Error();
     await adjustLootCore(TENANT_A.id, cmd.id, cmd.accountId, "COMMAND", { memberId: a.memberId, amountTenths: 30, note: "seed" });
     const bMemberOtherTenant = await testPrisma.lootMember.create({ data: { tenantId: TENANT_B.id, displayName: "Bm" } });
     const r = await transferLootCore(TENANT_A.id, cmd.id, a.memberId, { toMemberId: bMemberOtherTenant.id, amountTenths: 10, note: "x" });
     expect(r.ok).toBe(false);
+  });
+
+  it("cannot transfer FROM a loot member you do not own", async () => {
+    const cmd = await membership(TENANT_A.id, "cmd", "COMMAND");
+    // two loot members linked to two different memberships
+    const aMs = await membership(TENANT_A.id, "alice", "OFFICER");
+    const bMs = await membership(TENANT_A.id, "bob", "ENLISTED");
+    const aLm = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "Alice", membershipId: aMs.id });
+    const bLm = await createLootMemberCore(TENANT_A.id, cmd.id, "OFFICER", { displayName: "Bob", membershipId: bMs.id });
+    if (!aLm.ok || !bLm.ok) throw new Error();
+    await adjustLootCore(TENANT_A.id, cmd.id, cmd.accountId, "COMMAND", { memberId: aLm.memberId, amountTenths: 50, note: "seed" });
+    // Bob (bMs) tries to transfer FROM Alice's loot member -> must be rejected
+    const r = await transferLootCore(TENANT_A.id, bMs.id, aLm.memberId, { toMemberId: bLm.memberId, amountTenths: 20, note: "theft" });
+    expect(r.ok).toBe(false);
+    // Alice's balance unchanged (no TRANSFER_OUT)
+    const stolen = await testPrisma.lootTransaction.findFirst({ where: { memberId: aLm.memberId, type: "TRANSFER_OUT" } });
+    expect(stolen).toBeNull();
   });
 });

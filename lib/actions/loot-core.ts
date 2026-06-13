@@ -26,6 +26,7 @@ const MAX_ADJUST_ABS = 1_000_000;
 // Inline balance helper — runs INSIDE a Serializable tx via the tx client so
 // the read is part of the same snapshot as the subsequent write.
 // ---------------------------------------------------------------------------
+// Scans a member's attendance+txn rows (bounded by org activity). Fine at org scale; if a tenant's ledger grows very large, push the SUM into Postgres.
 async function balanceInTx(
   tx: Parameters<Parameters<typeof prismaGlobal.$transaction>[0]>[0],
   tenantId: string,
@@ -198,6 +199,7 @@ export async function spendLootCore(
       const balance = await balanceInTx(tx, tenantId, memberId);
       if (balance < amountTenths) throw new OverdrawError();
 
+      // The lootTransaction row (with createdByMembershipId) is the audit-of-record for spend/transfer; only COMMAND adjust additionally writes auditLog.
       const t = await tx.lootTransaction.create({
         data: {
           tenantId,
@@ -240,6 +242,9 @@ export async function adjustLootCore(
   const parsed = AdjustSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid" };
 
+  // NOTE: adjust intentionally has NO balance floor — COMMAND may set a member
+  // negative (clawback / correction). This is a privileged manual override and
+  // is audit-logged. Spend/transfer (non-override) DO guard the floor.
   const { memberId, amountTenths, note } = parsed.data;
 
   try {
@@ -309,17 +314,19 @@ export async function transferLootCore(
 
       // Confirm BOTH members exist in this tenant. If toMember belongs to
       // another tenant its tenantId won't match → findFirst returns null → reject.
+      // SECURITY: source must be the actor's OWN loot member (membershipId === actor) — a member cannot transfer FROM someone else's balance.
       const [fromMem, toMem] = await Promise.all([
-        tx.lootMember.findFirst({ where: { id: fromMemberId, tenantId }, select: { id: true } }),
+        tx.lootMember.findFirst({ where: { id: fromMemberId, tenantId, membershipId: actorMembershipId }, select: { id: true } }),
         tx.lootMember.findFirst({ where: { id: toMemberId, tenantId }, select: { id: true } }),
       ]);
-      if (!fromMem) throw new GuardError("Source member not found");
+      if (!fromMem) throw new GuardError("Source member not found or not owned by you");
       if (!toMem) throw new GuardError("Destination member not found or belongs to another org");
 
       // Authoritative balance read inside the Serializable tx.
       const balance = await balanceInTx(tx, tenantId, fromMemberId);
       if (balance < amountTenths) throw new OverdrawError();
 
+      // The lootTransaction row (with createdByMembershipId) is the audit-of-record for spend/transfer; only COMMAND adjust additionally writes auditLog.
       // Both inserts or neither — inside the same tx.
       await tx.lootTransaction.create({
         data: {
