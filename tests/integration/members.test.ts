@@ -63,7 +63,7 @@ describe("member self-profile edit", () => {
 
   it("updates own displayName + bio", async () => {
     const m = await mk(TENANT_A.id, "self", "ENLISTED", "Self");
-    const r = await updateOwnProfileCore(TENANT_A.id, m.id, { displayName: "New Name", bio: "hi there" });
+    const r = await updateOwnProfileCore(TENANT_A.id, m.accountId, m.id, { displayName: "New Name", bio: "hi there" });
     expect(r.ok).toBe(true);
     const row = await testPrisma.membership.findUnique({ where: { id: m.id } });
     expect(row?.displayName).toBe("New Name");
@@ -72,14 +72,30 @@ describe("member self-profile edit", () => {
 
   it("rejects an over-long bio", async () => {
     const m = await mk(TENANT_A.id, "self2", "ENLISTED");
-    const r = await updateOwnProfileCore(TENANT_A.id, m.id, { bio: "x".repeat(501) });
+    const r = await updateOwnProfileCore(TENANT_A.id, m.accountId, m.id, { bio: "x".repeat(501) });
     expect(r.ok).toBe(false);
   });
 
   it("rejects a non-http avatarUrl", async () => {
     const m = await mk(TENANT_A.id, "self3", "ENLISTED");
-    const r = await updateOwnProfileCore(TENANT_A.id, m.id, { avatarUrl: "javascript:alert(1)" });
+    const r = await updateOwnProfileCore(TENANT_A.id, m.accountId, m.id, { avatarUrl: "javascript:alert(1)" });
     expect(r.ok).toBe(false);
+  });
+
+  it("cannot edit another member's profile via a forged membershipId", async () => {
+    const me = await mk(TENANT_A.id, "me", "ENLISTED");
+    const other = await mk(TENANT_A.id, "other", "ENLISTED", "Other");
+    const r = await updateOwnProfileCore(TENANT_A.id, me.accountId, other.id, { displayName: "HACKED" });
+    expect(r.ok).toBe(false);
+    const row = await testPrisma.membership.findUnique({ where: { id: other.id } });
+    expect(row?.displayName).toBe("Other");
+  });
+
+  it("profile update writes an audit row", async () => {
+    const m = await mk(TENANT_A.id, "audited", "ENLISTED");
+    await updateOwnProfileCore(TENANT_A.id, m.accountId, m.id, { bio: "new bio" });
+    const audit = await testPrisma.auditLog.findFirst({ where: { tenantId: TENANT_A.id, action: "member.profile.update" } });
+    expect(audit).not.toBeNull();
   });
 });
 
@@ -90,7 +106,7 @@ describe("rank management", () => {
   it("COMMAND promotes ENLISTED -> OFFICER and writes an audit row", async () => {
     const boss = await mk(TENANT_A.id, "boss", "COMMAND");
     const grunt = await mk(TENANT_A.id, "grunt", "ENLISTED");
-    const r = await setMemberTierCore(TENANT_A.id, boss.accountId, "COMMAND", grunt.id, "OFFICER");
+    const r = await setMemberTierCore(TENANT_A.id, boss.accountId, grunt.id, "OFFICER");
     expect(r.ok).toBe(true);
     const row = await testPrisma.membership.findUnique({ where: { id: grunt.id } });
     expect(row?.tier).toBe("OFFICER");
@@ -102,13 +118,13 @@ describe("rank management", () => {
   it("OFFICER cannot change tiers", async () => {
     const off = await mk(TENANT_A.id, "off", "OFFICER");
     const grunt = await mk(TENANT_A.id, "grunt", "ENLISTED");
-    const r = await setMemberTierCore(TENANT_A.id, off.accountId, "OFFICER", grunt.id, "OFFICER");
+    const r = await setMemberTierCore(TENANT_A.id, off.accountId, grunt.id, "OFFICER");
     expect(r.ok).toBe(false);
   });
 
   it("refuses to demote the LAST COMMAND (lockout protection)", async () => {
     const only = await mk(TENANT_A.id, "only", "COMMAND");
-    const r = await setMemberTierCore(TENANT_A.id, only.accountId, "COMMAND", only.id, "OFFICER");
+    const r = await setMemberTierCore(TENANT_A.id, only.accountId, only.id, "OFFICER");
     expect(r.ok).toBe(false);
     expect(r.error).toMatch(/last|only|command/i);
     const row = await testPrisma.membership.findUnique({ where: { id: only.id } });
@@ -118,21 +134,32 @@ describe("rank management", () => {
   it("allows demoting a COMMAND when another COMMAND remains", async () => {
     const a = await mk(TENANT_A.id, "ca", "COMMAND");
     const b = await mk(TENANT_A.id, "cb", "COMMAND");
-    const r = await setMemberTierCore(TENANT_A.id, a.accountId, "COMMAND", b.id, "OFFICER");
+    const r = await setMemberTierCore(TENANT_A.id, a.accountId, b.id, "OFFICER");
     expect(r.ok).toBe(true);
   });
 
   it("cannot change a member in another tenant", async () => {
     const boss = await mk(TENANT_A.id, "boss", "COMMAND");
     const victim = await mk(TENANT_B.id, "victim", "ENLISTED");
-    const r = await setMemberTierCore(TENANT_A.id, boss.accountId, "COMMAND", victim.id, "COMMAND");
+    const r = await setMemberTierCore(TENANT_A.id, boss.accountId, victim.id, "COMMAND");
     expect(r.ok).toBe(false);
   });
 
   it("rejects an invalid tier value", async () => {
     const boss = await mk(TENANT_A.id, "boss", "COMMAND");
     const grunt = await mk(TENANT_A.id, "grunt", "ENLISTED");
-    const r = await setMemberTierCore(TENANT_A.id, boss.accountId, "COMMAND", grunt.id, "KING" as never);
+    const r = await setMemberTierCore(TENANT_A.id, boss.accountId, grunt.id, "KING" as never);
     expect(r.ok).toBe(false);
+  });
+
+  it("concurrent demotes cannot drop the org below one COMMAND", async () => {
+    const a = await mk(TENANT_A.id, "ca", "COMMAND");
+    const b = await mk(TENANT_A.id, "cb", "COMMAND");
+    await Promise.allSettled([
+      setMemberTierCore(TENANT_A.id, a.accountId, b.id, "OFFICER"),
+      setMemberTierCore(TENANT_A.id, b.accountId, a.id, "OFFICER"),
+    ]);
+    const commandLeft = await testPrisma.membership.count({ where: { tenantId: TENANT_A.id, tier: "COMMAND" } });
+    expect(commandLeft).toBeGreaterThanOrEqual(1);  // lockout never reaches zero
   });
 });
