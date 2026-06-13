@@ -25,6 +25,8 @@ export default async function TenantAdminLayout({ children }: { children: ReactN
           <a href="/admin" className="font-bold">{tenant.name} admin</a>
           <a href="/admin/config" className="text-neutral-400 hover:text-neutral-100">Configuration</a>
           <a href="/admin/directory" className="text-neutral-400 hover:text-neutral-100">Directory</a>
+          <a href="/admin/integrations" className="text-neutral-400 hover:text-neutral-100">Integrations</a>
+          <a href="/admin/billing" className="text-neutral-400 hover:text-neutral-100">Billing</a>
           <a href="/" className="text-neutral-400 hover:text-neutral-100">View site</a>
         </nav>
       </header>
