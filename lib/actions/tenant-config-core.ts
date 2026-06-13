@@ -33,7 +33,7 @@ function deepMerge(a: Record<string, unknown>, b: Record<string, unknown>): Reco
   return out;
 }
 
-async function guardCommand(tenantId: string, accountId: string): Promise<Result> {
+export async function guardCommand(tenantId: string, accountId: string): Promise<Result> {
   try {
     await requireTier(tenantId, accountId, "COMMAND");
     return { ok: true };
