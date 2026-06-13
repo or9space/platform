@@ -6,6 +6,7 @@ import { Hero } from "@/components/marketing/hero";
 import { FeatureGrid } from "@/components/marketing/feature-grid";
 import { PricingTable } from "@/components/marketing/pricing-table";
 import { Cta } from "@/components/marketing/cta";
+import { AdSlot } from "@/components/ads/ad-slot";
 
 export default async function HomePage() {
   const tenant = await getCurrentTenant();
@@ -35,6 +36,7 @@ export default async function HomePage() {
         <p className="text-sm text-neutral-500">
           Phase 1 — tenant lifecycle live. <a className="underline" href="/login">Sign in</a> · <a className="underline" href="/register">Join</a>
         </p>
+        <AdSlot slot="sidebar-bottom" />
       </div>
     </main>
   );
