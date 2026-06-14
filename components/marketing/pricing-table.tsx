@@ -2,95 +2,170 @@ import { buildPlanMatrix } from "@/lib/marketing/features";
 
 export function PricingTable() {
   const rows = buildPlanMatrix();
-  // Separate the ads row for special treatment; show remaining features
   const featureRows = rows.filter((r) => r.key !== "ads");
   const paidOnlyKeys = rows.filter((r) => r.paidOnly).map((r) => r.label);
 
   return (
     <section className="px-6 py-16">
       <div className="mx-auto max-w-4xl">
-        <p className="mb-2 text-center text-sm text-neutral-500">
-          Free tier is ad-supported. Paid removes ads and unlocks paid-only features
-          {paidOnlyKeys.length > 0 && (
-            <> ({paidOnlyKeys.join(", ")})</>
-          )}.
-        </p>
+        {/* Section head */}
+        <div
+          className="mb-8 border-b pb-4"
+          style={{ borderColor: "var(--ink-line)" }}
+        >
+          <h2
+            className="font-display text-2xl font-bold"
+            style={{ color: "var(--cream)" }}
+          >
+            Plans
+          </h2>
+          <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
+            Free tier is ad-supported. Paid removes ads and unlocks paid-only features
+            {paidOnlyKeys.length > 0 && (
+              <> ({paidOnlyKeys.join(", ")})</>
+            )}.
+          </p>
+        </div>
 
-        <div className="mt-6 overflow-x-auto rounded border border-neutral-800">
+        {/* Comparison table */}
+        <div className="overflow-x-auto">
           <table className="w-full min-w-[480px] text-sm">
             <thead>
-              <tr className="border-b border-neutral-800 bg-neutral-900">
-                <th className="px-5 py-3 text-left font-semibold text-neutral-300">Feature</th>
-                <th className="px-5 py-3 text-center font-semibold text-neutral-300">Free</th>
-                <th className="px-5 py-3 text-center font-semibold text-amber-400">Paid</th>
+              <tr
+                className="border-b"
+                style={{
+                  background: "var(--ink-raised)",
+                  borderColor: "var(--ink-line)",
+                }}
+              >
+                <th
+                  className="px-5 py-3 text-left"
+                  style={{ color: "var(--muted)" }}
+                >
+                  <span className="font-display text-xs font-semibold uppercase tracking-wide">
+                    Feature
+                  </span>
+                </th>
+                <th
+                  className="px-5 py-3 text-center"
+                  style={{ color: "var(--muted)" }}
+                >
+                  <span className="font-display text-xs font-semibold uppercase tracking-wide">
+                    Free
+                  </span>
+                </th>
+                <th className="px-5 py-3 text-center">
+                  <span
+                    className="font-display text-xs font-semibold uppercase tracking-wide"
+                    style={{ color: "var(--signal)" }}
+                  >
+                    Hosted
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              {featureRows.map((row, i) => (
+              {featureRows.map((row) => (
                 <tr
                   key={row.key}
-                  className={
-                    i % 2 === 0
-                      ? "border-b border-neutral-800/60 bg-neutral-950"
-                      : "border-b border-neutral-800/60 bg-neutral-900/40"
-                  }
+                  className="border-b"
+                  style={{ borderColor: "var(--ink-line)" }}
                 >
-                  <td className="px-5 py-3 text-neutral-300">
+                  <td className="px-5 py-3.5" style={{ color: "var(--cream)" }}>
                     {row.label}
                     {row.paidOnly && (
-                      <span className="ml-2 rounded bg-amber-900/40 px-1.5 py-0.5 text-xs text-amber-400">
+                      <span
+                        className="ml-2 rounded px-1.5 py-0.5 text-xs"
+                        style={{
+                          background: "var(--ink-raised)",
+                          color: "var(--signal)",
+                        }}
+                      >
                         paid only
                       </span>
                     )}
                   </td>
-                  <td className="px-5 py-3 text-center">
+                  <td className="px-5 py-3.5 text-center">
                     {row.free ? (
-                      <span className="text-green-400">✓</span>
+                      <span style={{ color: "var(--signal)" }}>✓</span>
                     ) : (
-                      <span className="text-neutral-600">—</span>
+                      <span style={{ color: "var(--ink-line)" }}>—</span>
                     )}
                   </td>
-                  <td className="px-5 py-3 text-center">
+                  <td className="px-5 py-3.5 text-center">
                     {row.paid ? (
-                      <span className="text-green-400">✓</span>
+                      <span style={{ color: "var(--signal)" }}>✓</span>
                     ) : (
-                      <span className="text-neutral-600">—</span>
+                      <span style={{ color: "var(--ink-line)" }}>—</span>
                     )}
                   </td>
                 </tr>
               ))}
-              {/* Ads row gets special treatment */}
-              <tr className="border-b border-neutral-800/60 bg-neutral-950">
-                <td className="px-5 py-3 text-neutral-300">
+              {/* Ads row */}
+              <tr className="border-b" style={{ borderColor: "var(--ink-line)" }}>
+                <td className="px-5 py-3.5" style={{ color: "var(--cream)" }}>
                   Ads
-                  <span className="ml-2 text-xs text-neutral-500">(removed on paid)</span>
+                  <span className="ml-2 text-xs" style={{ color: "var(--muted)" }}>
+                    (removed on paid)
+                  </span>
                 </td>
-                <td className="px-5 py-3 text-center text-neutral-500 text-xs">shown</td>
-                <td className="px-5 py-3 text-center text-green-400">✓ removed</td>
+                <td className="px-5 py-3.5 text-center text-xs" style={{ color: "var(--muted)" }}>
+                  shown
+                </td>
+                <td className="px-5 py-3.5 text-center" style={{ color: "var(--signal)" }}>
+                  ✓ removed
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded border border-neutral-800 bg-neutral-900 p-6 text-center">
-            <p className="mb-1 text-lg font-bold text-white">Free</p>
-            <p className="mb-4 text-sm text-neutral-400">Ad-supported. Core features included.</p>
+        {/* Column footers */}
+        <div
+          className="mt-8 grid gap-6 border-t pt-8 sm:grid-cols-2"
+          style={{ borderColor: "var(--ink-line)" }}
+        >
+          <div
+            className="border-t-2 pt-4"
+            style={{ borderColor: "var(--ink-line)" }}
+          >
+            <p
+              className="font-display mb-1 text-base font-semibold"
+              style={{ color: "var(--cream)" }}
+            >
+              Free
+            </p>
+            <p className="mb-4 text-sm" style={{ color: "var(--muted)" }}>
+              Ad-supported. Self-host free under AGPL.
+            </p>
             <a
               href="/start-org"
-              className="inline-block rounded border border-neutral-700 px-5 py-2 text-sm font-semibold text-neutral-300 transition-colors hover:border-neutral-500 hover:text-white"
+              style={{ borderColor: "var(--ink-line)", color: "var(--muted)" }}
+              className="font-display inline-block rounded border px-5 py-2 text-sm font-semibold transition-colors hover:border-[color:var(--cream)] hover:text-[color:var(--cream)]"
             >
-              Get started free
+              Start free
             </a>
           </div>
-          <div className="rounded border border-amber-900/40 bg-neutral-900 p-6 text-center">
-            <p className="mb-1 text-lg font-bold text-amber-400">Paid</p>
-            <p className="mb-4 text-sm text-neutral-400">Ad-free, all features, priority support.</p>
+
+          <div
+            className="border-t-2 pt-4"
+            style={{ borderColor: "var(--signal)" }}
+          >
+            <p
+              className="font-display mb-1 text-base font-semibold"
+              style={{ color: "var(--signal)" }}
+            >
+              Hosted
+            </p>
+            <p className="mb-4 text-sm" style={{ color: "var(--muted)" }}>
+              Ads off. Paid-only features. Low monthly rate.
+            </p>
             <a
               href="/start-org"
-              className="inline-block rounded bg-amber-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-500"
+              style={{ background: "var(--signal)", color: "var(--signal-ink)" }}
+              className="font-display inline-block rounded px-5 py-2 text-sm font-semibold transition-colors hover:opacity-90"
             >
-              Start with paid
+              Start your org
             </a>
           </div>
         </div>
