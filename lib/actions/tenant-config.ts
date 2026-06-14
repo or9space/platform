@@ -8,7 +8,7 @@ import {
 } from "./tenant-config-core";
 
 async function acct(): Promise<string | null> { return getSessionAccountId(); }
-function bust(tenantId: string) { revalidateTag(`tenant-config:${tenantId}`); }
+function bust(tenantId: string) { revalidateTag(`tenant-config:${tenantId}`, "max"); }
 
 export async function updateBrandingAction(tenantId: string, input: { name?: string; tagline?: string | null; preset?: string }) {
   const a = await acct(); if (!a) return { ok: false as const, error: "Sign in required" };
