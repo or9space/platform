@@ -1,25 +1,23 @@
 /**
- * Next.js startup hook. On the HOSTED build (where the private `platform-paid`
- * overlay is present AND Stripe keys are set), this registers the real
- * providers onto the ExtensionRegistry. On OSS / self-host builds the overlay
- * module isn't installed, so the dynamic import throws and is swallowed —
- * the platform keeps its no-op providers.
+ * Next.js startup hook. Registers the overlay's real providers onto the
+ * ExtensionRegistry when Stripe keys are present.
  *
- * The import specifier is held in a variable so the bundler treats it as fully
- * dynamic and never tries to resolve `platform-paid` at build time (keeping the
- * OSS build green without the overlay).
+ * The overlay is imported through the `lib/extensions/overlay` seam: in OSS it's
+ * a no-op stub; the hosted build swaps that file for the real platform-paid
+ * re-export. Either way this is a normal static import (transpiled + bundled by
+ * Next), so there's no runtime module-resolution fragility.
  */
-export async function register() {
+import { ext } from "@/lib/extensions/registry";
+import { registerPaidExtensions } from "@/lib/extensions/overlay";
+
+export function register() {
   if (!process.env.STRIPE_SECRET_KEY) return; // fail-safe: no keys, no overlay
   try {
-    const spec = "platform-paid/src/register";
-    const overlay = (await import(/* webpackIgnore: true */ spec)) as {
-      registerPaidExtensions: (ext: unknown) => void;
-    };
-    const { ext } = await import("@/lib/extensions/registry");
-    overlay.registerPaidExtensions(ext);
-    console.log("[or9] platform-paid overlay registered");
+    registerPaidExtensions(ext);
+    if (ext.billingProvider.kind !== "noop") {
+      console.log("[or9] paid overlay registered:", ext.billingProvider.kind);
+    }
   } catch (e) {
-    console.warn("[or9] platform-paid overlay not loaded:", (e as Error).message);
+    console.warn("[or9] overlay registration failed:", (e as Error).message);
   }
 }
