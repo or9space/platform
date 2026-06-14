@@ -1,32 +1,75 @@
 export function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-neutral-800 bg-neutral-950 px-6 py-24 sm:py-32">
-      {/* Subtle radial gradient backdrop */}
+    <section className="relative px-6 pb-24 pt-16 sm:pb-32 sm:pt-20">
+      {/* Dispatch strip */}
       <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(220,38,38,0.12),transparent)]"
-      />
-      <div className="relative mx-auto max-w-3xl space-y-6 text-center">
-        <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl">
-          Command headquarters for your org
-        </h1>
-        <p className="mx-auto max-w-xl text-lg text-neutral-400">
-          or9.space is a configurable, multi-tenant platform that gives serious Star Citizen orgs a private space for forums, members, treasury, loot, fleet, and more.
-        </p>
-        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <a
-            href="/start-org"
-            className="inline-block rounded bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-500"
+        className="mb-10 inline-flex items-center gap-3 border-b pb-2"
+        style={{ borderColor: "var(--ink-line)" }}
+      >
+        <span
+          className="font-mono text-xs font-semibold uppercase tracking-widest"
+          style={{ color: "var(--signal)" }}
+        >
+          ORG.HQ
+        </span>
+        <span style={{ color: "var(--ink-line)" }} className="text-xs">//</span>
+        <span
+          className="font-mono text-xs uppercase tracking-widest"
+          style={{ color: "var(--muted)" }}
+        >
+          STATUS: LIVE
+        </span>
+        <span style={{ color: "var(--ink-line)" }} className="text-xs">//</span>
+        <span
+          className="font-mono text-xs uppercase tracking-widest"
+          style={{ color: "var(--muted)" }}
+        >
+          OPEN-SOURCE
+        </span>
+      </div>
+
+      {/* Left-weighted layout */}
+      <div className="mx-auto max-w-6xl">
+        <div className="max-w-2xl">
+          <h1
+            className="font-display mb-6 text-[clamp(2.75rem,6vw,4.5rem)] font-bold leading-none"
+            style={{ color: "var(--cream)" }}
           >
-            Start your org
-          </a>
-          <a
-            href="/features"
-            className="inline-block rounded border border-neutral-700 px-6 py-3 text-sm font-semibold text-neutral-300 transition-colors hover:border-neutral-500 hover:text-white"
+            Your org runs on a real{" "}
+            <span style={{ color: "var(--signal)" }}>command HQ.</span>
+          </h1>
+
+          <p
+            className="mb-8 max-w-lg text-lg leading-relaxed"
+            style={{ color: "var(--muted)" }}
           >
-            See features
-          </a>
+            Freedom Guard already runs on it. Open-source under AGPL. Per-org isolated at
+            the database level. Nine built-in modules. Live in minutes.
+          </p>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <a
+              href="/start-org"
+              style={{ background: "var(--signal)", color: "var(--signal-ink)" }}
+              className="font-display inline-block rounded px-7 py-3.5 text-sm font-semibold transition-colors hover:opacity-90"
+            >
+              Start your org
+            </a>
+            <a
+              href="/features"
+              style={{ borderColor: "var(--ink-line)", color: "var(--muted)" }}
+              className="font-display inline-block rounded border px-7 py-3.5 text-sm font-semibold transition-colors hover:border-[color:var(--cream)] hover:text-[color:var(--cream)]"
+            >
+              See features
+            </a>
+          </div>
         </div>
+
+        {/* Hairline framing element */}
+        <div
+          className="mt-16 border-t"
+          style={{ borderColor: "var(--ink-line)" }}
+        />
       </div>
     </section>
   );
