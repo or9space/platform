@@ -7,6 +7,7 @@ import { listMembers } from "@/lib/queries/members";
 import { makeTenantContext } from "@/lib/tenant";
 import { Rank } from "@/components/rank";
 import { RankControls } from "./rank-controls";
+import { LoginLinkButton } from "@/components/admin/login-link-button";
 
 export default async function AdminMembersPage() {
   const ctx = await getFullTenantContext();
@@ -35,7 +36,8 @@ export default async function AdminMembersPage() {
             <tr className="border-b border-neutral-800 text-left text-neutral-400">
               <th className="pb-2 pr-4 font-medium">Member</th>
               <th className="pb-2 pr-4 font-medium">Rank</th>
-              <th className="pb-2 font-medium">Change rank</th>
+              <th className="pb-2 pr-4 font-medium">Change rank</th>
+              <th className="pb-2 font-medium">Login link</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-800">
@@ -69,12 +71,15 @@ export default async function AdminMembersPage() {
                   <td className="py-3 pr-4 text-neutral-300">
                     <Rank tier={member.tier} />
                   </td>
-                  <td className="py-3">
+                  <td className="py-3 pr-4">
                     <RankControls
                       membershipId={member.id}
                       currentTier={member.tier}
                       username={member.username}
                     />
+                  </td>
+                  <td className="py-3">
+                    <LoginLinkButton tenantId={tenant.id} membershipId={member.id} />
                   </td>
                 </tr>
               );

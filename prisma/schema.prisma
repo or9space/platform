@@ -21,8 +21,28 @@ model Account {
 
   memberships    Membership[]
   supportTickets SupportTicket[]
+  setupTokens    LoginSetupToken[]
 
   @@map("accounts")
+}
+
+/**
+ * One-time, admin-generated link for a member to set their password. Used to
+ * onboard accounts created without a password (e.g. migrated rosters) since
+ * there is no email/SMTP yet — an OFFICER generates the link and shares it.
+ * Global (keyed to the global Account); no RLS, like `accounts`.
+ */
+model LoginSetupToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique @map("token_hash")
+  accountId String    @map("account_id")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("login_setup_tokens")
 }
 
 enum TenantStatus {

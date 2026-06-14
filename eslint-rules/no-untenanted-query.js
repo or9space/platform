@@ -16,6 +16,7 @@ const GLOBAL_TABLES = [
   "supportMessage",
   "adSlot",
   "adCreative",
+  "loginSetupToken",
 ];
 
 const PRISMA_VERBS = new Set([
