@@ -29,6 +29,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    /**
+     * Keep post-auth redirects on the tenant subdomain the user came from.
+     * NEXTAUTH_URL is pinned to the apex (https://or9.space), so Auth.js's
+     * default same-origin check rejects a freedomguards.or9.space callbackUrl
+     * and bounces to the apex. Allow any or9.space host (apex + subdomains).
+     */
+    redirect({ url, baseUrl }) {
+      try {
+        const u = new URL(url, baseUrl);
+        if (u.hostname === "or9.space" || u.hostname.endsWith(".or9.space")) {
+          return u.toString();
+        }
+      } catch {
+        // fall through to baseUrl on a malformed url
+      }
+      return baseUrl;
+    },
     jwt({ token, user }) {
       if (user?.id) token.accountId = user.id;
       return token;
