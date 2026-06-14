@@ -1,8 +1,10 @@
+import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getCurrentTenant } from "@/lib/server/get-tenant";
 import { resolveTenantConfig, getTenantDbOverrides } from "@/lib/config";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { TenantNav } from "@/components/tenant-nav";
+import { OrgDashboard } from "@/components/dashboard/org-dashboard";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { Hero } from "@/components/marketing/hero";
@@ -29,24 +31,22 @@ export default async function HomePage() {
     );
   }
 
-  const cfg = await resolveTenantConfig(tenant.plan, await getTenantDbOverrides(tenant.id));
+  const full = await getFullTenantContext();
+  const cfg = full?.config ?? (await resolveTenantConfig(tenant.plan, await getTenantDbOverrides(tenant.id)));
   const accountId = await getSessionAccountId();
   const viewer = await getViewerMembership(tenant.id, accountId);
 
-  // Signed-in member: show the org chrome + a real landing, not a sign-in prompt.
-  if (viewer) {
+  // Signed-in member: show the full org dashboard, not a sign-in prompt.
+  if (viewer && full) {
     return (
       <div className="min-h-screen">
         <TenantNav />
-        <main className="mx-auto max-w-2xl space-y-4 p-8">
-          <h1 className="text-3xl font-bold">{cfg.branding.name}</h1>
-          <p className="text-neutral-400">
-            Signed in as{" "}
-            <strong className="text-neutral-200">{viewer.displayName ?? viewer.username}</strong>. Use
-            the nav above to jump into forums, members, loot and more.
-          </p>
-          <AdSlot slot="sidebar-bottom" />
-        </main>
+        <OrgDashboard
+          tenantId={tenant.id}
+          config={full.config}
+          features={full.features}
+          viewer={viewer}
+        />
       </div>
     );
   }

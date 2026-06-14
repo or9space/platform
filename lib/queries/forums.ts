@@ -68,6 +68,33 @@ export async function getThread(ctx: TenantContext, threadId: string) {
   };
 }
 
+export interface RecentThread {
+  id: string; title: string; categorySlug: string; categoryName: string;
+  authorName: string; lastPostAt: Date | null; postCount: number;
+}
+
+/** Newest-active threads across all categories — for the org dashboard. */
+export async function listRecentThreads(ctx: TenantContext, limit = 5): Promise<RecentThread[]> {
+  const threads = await db(ctx).forumThread.findMany({
+    orderBy: [{ lastPostAt: "desc" }, { createdAt: "desc" }],
+    take: limit,
+    select: {
+      id: true, title: true, lastPostAt: true,
+      category: { select: { slug: true, name: true } },
+      author: { select: { displayName: true, username: true } },
+      _count: { select: { posts: true } },
+    },
+  });
+  return threads.map((t) => ({
+    id: t.id, title: t.title,
+    categorySlug: t.category?.slug ?? "",
+    categoryName: t.category?.name ?? "",
+    authorName: t.author?.displayName ?? t.author?.username ?? "Unknown",
+    lastPostAt: t.lastPostAt,
+    postCount: t._count.posts,
+  }));
+}
+
 export async function searchThreads(ctx: TenantContext, query: string) {
   const q = query.trim();
   if (q.length < 2) return [];
