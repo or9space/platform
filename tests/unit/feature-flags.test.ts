@@ -3,12 +3,12 @@ import { FEATURE_FLAGS, isValidFlagKey } from "@/lib/feature-flags";
 import { featureDefaultsForPlan } from "@/lib/config/apply-defaults";
 import { isFlagAllowedForPlan } from "@/lib/paywall";
 
-const FREE_FEATURES = ["forums", "events", "news", "handbook"] as const;
-const PAID_FEATURES = ["operations", "loot", "treasury", "inventory", "fleet", "tournaments", "resources", "lfg", "alliances", "awards", "contracts", "gallery"] as const;
+const FREE_FEATURES = ["forums", "events", "news", "handbook", "activity"] as const;
+const PAID_FEATURES = ["operations", "loot", "treasury", "inventory", "fleet", "tournaments", "resources", "lfg", "alliances", "awards", "contracts", "gallery", "squads"] as const;
 
 describe("feature flag registry", () => {
   it("declares all v1 flags", () => {
-    expect(FEATURE_FLAGS).toHaveLength(19);
+    expect(FEATURE_FLAGS).toHaveLength(21);
   });
 
   it("free tier gets the community starter, not the paid ops features", () => {
@@ -41,8 +41,8 @@ describe("feature flag registry", () => {
   it("includes the locked flag keys", () => {
     const keys = FEATURE_FLAGS.map((f) => f.key);
     for (const expected of [
-      "forums", "events", "news", "operations", "resources", "lfg", "alliances",
-      "awards", "contracts", "gallery",
+      "forums", "events", "news", "activity", "operations", "resources", "lfg", "alliances",
+      "awards", "contracts", "gallery", "squads",
       "handbook", "loot", "inventory", "treasury",
       "fleet", "tournaments", "calendar.googleIntegration",
       "discord.bot", "ads"

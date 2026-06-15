@@ -324,6 +324,41 @@ model GalleryItem {
   @@map("gallery_items")
 }
 
+// === Squads ===
+
+model Squad {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  name        String   @db.VarChar(120)
+  description String?  @db.Text
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant    Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy Membership    @relation("squadCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  members   SquadMember[]
+
+  @@index([tenantId])
+  @@map("squads")
+}
+
+model SquadMember {
+  id           String   @id @default(cuid())
+  tenantId     String   @map("tenant_id")
+  squadId      String   @map("squad_id")
+  membershipId String   @map("membership_id")
+  role         String?  @db.VarChar(80)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  squad      Squad      @relation(fields: [squadId], references: [id], onDelete: Cascade)
+  member     Membership @relation("squadMember", fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([squadId, membershipId])
+  @@index([tenantId])
+  @@map("squad_members")
+}
+
 enum TenantStatus {
   PENDING
   PROVISIONING
@@ -363,6 +398,8 @@ model Tenant {
   memberAwards MemberAward[]
   contracts    Contract[]
   galleryItems GalleryItem[]
+  squads       Squad[]
+  squadMembers SquadMember[]
 
   @@map("tenants")
 }
@@ -409,6 +446,8 @@ model Membership {
   contractsCreated Contract[]   @relation("contractCreator")
   contractsClaimed Contract[]   @relation("contractsClaimed")
   galleryItems     GalleryItem[] @relation("galleryAuthor")
+  squadsCreated    Squad[]       @relation("squadCreator")
+  squadMemberships SquadMember[] @relation("squadMember")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])

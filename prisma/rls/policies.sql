@@ -236,3 +236,17 @@ DROP POLICY IF EXISTS tenant_isolation ON gallery_items;
 CREATE POLICY tenant_isolation ON gallery_items
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE squads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE squads FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON squads;
+CREATE POLICY tenant_isolation ON squads
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE squad_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE squad_members FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON squad_members;
+CREATE POLICY tenant_isolation ON squad_members
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

@@ -25,6 +25,9 @@ export async function TenantNav({ active }: { active?: string }) {
 
   const items: { href: string; label: string; key: string }[] = [];
 
+  if (isFeatureEnabled(ctx.features, "activity"))
+    items.push({ href: "/activity", label: "Activity", key: "activity" });
+
   if (isFeatureEnabled(ctx.features, "forums"))
     items.push({ href: "/forums", label: "Forums", key: "forums" });
 
@@ -38,6 +41,9 @@ export async function TenantNav({ active }: { active?: string }) {
     items.push({ href: "/operations", label: "Operations", key: "operations" });
 
   items.push({ href: "/members", label: "Members", key: "members" });
+
+  if (isFeatureEnabled(ctx.features, "squads"))
+    items.push({ href: "/squads", label: "Squads", key: "squads" });
 
   if (isFeatureEnabled(ctx.features, "handbook"))
     items.push({ href: "/handbook", label: "Handbook", key: "handbook" });
@@ -75,6 +81,9 @@ export async function TenantNav({ active }: { active?: string }) {
   // Treasury is OFFICER+ (leadership) — only show the link to OFFICER+.
   if (isFeatureEnabled(ctx.features, "treasury") && hasTier(tier, "OFFICER"))
     items.push({ href: "/treasury", label: "Treasury", key: "treasury" });
+
+  // Personal settings — always available to a member.
+  items.push({ href: "/settings", label: "Settings", key: "settings" });
 
   return (
     <header className="border-b border-neutral-800">

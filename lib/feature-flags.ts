@@ -11,6 +11,8 @@ export type FeatureFlagKey =
   | "forums"
   | "events"
   | "news"
+  | "activity"
+  | "squads"
   | "operations"
   | "resources"
   | "lfg"
@@ -38,6 +40,7 @@ export const FEATURE_FLAGS: ReadonlyArray<FeatureFlagDef> = [
   { key: "forums",                      label: "Forums",            defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "events",                      label: "Events",            defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "news",                        label: "News",              defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
+  { key: "activity",                    label: "Activity",          defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "handbook",                    label: "Handbook",          defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   // --- Paid tier (full ops HQ) ---
   { key: "operations",                  label: "Operations",        defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
@@ -52,6 +55,7 @@ export const FEATURE_FLAGS: ReadonlyArray<FeatureFlagDef> = [
   { key: "awards",                      label: "Awards",            defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
   { key: "contracts",                   label: "Contracts",         defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
   { key: "gallery",                     label: "Gallery",           defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "squads",                      label: "Squads",            defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
   // --- Integrations / platform ---
   { key: "calendar.googleIntegration",  label: "Google Calendar",   defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "discord.bot",                 label: "Discord Bot",       defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
