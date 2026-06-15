@@ -433,6 +433,53 @@ model Application {
   @@map("applications")
 }
 
+/// 1:1 direct-message conversation between two memberships in an org.
+model Conversation {
+  id            String   @id @default(cuid())
+  tenantId      String   @map("tenant_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  lastMessageAt DateTime @default(now()) @map("last_message_at")
+
+  tenant       Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([tenantId])
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id             String    @id @default(cuid())
+  tenantId       String    @map("tenant_id")
+  conversationId String    @map("conversation_id")
+  membershipId   String    @map("membership_id")
+  lastReadAt     DateTime? @map("last_read_at")
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  membership   Membership   @relation("conversationParticipations", fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, membershipId])
+  @@index([tenantId, membershipId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  tenantId       String   @map("tenant_id")
+  conversationId String   @map("conversation_id")
+  senderId       String   @map("sender_id")
+  body           String   @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       Membership   @relation("messagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, conversationId, createdAt])
+  @@map("messages")
+}
+
 enum TenantStatus {
   PENDING
   PROVISIONING
@@ -477,6 +524,9 @@ model Tenant {
   projects     Project[]
   tickets      Ticket[]
   applications Application[]
+  conversations Conversation[]
+  conversationParticipants ConversationParticipant[]
+  messages     Message[]
 
   @@map("tenants")
 }
@@ -529,6 +579,8 @@ model Membership {
   ticketsCreated   Ticket[]      @relation("ticketCreator")
   ticketsAssigned  Ticket[]      @relation("ticketAssignee")
   applicationsReviewed Application[] @relation("applicationReviewer")
+  conversationParticipations ConversationParticipant[] @relation("conversationParticipations")
+  messagesSent     Message[]     @relation("messagesSent")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])

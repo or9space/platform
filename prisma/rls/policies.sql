@@ -271,3 +271,24 @@ DROP POLICY IF EXISTS tenant_isolation ON applications;
 CREATE POLICY tenant_isolation ON applications
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE conversations FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON conversations;
+CREATE POLICY tenant_isolation ON conversations
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE conversation_participants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE conversation_participants FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON conversation_participants;
+CREATE POLICY tenant_isolation ON conversation_participants
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE messages FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON messages;
+CREATE POLICY tenant_isolation ON messages
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

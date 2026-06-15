@@ -14,6 +14,7 @@ export type FeatureFlagKey =
   | "activity"
   | "recruitment"
   | "squads"
+  | "messages"
   | "operations"
   | "resources"
   | "lfg"
@@ -60,6 +61,7 @@ export const FEATURE_FLAGS: ReadonlyArray<FeatureFlagDef> = [
   { key: "gallery",                     label: "Gallery",           defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
   { key: "squads",                      label: "Squads",            defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
   { key: "projects",                    label: "Projects",          defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "messages",                    label: "Direct Messages",   defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
   // --- Integrations / platform ---
   { key: "calendar.googleIntegration",  label: "Google Calendar",   defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "discord.bot",                 label: "Discord Bot",       defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
