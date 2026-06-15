@@ -25,22 +25,30 @@ export type FeatureFlagKey =
   | "discord.bot"
   | "ads";
 
+// Free tier = a usable community starter (forums, events, news, handbook +
+// members/directory which need no flag). Everything operational/economy is
+// PAID-only: off by default for free tenants AND blocked from being enabled
+// (isFlagAllowedForPlan) until they upgrade. paidOnly drives both the gate and
+// the locked toggle in the admin UI.
 export const FEATURE_FLAGS: ReadonlyArray<FeatureFlagDef> = [
+  // --- Free tier (community starter) ---
   { key: "forums",                      label: "Forums",            defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "events",                      label: "Events",            defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "news",                        label: "News",              defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "operations",                  label: "Operations",        defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "resources",                   label: "Resources",         defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "lfg",                         label: "LFG",               defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "alliances",                   label: "Alliances",         defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "handbook",                    label: "Handbook",          defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "loot",                        label: "Loot Points",       defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "inventory",                   label: "Inventory",         defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "treasury",                    label: "Treasury",          defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "fleet",                       label: "Fleet",             defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "tournaments",                 label: "Tournaments",       defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: false },
+  // --- Paid tier (full ops HQ) ---
+  { key: "operations",                  label: "Operations",        defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "loot",                        label: "Loot Points",       defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "treasury",                    label: "Treasury",          defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "inventory",                   label: "Inventory",         defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "fleet",                       label: "Fleet",             defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "tournaments",                 label: "Tournaments",       defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "resources",                   label: "Resources",         defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "lfg",                         label: "LFG",               defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  { key: "alliances",                   label: "Alliances",         defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
+  // --- Integrations / platform ---
   { key: "calendar.googleIntegration",  label: "Google Calendar",   defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
-  { key: "discord.bot",                 label: "Discord Bot",       defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true },
+  { key: "discord.bot",                 label: "Discord Bot",       defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
   { key: "ads",                         label: "Ads",               defaultFree: true,  defaultPaid: false, tenantEditable: false, paidOnly: false },
 ];
 

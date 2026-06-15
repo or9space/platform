@@ -48,12 +48,12 @@ describe("tenant-config write actions", () => {
     expect((row?.json as any).labels.memberPlural).toBe("Pilots");
   });
 
-  it("COMMAND can toggle a feature flag (fleet on)", async () => {
+  it("COMMAND can toggle a community-tier feature flag (forums off)", async () => {
     const cmd = await commandAccount(TENANT_A.id);
-    const r = await setFeatureFlagCore(TENANT_A.id, cmd, "fleet", true);
+    const r = await setFeatureFlagCore(TENANT_A.id, cmd, "forums", false);
     expect(r.ok).toBe(true);
-    const ff = await testPrisma.tenantFeatureFlag.findUnique({ where: { tenantId_key: { tenantId: TENANT_A.id, key: "fleet" } } });
-    expect(ff?.enabled).toBe(true);
+    const ff = await testPrisma.tenantFeatureFlag.findUnique({ where: { tenantId_key: { tenantId: TENANT_A.id, key: "forums" } } });
+    expect(ff?.enabled).toBe(false);
   });
 
   it("FREE tenant cannot enable a paid-only flag (discord.bot) — plan read server-side, not spoofable", async () => {

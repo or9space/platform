@@ -6,9 +6,16 @@ describe("paywall", () => {
     expect(isFlagAllowedForPlan("FREE", "discord.bot")).toBe(false);
     expect(isFlagAllowedForPlan("PAID", "discord.bot")).toBe(true);
   });
-  it("free tier CAN enable fleet/tournaments (off by default but not paid-locked)", () => {
-    expect(isFlagAllowedForPlan("FREE", "fleet")).toBe(true);
-    expect(isFlagAllowedForPlan("FREE", "tournaments")).toBe(true);
+  it("free tier cannot enable paid-only ops features; paid can", () => {
+    for (const k of ["fleet", "tournaments", "loot", "treasury", "operations", "inventory", "resources", "lfg", "alliances"] as const) {
+      expect(isFlagAllowedForPlan("FREE", k)).toBe(false);
+      expect(isFlagAllowedForPlan("PAID", k)).toBe(true);
+    }
+  });
+  it("free tier can still toggle the community-tier flags", () => {
+    for (const k of ["forums", "events", "news", "handbook"] as const) {
+      expect(isFlagAllowedForPlan("FREE", k)).toBe(true);
+    }
   });
   it("free tier cannot set a custom domain; paid can", () => {
     expect(isConfigPathAllowedForPlan("FREE", "domains.customDomain")).toBe(false);
