@@ -4,11 +4,11 @@ import { featureDefaultsForPlan } from "@/lib/config/apply-defaults";
 import { isFlagAllowedForPlan } from "@/lib/paywall";
 
 const FREE_FEATURES = ["forums", "events", "news", "handbook", "activity"] as const;
-const PAID_FEATURES = ["operations", "loot", "treasury", "inventory", "fleet", "tournaments", "resources", "lfg", "alliances", "awards", "contracts", "gallery", "squads"] as const;
+const PAID_FEATURES = ["operations", "loot", "treasury", "inventory", "fleet", "tournaments", "resources", "lfg", "alliances", "awards", "contracts", "gallery", "squads", "projects"] as const;
 
 describe("feature flag registry", () => {
   it("declares all v1 flags", () => {
-    expect(FEATURE_FLAGS).toHaveLength(21);
+    expect(FEATURE_FLAGS).toHaveLength(22);
   });
 
   it("free tier gets the community starter, not the paid ops features", () => {
@@ -42,7 +42,7 @@ describe("feature flag registry", () => {
     const keys = FEATURE_FLAGS.map((f) => f.key);
     for (const expected of [
       "forums", "events", "news", "activity", "operations", "resources", "lfg", "alliances",
-      "awards", "contracts", "gallery", "squads",
+      "awards", "contracts", "gallery", "squads", "projects",
       "handbook", "loot", "inventory", "treasury",
       "fleet", "tournaments", "calendar.googleIntegration",
       "discord.bot", "ads"

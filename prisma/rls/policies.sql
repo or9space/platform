@@ -250,3 +250,17 @@ DROP POLICY IF EXISTS tenant_isolation ON squad_members;
 CREATE POLICY tenant_isolation ON squad_members
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE projects FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON projects;
+CREATE POLICY tenant_isolation ON projects
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE tickets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tickets FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON tickets;
+CREATE POLICY tenant_isolation ON tickets
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

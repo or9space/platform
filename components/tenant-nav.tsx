@@ -45,6 +45,9 @@ export async function TenantNav({ active }: { active?: string }) {
   if (isFeatureEnabled(ctx.features, "squads"))
     items.push({ href: "/squads", label: "Squads", key: "squads" });
 
+  if (isFeatureEnabled(ctx.features, "projects"))
+    items.push({ href: "/projects", label: "Projects", key: "projects" });
+
   if (isFeatureEnabled(ctx.features, "handbook"))
     items.push({ href: "/handbook", label: "Handbook", key: "handbook" });
 

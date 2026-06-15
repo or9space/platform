@@ -359,6 +359,51 @@ model SquadMember {
   @@map("squad_members")
 }
 
+// === Projects (boards + tickets) ===
+
+enum TicketStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  name        String   @db.VarChar(120)
+  description String?  @db.Text
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy Membership @relation("projectCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  tickets   Ticket[]
+
+  @@index([tenantId])
+  @@map("projects")
+}
+
+model Ticket {
+  id          String       @id @default(cuid())
+  tenantId    String       @map("tenant_id")
+  projectId   String       @map("project_id")
+  title       String       @db.VarChar(200)
+  description String?      @db.Text
+  status      TicketStatus @default(TODO)
+  assigneeId  String?      @map("assignee_id")
+  createdById String       @map("created_by_id")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  tenant    Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee  Membership? @relation("ticketAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  createdBy Membership  @relation("ticketCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, projectId])
+  @@map("tickets")
+}
+
 enum TenantStatus {
   PENDING
   PROVISIONING
@@ -400,6 +445,8 @@ model Tenant {
   galleryItems GalleryItem[]
   squads       Squad[]
   squadMembers SquadMember[]
+  projects     Project[]
+  tickets      Ticket[]
 
   @@map("tenants")
 }
@@ -448,6 +495,9 @@ model Membership {
   galleryItems     GalleryItem[] @relation("galleryAuthor")
   squadsCreated    Squad[]       @relation("squadCreator")
   squadMemberships SquadMember[] @relation("squadMember")
+  projectsCreated  Project[]     @relation("projectCreator")
+  ticketsCreated   Ticket[]      @relation("ticketCreator")
+  ticketsAssigned  Ticket[]      @relation("ticketAssignee")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])
