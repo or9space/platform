@@ -84,6 +84,9 @@ export async function TenantNav({ active }: { active?: string }) {
   if (isFeatureEnabled(ctx.features, "resources"))
     items.push({ href: "/resources", label: "Resources", key: "resources" });
 
+  if (isFeatureEnabled(ctx.features, "scTools") && tier)
+    items.push({ href: "/sc-tools", label: "SC Tools", key: "sc-tools" });
+
   // Recruitment review is OFFICER+ (leadership) — public apply form lives at /apply.
   if (isFeatureEnabled(ctx.features, "recruitment") && hasTier(tier, "OFFICER"))
     items.push({ href: "/recruitment", label: "Recruitment", key: "recruitment" });
