@@ -241,6 +241,89 @@ model Alliance {
   @@map("alliances")
 }
 
+// === Awards ===
+
+model Award {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  name        String   @db.VarChar(120)
+  description String?  @db.Text
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant     Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy  Membership    @relation("awardCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  recipients MemberAward[]
+
+  @@index([tenantId])
+  @@map("awards")
+}
+
+model MemberAward {
+  id           String   @id @default(cuid())
+  tenantId     String   @map("tenant_id")
+  awardId      String   @map("award_id")
+  membershipId String   @map("membership_id")
+  note         String?  @db.VarChar(300)
+  awardedById  String   @map("awarded_by_id")
+  awardedAt    DateTime @default(now()) @map("awarded_at")
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  award      Award      @relation(fields: [awardId], references: [id], onDelete: Cascade)
+  member     Membership @relation("awardsReceived", fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([awardId, membershipId])
+  @@index([tenantId, membershipId])
+  @@map("member_awards")
+}
+
+// === Contracts ===
+
+enum ContractStatus {
+  OPEN
+  CLAIMED
+  COMPLETED
+  CANCELLED
+}
+
+model Contract {
+  id          String         @id @default(cuid())
+  tenantId    String         @map("tenant_id")
+  title       String         @db.VarChar(160)
+  description String?        @db.Text
+  reward      String?        @db.VarChar(160)
+  status      ContractStatus @default(OPEN)
+  claimedById String?        @map("claimed_by_id")
+  createdById String         @map("created_by_id")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  tenant    Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy Membership  @relation("contractCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  claimedBy Membership? @relation("contractsClaimed", fields: [claimedById], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, status])
+  @@map("contracts")
+}
+
+// === Gallery ===
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  title       String?  @db.VarChar(160)
+  imageUrl    String   @map("image_url") @db.VarChar(1000)
+  caption     String?  @db.Text
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy Membership @relation("galleryAuthor", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("gallery_items")
+}
+
 enum TenantStatus {
   PENDING
   PROVISIONING
@@ -252,6 +335,7 @@ enum TenantStatus {
 enum TenantPlan {
   FREE
   PAID
+  SELF_HOSTED
 }
 
 model Tenant {
@@ -275,6 +359,10 @@ model Tenant {
   resources    Resource[]
   lfgPosts     LfgPost[]
   alliances    Alliance[]
+  awards       Award[]
+  memberAwards MemberAward[]
+  contracts    Contract[]
+  galleryItems GalleryItem[]
 
   @@map("tenants")
 }
@@ -316,6 +404,11 @@ model Membership {
   resourcesCreated Resource[]   @relation("resourceCreator")
   lfgPosts        LfgPost[]     @relation("lfgAuthor")
   alliancesCreated Alliance[]   @relation("allianceCreator")
+  awardsCreated    Award[]      @relation("awardCreator")
+  awardsReceived   MemberAward[] @relation("awardsReceived")
+  contractsCreated Contract[]   @relation("contractCreator")
+  contractsClaimed Contract[]   @relation("contractsClaimed")
+  galleryItems     GalleryItem[] @relation("galleryAuthor")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])

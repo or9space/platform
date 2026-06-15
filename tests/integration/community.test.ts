@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterAll } from "vitest";
-import { createResourceCore, deleteResourceCore } from "@/lib/actions/resources-core";
+import { createResourceCore } from "@/lib/actions/resources-core";
 import { listResources } from "@/lib/queries/resources";
 import { createLfgCore, deleteLfgCore } from "@/lib/actions/lfg-core";
 import { listLfg } from "@/lib/queries/lfg";

@@ -208,3 +208,31 @@ DROP POLICY IF EXISTS tenant_isolation ON alliances;
 CREATE POLICY tenant_isolation ON alliances
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE awards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE awards FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON awards;
+CREATE POLICY tenant_isolation ON awards
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE member_awards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE member_awards FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON member_awards;
+CREATE POLICY tenant_isolation ON member_awards
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE contracts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contracts FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON contracts;
+CREATE POLICY tenant_isolation ON contracts
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE gallery_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gallery_items FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gallery_items;
+CREATE POLICY tenant_isolation ON gallery_items
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

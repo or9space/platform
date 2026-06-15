@@ -26,11 +26,12 @@ export class PaywallError extends Error {
 }
 
 export function isFlagAllowedForPlan(plan: TenantPlan, key: FeatureFlagKey): boolean {
-  if (plan === "PAID") return true;
+  // Only FREE is gated; PAID (hosted) and SELF_HOSTED (open-core) get everything.
+  if (plan !== "FREE") return true;
   return !PAID_ONLY_FLAGS.has(key);
 }
 
 export function isConfigPathAllowedForPlan(plan: TenantPlan, path: string): boolean {
-  if (plan === "PAID") return true;
+  if (plan !== "FREE") return true;
   return !PAYWALL_CONFIG_PATHS.has(path);
 }

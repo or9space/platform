@@ -60,6 +60,15 @@ export async function TenantNav({ active }: { active?: string }) {
   if (isFeatureEnabled(ctx.features, "alliances"))
     items.push({ href: "/alliances", label: "Alliances", key: "alliances" });
 
+  if (isFeatureEnabled(ctx.features, "contracts"))
+    items.push({ href: "/contracts", label: "Contracts", key: "contracts" });
+
+  if (isFeatureEnabled(ctx.features, "awards"))
+    items.push({ href: "/awards", label: "Awards", key: "awards" });
+
+  if (isFeatureEnabled(ctx.features, "gallery"))
+    items.push({ href: "/gallery", label: "Gallery", key: "gallery" });
+
   if (isFeatureEnabled(ctx.features, "resources"))
     items.push({ href: "/resources", label: "Resources", key: "resources" });
 

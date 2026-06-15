@@ -1,10 +1,11 @@
 "use client";
 import { useState, useTransition } from "react";
 import { setFeatureFlagAction } from "@/lib/actions/tenant-config";
+import type { TenantPlan } from "@/lib/db";
 
 type Flag = { key: string; label: string; enabled: boolean; tenantEditable: boolean; paidOnly: boolean };
 
-export function FeatureToggles({ tenantId, plan, flags }: { tenantId: string; plan: "FREE" | "PAID"; flags: Flag[] }) {
+export function FeatureToggles({ tenantId, plan, flags }: { tenantId: string; plan: TenantPlan; flags: Flag[] }) {
   const [state, setState] = useState<Record<string, boolean>>(Object.fromEntries(flags.map((f) => [f.key, f.enabled])));
   const [msg, setMsg] = useState<string | null>(null);
   const [pending, start] = useTransition();
