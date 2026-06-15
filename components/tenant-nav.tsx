@@ -28,6 +28,9 @@ export async function TenantNav({ active }: { active?: string }) {
   if (isFeatureEnabled(ctx.features, "forums"))
     items.push({ href: "/forums", label: "Forums", key: "forums" });
 
+  if (isFeatureEnabled(ctx.features, "events"))
+    items.push({ href: "/events", label: "Events", key: "events" });
+
   items.push({ href: "/members", label: "Members", key: "members" });
 
   if (isFeatureEnabled(ctx.features, "handbook"))

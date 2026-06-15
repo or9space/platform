@@ -45,6 +45,60 @@ model LoginSetupToken {
   @@map("login_setup_tokens")
 }
 
+// === Events / Calendar ===
+
+enum EventType {
+  OP
+  MEETING
+  TRAINING
+  SOCIAL
+  TOURNAMENT
+  OTHER
+}
+
+enum RsvpStatus {
+  GOING
+  MAYBE
+  NOT_GOING
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  tenantId    String    @map("tenant_id")
+  title       String    @db.VarChar(160)
+  description String?   @db.Text
+  type        EventType @default(OP)
+  startsAt    DateTime  @map("starts_at")
+  endsAt      DateTime? @map("ends_at")
+  location    String?   @db.VarChar(200)
+  createdById String    @map("created_by_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy Membership @relation("eventCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  rsvps     EventRsvp[]
+
+  @@index([tenantId, startsAt])
+  @@map("events")
+}
+
+model EventRsvp {
+  id           String     @id @default(cuid())
+  tenantId     String     @map("tenant_id")
+  eventId      String     @map("event_id")
+  membershipId String     @map("membership_id")
+  status       RsvpStatus @default(GOING)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  event      Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  membership Membership @relation("eventRsvps", fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, membershipId])
+  @@index([tenantId])
+  @@map("event_rsvps")
+}
+
 enum TenantStatus {
   PENDING
   PROVISIONING
@@ -73,6 +127,7 @@ model Tenant {
   updatedAt             DateTime     @updatedAt @map("updated_at")
 
   memberships  Membership[]
+  events       Event[]
 
   @@map("tenants")
 }
@@ -106,6 +161,8 @@ model Membership {
   heldInventory   InventoryHolding[] @relation("heldInventory")
   fleetShips      FleetShip[]   @relation("fleetShips")
   tournamentEntries TournamentEntry[] @relation("tournamentEntries")
+  eventsCreated   Event[]       @relation("eventCreator")
+  eventRsvps      EventRsvp[]   @relation("eventRsvps")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])

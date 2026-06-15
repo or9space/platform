@@ -5,10 +5,12 @@ import { hasTier, type RankTier } from "../permissions";
 import { listRecentThreads, type RecentThread } from "./forums";
 import { listLootMembersWithBalances } from "./loot";
 import { listTournaments, type TournamentRow } from "./tournaments";
+import { listUpcomingEvents, type EventRow } from "./events";
 import { getTreasuryBalance } from "./treasury";
 
 export interface DashboardData {
   memberCount: number;
+  events: { upcoming: EventRow[] } | null;
   forums: { threadCount: number; recent: RecentThread[] } | null;
   loot: {
     top: { displayName: string; membershipId: string | null; balanceTenths: number }[];
@@ -34,6 +36,11 @@ export async function getDashboardData(
   const { features, viewerTier, viewerMembershipId } = opts;
 
   const memberCount = await db(ctx).membership.count();
+
+  let events: DashboardData["events"] = null;
+  if (isFeatureEnabled(features, "events")) {
+    events = { upcoming: await listUpcomingEvents(ctx, 5) };
+  }
 
   let forums: DashboardData["forums"] = null;
   if (isFeatureEnabled(features, "forums")) {
@@ -67,5 +74,5 @@ export async function getDashboardData(
     treasury = { balance: await getTreasuryBalance(ctx) };
   }
 
-  return { memberCount, forums, loot, tournaments, treasury };
+  return { memberCount, events, forums, loot, tournaments, treasury };
 }

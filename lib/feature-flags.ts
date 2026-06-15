@@ -9,6 +9,7 @@ export interface FeatureFlagDef {
 
 export type FeatureFlagKey =
   | "forums"
+  | "events"
   | "handbook"
   | "loot"
   | "inventory"
@@ -21,6 +22,7 @@ export type FeatureFlagKey =
 
 export const FEATURE_FLAGS: ReadonlyArray<FeatureFlagDef> = [
   { key: "forums",                      label: "Forums",            defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
+  { key: "events",                      label: "Events",            defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "handbook",                    label: "Handbook",          defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "loot",                        label: "Loot Points",       defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "inventory",                   label: "Inventory",         defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },

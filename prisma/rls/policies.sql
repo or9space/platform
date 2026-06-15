@@ -152,3 +152,17 @@ DROP POLICY IF EXISTS tenant_isolation ON tournament_entries;
 CREATE POLICY tenant_isolation ON tournament_entries
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE events FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON events;
+CREATE POLICY tenant_isolation ON events
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE event_rsvps ENABLE ROW LEVEL SECURITY;
+ALTER TABLE event_rsvps FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON event_rsvps;
+CREATE POLICY tenant_isolation ON event_rsvps
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

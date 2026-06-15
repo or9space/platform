@@ -2,14 +2,14 @@ import { describe, it, expect } from "vitest";
 import { FEATURE_FLAGS, isValidFlagKey } from "@/lib/feature-flags";
 
 describe("feature flag registry", () => {
-  it("declares all 10 v1 flags", () => {
-    expect(FEATURE_FLAGS).toHaveLength(10);
+  it("declares all v1 flags", () => {
+    expect(FEATURE_FLAGS).toHaveLength(11);
   });
 
   it("includes the locked flag keys", () => {
     const keys = FEATURE_FLAGS.map((f) => f.key);
     for (const expected of [
-      "forums", "handbook", "loot", "inventory", "treasury",
+      "forums", "events", "handbook", "loot", "inventory", "treasury",
       "fleet", "tournaments", "calendar.googleIntegration",
       "discord.bot", "ads"
     ]) {

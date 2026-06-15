@@ -6,6 +6,8 @@ import type { TenantConfig } from "@/lib/config/schema";
 import type { ViewerMembership } from "@/lib/authz";
 import { Rank } from "@/components/rank";
 import { AdSlot } from "@/components/ads/ad-slot";
+import { EventTypeBadge } from "@/components/events/event-type-badge";
+import { formatDateTime } from "@/lib/format";
 import { StatTile } from "./stat-tile";
 import { Panel } from "./panel";
 
@@ -43,6 +45,7 @@ export async function OrgDashboard({
 
   const quickLinks = [
     { show: isFeatureEnabled(features, "forums"), href: "/forums", label: "Forums" },
+    { show: isFeatureEnabled(features, "events"), href: "/events", label: "Events" },
     { show: true, href: "/members", label: "Members" },
     { show: isFeatureEnabled(features, "handbook"), href: "/handbook", label: "Handbook" },
     { show: isFeatureEnabled(features, "loot"), href: "/loot", label: "Loot" },
@@ -73,6 +76,14 @@ export async function OrgDashboard({
       {/* Stat strip */}
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <StatTile label="Members" value={data.memberCount} href="/members" />
+        {data.events && (
+          <StatTile
+            label="Upcoming events"
+            value={data.events.upcoming.length}
+            sub={data.events.upcoming[0]?.title}
+            href="/events"
+          />
+        )}
         {data.forums && (
           <StatTile label="Forum threads" value={data.forums.threadCount} href="/forums" />
         )}
@@ -123,6 +134,30 @@ export async function OrgDashboard({
 
       {/* Feeds */}
       <div className="grid gap-6 lg:grid-cols-2">
+        {data.events && (
+          <Panel title="Mission clock" href="/events">
+            {data.events.upcoming.length === 0 ? (
+              <p className="text-sm text-neutral-500">No upcoming events.</p>
+            ) : (
+              <ul className="space-y-3">
+                {data.events.upcoming.map((e) => (
+                  <li key={e.id}>
+                    <a href={`/events/${e.id}`} className="block rounded p-2 transition-colors hover:bg-neutral-900">
+                      <div className="flex items-center gap-2">
+                        <EventTypeBadge type={e.type} />
+                        <span className="truncate text-sm font-medium text-neutral-200">{e.title}</span>
+                      </div>
+                      <p className="mt-1 text-xs text-neutral-500">
+                        {formatDateTime(e.startsAt)} · {e.goingCount} going
+                      </p>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+        )}
+
         {data.forums && (
           <Panel title="Forum activity" href="/forums">
             {data.forums.recent.length === 0 ? (
