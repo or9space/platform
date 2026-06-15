@@ -404,6 +404,35 @@ model Ticket {
   @@map("tickets")
 }
 
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Public recruitment applications. Submitted by ANONYMOUS visitors (no
+/// account yet); reviewed by OFFICER+. On approval an Account + Membership is
+/// created and a one-time set-password link is generated for the applicant.
+model Application {
+  id           String            @id @default(cuid())
+  tenantId     String            @map("tenant_id")
+  handle       String            @db.VarChar(60)  // desired in-org username
+  email        String            @db.VarChar(200)
+  contactName  String?           @map("contact_name") @db.VarChar(120)
+  message      String            @db.Text
+  status       ApplicationStatus @default(PENDING)
+  reviewedById String?           @map("reviewed_by_id")
+  reviewedAt   DateTime?         @map("reviewed_at")
+  reviewNote   String?           @map("review_note") @db.VarChar(500)
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  reviewedBy Membership? @relation("applicationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, status])
+  @@map("applications")
+}
+
 enum TenantStatus {
   PENDING
   PROVISIONING
@@ -447,6 +476,7 @@ model Tenant {
   squadMembers SquadMember[]
   projects     Project[]
   tickets      Ticket[]
+  applications Application[]
 
   @@map("tenants")
 }
@@ -498,6 +528,7 @@ model Membership {
   projectsCreated  Project[]     @relation("projectCreator")
   ticketsCreated   Ticket[]      @relation("ticketCreator")
   ticketsAssigned  Ticket[]      @relation("ticketAssignee")
+  applicationsReviewed Application[] @relation("applicationReviewer")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])

@@ -22,6 +22,7 @@ export async function seedTwoTenants(): Promise<void> {
 
 /** Order matters: children before parents. Only touches integration data. */
 export async function resetDb(): Promise<void> {
+  await testPrisma.application.deleteMany({});
   await testPrisma.supportMessage.deleteMany({});
   await testPrisma.supportTicket.deleteMany({});
   await testPrisma.auditLog.deleteMany({});

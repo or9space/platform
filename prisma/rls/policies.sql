@@ -264,3 +264,10 @@ DROP POLICY IF EXISTS tenant_isolation ON tickets;
 CREATE POLICY tenant_isolation ON tickets
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE applications FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON applications;
+CREATE POLICY tenant_isolation ON applications
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

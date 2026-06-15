@@ -12,6 +12,7 @@ export type FeatureFlagKey =
   | "events"
   | "news"
   | "activity"
+  | "recruitment"
   | "squads"
   | "operations"
   | "resources"
@@ -43,6 +44,7 @@ export const FEATURE_FLAGS: ReadonlyArray<FeatureFlagDef> = [
   { key: "news",                        label: "News",              defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "activity",                    label: "Activity",          defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "handbook",                    label: "Handbook",          defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
+  { key: "recruitment",                 label: "Recruitment",       defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   // --- Paid tier (full ops HQ) ---
   { key: "operations",                  label: "Operations",        defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
   { key: "loot",                        label: "Loot Points",       defaultFree: false, defaultPaid: true,  tenantEditable: true,  paidOnly: true  },
