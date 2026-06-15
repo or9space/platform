@@ -99,6 +99,80 @@ model EventRsvp {
   @@map("event_rsvps")
 }
 
+// === News / Announcements ===
+
+enum NewsCategory {
+  ANNOUNCEMENT
+  PATCH_NOTES
+  COMMUNITY
+  GUIDE
+}
+
+model NewsPost {
+  id        String       @id @default(cuid())
+  tenantId  String       @map("tenant_id")
+  title     String       @db.VarChar(200)
+  body      String       @db.Text
+  category  NewsCategory @default(ANNOUNCEMENT)
+  isPinned  Boolean      @default(false) @map("is_pinned")
+  authorId  String       @map("author_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  tenant Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  author Membership @relation("newsAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@map("news_posts")
+}
+
+// === Operations ===
+
+enum OperationStatus {
+  PLANNING
+  BRIEFING
+  ACTIVE
+  DEBRIEFING
+  COMPLETED
+  ARCHIVED
+}
+
+model Operation {
+  id          String          @id @default(cuid())
+  tenantId    String          @map("tenant_id")
+  title       String          @db.VarChar(160)
+  description String?         @db.Text
+  status      OperationStatus @default(PLANNING)
+  scheduledAt DateTime?       @map("scheduled_at")
+  location    String?         @db.VarChar(200)
+  createdById String          @map("created_by_id")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  tenant    Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy Membership        @relation("operationCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  signups   OperationSignup[]
+
+  @@index([tenantId, status])
+  @@map("operations")
+}
+
+model OperationSignup {
+  id           String   @id @default(cuid())
+  tenantId     String   @map("tenant_id")
+  operationId  String   @map("operation_id")
+  membershipId String   @map("membership_id")
+  role         String?  @db.VarChar(80)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  operation  Operation  @relation(fields: [operationId], references: [id], onDelete: Cascade)
+  membership Membership @relation("operationSignups", fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@unique([operationId, membershipId])
+  @@index([tenantId])
+  @@map("operation_signups")
+}
+
 enum TenantStatus {
   PENDING
   PROVISIONING
@@ -128,6 +202,8 @@ model Tenant {
 
   memberships  Membership[]
   events       Event[]
+  newsPosts    NewsPost[]
+  operations   Operation[]
 
   @@map("tenants")
 }
@@ -163,6 +239,9 @@ model Membership {
   tournamentEntries TournamentEntry[] @relation("tournamentEntries")
   eventsCreated   Event[]       @relation("eventCreator")
   eventRsvps      EventRsvp[]   @relation("eventRsvps")
+  newsPosts       NewsPost[]    @relation("newsAuthor")
+  operationsCreated Operation[] @relation("operationCreator")
+  operationSignups  OperationSignup[] @relation("operationSignups")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])

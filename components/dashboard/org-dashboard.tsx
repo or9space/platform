@@ -7,7 +7,8 @@ import type { ViewerMembership } from "@/lib/authz";
 import { Rank } from "@/components/rank";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { EventTypeBadge } from "@/components/events/event-type-badge";
-import { formatDateTime } from "@/lib/format";
+import { CategoryBadge } from "@/components/news/category-badge";
+import { formatDateTime, formatDate } from "@/lib/format";
 import { StatTile } from "./stat-tile";
 import { Panel } from "./panel";
 
@@ -46,6 +47,8 @@ export async function OrgDashboard({
   const quickLinks = [
     { show: isFeatureEnabled(features, "forums"), href: "/forums", label: "Forums" },
     { show: isFeatureEnabled(features, "events"), href: "/events", label: "Events" },
+    { show: isFeatureEnabled(features, "news"), href: "/news", label: "News" },
+    { show: isFeatureEnabled(features, "operations"), href: "/operations", label: "Operations" },
     { show: true, href: "/members", label: "Members" },
     { show: isFeatureEnabled(features, "handbook"), href: "/handbook", label: "Handbook" },
     { show: isFeatureEnabled(features, "loot"), href: "/loot", label: "Loot" },
@@ -98,6 +101,9 @@ export async function OrgDashboard({
           ) : (
             <StatTile label="Loot members" value={data.loot.memberCount} href="/loot" />
           ))}
+        {data.operations && (
+          <StatTile label="Live operations" value={data.operations.live} href="/operations" />
+        )}
         {data.tournaments && (
           <StatTile
             label="Open tournaments"
@@ -131,6 +137,26 @@ export async function OrgDashboard({
           ))}
         </div>
       </section>
+
+      {/* Announcements — full width when present */}
+      {data.news && data.news.latest.length > 0 && (
+        <Panel title="Announcements" href="/news">
+          <ul className="space-y-3">
+            {data.news.latest.map((p) => (
+              <li key={p.id}>
+                <a href={`/news/${p.id}`} className="block rounded p-2 transition-colors hover:bg-neutral-900">
+                  <div className="flex items-center gap-2">
+                    {p.isPinned && <span className="text-xs font-semibold uppercase text-amber-400">Pinned</span>}
+                    <CategoryBadge category={p.category} />
+                    <span className="truncate text-sm font-medium text-neutral-200">{p.title}</span>
+                  </div>
+                  <p className="mt-1 text-xs text-neutral-500">{p.authorName} · {formatDate(p.createdAt)}</p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
 
       {/* Feeds */}
       <div className="grid gap-6 lg:grid-cols-2">

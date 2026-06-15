@@ -6,11 +6,17 @@ import { listRecentThreads, type RecentThread } from "./forums";
 import { listLootMembersWithBalances } from "./loot";
 import { listTournaments, type TournamentRow } from "./tournaments";
 import { listUpcomingEvents, type EventRow } from "./events";
+import { latestNews, type NewsRow } from "./news";
+import { listOperations } from "./operations";
 import { getTreasuryBalance } from "./treasury";
+
+const LIVE_OPS = new Set(["PLANNING", "BRIEFING", "ACTIVE", "DEBRIEFING"]);
 
 export interface DashboardData {
   memberCount: number;
   events: { upcoming: EventRow[] } | null;
+  news: { latest: NewsRow[] } | null;
+  operations: { live: number } | null;
   forums: { threadCount: number; recent: RecentThread[] } | null;
   loot: {
     top: { displayName: string; membershipId: string | null; balanceTenths: number }[];
@@ -40,6 +46,17 @@ export async function getDashboardData(
   let events: DashboardData["events"] = null;
   if (isFeatureEnabled(features, "events")) {
     events = { upcoming: await listUpcomingEvents(ctx, 5) };
+  }
+
+  let news: DashboardData["news"] = null;
+  if (isFeatureEnabled(features, "news")) {
+    news = { latest: await latestNews(ctx, 3) };
+  }
+
+  let operations: DashboardData["operations"] = null;
+  if (isFeatureEnabled(features, "operations")) {
+    const all = await listOperations(ctx);
+    operations = { live: all.filter((o) => LIVE_OPS.has(o.status)).length };
   }
 
   let forums: DashboardData["forums"] = null;
@@ -74,5 +91,5 @@ export async function getDashboardData(
     treasury = { balance: await getTreasuryBalance(ctx) };
   }
 
-  return { memberCount, events, forums, loot, tournaments, treasury };
+  return { memberCount, events, news, operations, forums, loot, tournaments, treasury };
 }

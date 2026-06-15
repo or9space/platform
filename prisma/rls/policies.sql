@@ -166,3 +166,24 @@ DROP POLICY IF EXISTS tenant_isolation ON event_rsvps;
 CREATE POLICY tenant_isolation ON event_rsvps
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE news_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE news_posts FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON news_posts;
+CREATE POLICY tenant_isolation ON news_posts
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE operations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE operations FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON operations;
+CREATE POLICY tenant_isolation ON operations
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE operation_signups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE operation_signups FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON operation_signups;
+CREATE POLICY tenant_isolation ON operation_signups
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
