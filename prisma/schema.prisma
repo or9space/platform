@@ -173,6 +173,74 @@ model OperationSignup {
   @@map("operation_signups")
 }
 
+// === Resources ===
+
+model Resource {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  title       String   @db.VarChar(160)
+  url         String?  @db.VarChar(500)
+  body        String?  @db.Text
+  category    String?  @db.VarChar(60)
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy Membership @relation("resourceCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("resources")
+}
+
+// === LFG (looking for group) ===
+
+enum LfgStatus {
+  OPEN
+  CLOSED
+}
+
+model LfgPost {
+  id        String    @id @default(cuid())
+  tenantId  String    @map("tenant_id")
+  title     String    @db.VarChar(160)
+  body      String?   @db.Text
+  status    LfgStatus @default(OPEN)
+  authorId  String    @map("author_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  tenant Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  author Membership @relation("lfgAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+  @@map("lfg_posts")
+}
+
+// === Alliances ===
+
+enum AllianceStatus {
+  ALLY
+  NEUTRAL
+  HOSTILE
+  PENDING
+}
+
+model Alliance {
+  id          String         @id @default(cuid())
+  tenantId    String         @map("tenant_id")
+  name        String         @db.VarChar(120)
+  description String?        @db.Text
+  status      AllianceStatus @default(ALLY)
+  link        String?        @db.VarChar(500)
+  createdById String         @map("created_by_id")
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy Membership @relation("allianceCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("alliances")
+}
+
 enum TenantStatus {
   PENDING
   PROVISIONING
@@ -204,6 +272,9 @@ model Tenant {
   events       Event[]
   newsPosts    NewsPost[]
   operations   Operation[]
+  resources    Resource[]
+  lfgPosts     LfgPost[]
+  alliances    Alliance[]
 
   @@map("tenants")
 }
@@ -242,6 +313,9 @@ model Membership {
   newsPosts       NewsPost[]    @relation("newsAuthor")
   operationsCreated Operation[] @relation("operationCreator")
   operationSignups  OperationSignup[] @relation("operationSignups")
+  resourcesCreated Resource[]   @relation("resourceCreator")
+  lfgPosts        LfgPost[]     @relation("lfgAuthor")
+  alliancesCreated Alliance[]   @relation("allianceCreator")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])

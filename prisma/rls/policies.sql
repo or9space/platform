@@ -187,3 +187,24 @@ DROP POLICY IF EXISTS tenant_isolation ON operation_signups;
 CREATE POLICY tenant_isolation ON operation_signups
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE resources ENABLE ROW LEVEL SECURITY;
+ALTER TABLE resources FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON resources;
+CREATE POLICY tenant_isolation ON resources
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE lfg_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lfg_posts FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON lfg_posts;
+CREATE POLICY tenant_isolation ON lfg_posts
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE alliances ENABLE ROW LEVEL SECURITY;
+ALTER TABLE alliances FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON alliances;
+CREATE POLICY tenant_isolation ON alliances
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

@@ -12,6 +12,9 @@ export type FeatureFlagKey =
   | "events"
   | "news"
   | "operations"
+  | "resources"
+  | "lfg"
+  | "alliances"
   | "handbook"
   | "loot"
   | "inventory"
@@ -27,6 +30,9 @@ export const FEATURE_FLAGS: ReadonlyArray<FeatureFlagDef> = [
   { key: "events",                      label: "Events",            defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "news",                        label: "News",              defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "operations",                  label: "Operations",        defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
+  { key: "resources",                   label: "Resources",         defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
+  { key: "lfg",                         label: "LFG",               defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
+  { key: "alliances",                   label: "Alliances",         defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "handbook",                    label: "Handbook",          defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "loot",                        label: "Loot Points",       defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },
   { key: "inventory",                   label: "Inventory",         defaultFree: true,  defaultPaid: true,  tenantEditable: true,  paidOnly: false },

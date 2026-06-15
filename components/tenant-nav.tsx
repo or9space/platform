@@ -54,6 +54,15 @@ export async function TenantNav({ active }: { active?: string }) {
   if (isFeatureEnabled(ctx.features, "tournaments"))
     items.push({ href: "/tournaments", label: "Tournaments", key: "tournaments" });
 
+  if (isFeatureEnabled(ctx.features, "lfg"))
+    items.push({ href: "/lfg", label: "LFG", key: "lfg" });
+
+  if (isFeatureEnabled(ctx.features, "alliances"))
+    items.push({ href: "/alliances", label: "Alliances", key: "alliances" });
+
+  if (isFeatureEnabled(ctx.features, "resources"))
+    items.push({ href: "/resources", label: "Resources", key: "resources" });
+
   // Treasury is OFFICER+ (leadership) — only show the link to OFFICER+.
   if (isFeatureEnabled(ctx.features, "treasury") && hasTier(tier, "OFFICER"))
     items.push({ href: "/treasury", label: "Treasury", key: "treasury" });
