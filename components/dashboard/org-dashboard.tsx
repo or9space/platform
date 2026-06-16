@@ -1,16 +1,16 @@
+import {
+  Users, Swords, MessagesSquare, Calendar, Coins, Wallet, Trophy, Clock,
+  Newspaper, TrendingUp, ArrowRight,
+} from "lucide-react";
 import { getDashboardData } from "@/lib/queries/dashboard";
-import { isFeatureEnabled, type FeatureMap } from "@/lib/features";
-import { hasTier } from "@/lib/permissions";
+import { type FeatureMap } from "@/lib/features";
 import { makeTenantContext } from "@/lib/tenant";
-import type { TenantConfig } from "@/lib/config/schema";
 import type { ViewerMembership } from "@/lib/authz";
-import { Rank } from "@/components/rank";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { EventTypeBadge } from "@/components/events/event-type-badge";
 import { CategoryBadge } from "@/components/news/category-badge";
 import { formatDateTime, formatDate } from "@/lib/format";
-import { StatTile } from "./stat-tile";
-import { Panel } from "./panel";
+import { MfdPanel } from "@/components/ui/mfd";
 
 const fmtPts = (tenths: number) =>
   (tenths / 10).toLocaleString(undefined, { maximumFractionDigits: 1 });
@@ -25,233 +25,184 @@ function timeAgo(d: Date | null): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-/** The signed-in member's org home: welcome + stat strip + quick access + feeds. */
+/** Signed-in member's org home — the FG "MFD" daily briefing layout. */
 export async function OrgDashboard({
-  tenantId,
-  config,
-  features,
-  viewer,
+  tenantId, features, viewer,
 }: {
   tenantId: string;
-  config: TenantConfig;
   features: FeatureMap;
   viewer: ViewerMembership;
 }) {
   const ctx = makeTenantContext(tenantId);
   const data = await getDashboardData(ctx, {
-    features,
-    viewerTier: viewer.tier,
-    viewerMembershipId: viewer.id,
+    features, viewerTier: viewer.tier, viewerMembershipId: viewer.id,
   });
 
-  const quickLinks = [
-    { show: isFeatureEnabled(features, "forums"), href: "/forums", label: "Forums" },
-    { show: isFeatureEnabled(features, "events"), href: "/events", label: "Events" },
-    { show: isFeatureEnabled(features, "news"), href: "/news", label: "News" },
-    { show: isFeatureEnabled(features, "operations"), href: "/operations", label: "Operations" },
-    { show: true, href: "/members", label: "Members" },
-    { show: isFeatureEnabled(features, "handbook"), href: "/handbook", label: "Handbook" },
-    { show: isFeatureEnabled(features, "loot"), href: "/loot", label: "Loot" },
-    { show: isFeatureEnabled(features, "inventory"), href: "/inventory", label: "Inventory" },
-    { show: isFeatureEnabled(features, "fleet"), href: "/fleet", label: "Fleet" },
-    { show: isFeatureEnabled(features, "tournaments"), href: "/tournaments", label: "Tournaments" },
-    {
-      show: isFeatureEnabled(features, "treasury") && hasTier(viewer.tier, "OFFICER"),
-      href: "/treasury",
-      label: "Treasury",
-    },
-  ].filter((l) => l.show);
+  type Stat = { label: string; value: string; icon: typeof Users; color: string };
+  const stats: Stat[] = [
+    { label: "Members", value: String(data.memberCount), icon: Users, color: "text-success" },
+  ];
+  if (data.operations) stats.push({ label: "Active Ops", value: String(data.operations.live), icon: Swords, color: "text-primary" });
+  if (data.forums) stats.push({ label: "Forum Threads", value: String(data.forums.threadCount), icon: MessagesSquare, color: "text-fg-blue-light" });
+  if (data.events) stats.push({ label: "Upcoming Events", value: String(data.events.upcoming.length), icon: Calendar, color: "text-fg-red-light" });
+  if (data.loot) stats.push({
+    label: data.loot.viewer ? "Your Loot Rank" : "Loot Members",
+    value: data.loot.viewer ? `#${data.loot.viewer.rank}` : String(data.loot.memberCount),
+    icon: Coins, color: "text-amber",
+  });
+  if (data.tournaments) stats.push({ label: "Open Tournaments", value: String(data.tournaments.open), icon: Trophy, color: "text-warning" });
+  if (data.treasury) stats.push({ label: "Treasury", value: data.treasury.balance.toLocaleString(), icon: Wallet, color: "text-success" });
 
   return (
-    <main className="mx-auto max-w-5xl space-y-8 p-6">
-      {/* Welcome */}
-      <header>
-        <h1 className="text-3xl font-bold text-text-primary">{config.branding.name}</h1>
-        <p className="mt-1 text-text-secondary">
-          Welcome back, <strong className="text-text-primary">{viewer.displayName ?? viewer.username}</strong>{" "}
-          · <Rank tier={viewer.tier} />
-          {config.branding.tagline && (
-            <span className="block text-sm text-text-muted">{config.branding.tagline}</span>
-          )}
-        </p>
-      </header>
+    <div className="p-3 sm:p-6 animate-page-enter">
+      {/* Welcome header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-text-primary">{viewer.displayName ?? viewer.username}</h1>
+        <p className="text-text-muted">Daily briefing.</p>
+      </div>
 
-      {/* Stat strip */}
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <StatTile label="Members" value={data.memberCount} href="/members" />
-        {data.events && (
-          <StatTile
-            label="Upcoming events"
-            value={data.events.upcoming.length}
-            sub={data.events.upcoming[0]?.title}
-            href="/events"
-          />
-        )}
-        {data.forums && (
-          <StatTile label="Forum threads" value={data.forums.threadCount} href="/forums" />
-        )}
-        {data.loot &&
-          (data.loot.viewer ? (
-            <StatTile
-              label="Your loot rank"
-              value={`#${data.loot.viewer.rank}`}
-              sub={`${fmtPts(data.loot.viewer.balanceTenths)} pts`}
-              href="/loot"
-            />
-          ) : (
-            <StatTile label="Loot members" value={data.loot.memberCount} href="/loot" />
-          ))}
-        {data.operations && (
-          <StatTile label="Live operations" value={data.operations.live} href="/operations" />
-        )}
-        {data.tournaments && (
-          <StatTile
-            label="Open tournaments"
-            value={data.tournaments.open}
-            sub={`${data.tournaments.total} total`}
-            href="/tournaments"
-          />
-        )}
-        {data.treasury && (
-          <StatTile
-            label="Treasury"
-            value={data.treasury.balance.toLocaleString()}
-            sub="aUEC"
-            href="/treasury"
-          />
-        )}
-      </section>
+      {/* Quick stats — chamfered MFD readout strip */}
+      <div className="mb-8 flex flex-wrap items-stretch gap-x-6 gap-y-3 border border-border bg-surface-elevated px-4 py-2.5 mfd-cut-tl-br">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div key={stat.label} className="flex min-w-0 items-center gap-2.5">
+              <Icon className={`h-3.5 w-3.5 shrink-0 ${stat.color}`} aria-hidden="true" />
+              <span className="mfd-label">{stat.label}</span>
+              <span className="mfd-readout text-base font-semibold">{stat.value}</span>
+            </div>
+          );
+        })}
+      </div>
 
-      {/* Quick access */}
-      <section>
-        <h2 className="mb-3 font-mono text-xs uppercase tracking-widest text-text-muted">[ Jump in ]</h2>
-        <div className="flex flex-wrap gap-2">
-          {quickLinks.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="rounded border border-border px-4 py-2 text-sm text-text-secondary transition-colors hover:border-primary hover:text-text-primary"
-            >
-              {l.label}
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* Announcements — full width when present */}
+      {/* Announcements — primary chassis */}
       {data.news && data.news.latest.length > 0 && (
-        <Panel title="Announcements" href="/news">
-          <ul className="space-y-3">
-            {data.news.latest.map((p) => (
-              <li key={p.id}>
-                <a href={`/news/${p.id}`} className="block rounded p-2 transition-colors hover:bg-surface-hover">
-                  <div className="flex items-center gap-2">
-                    {p.isPinned && <span className="text-xs font-semibold uppercase text-amber">Pinned</span>}
-                    <CategoryBadge category={p.category} />
-                    <span className="truncate text-sm font-medium text-text-primary">{p.title}</span>
+        <div className="mb-6">
+          <MfdPanel
+            chassis="primary"
+            bodyPadding="md"
+            title={<><Newspaper className="h-3 w-3 text-primary" /><span className="text-primary">[ ANNOUNCEMENTS ]</span></>}
+            titleAside={<a href="/news" className="flex items-center gap-1 mfd-label hover:text-primary">View All<ArrowRight className="h-3 w-3" /></a>}
+          >
+            <div className="space-y-3">
+              {data.news.latest.map((p) => (
+                <a key={p.id} href={`/news/${p.id}`} className="block">
+                  <div className="border border-primary/20 bg-primary/5 p-4 transition-colors hover:border-primary/40 hover:bg-primary/10">
+                    <div className="mb-1 flex items-center gap-2">
+                      {p.isPinned && <span className="text-[10px] font-semibold uppercase tracking-wider text-amber">Pinned</span>}
+                      <CategoryBadge category={p.category} />
+                      <span className="text-xs text-text-muted">by <span className="text-text-secondary">{p.authorName}</span> · {formatDate(p.createdAt)}</span>
+                    </div>
+                    <h4 className="font-semibold text-text-primary">{p.title}</h4>
                   </div>
-                  <p className="mt-1 text-xs text-text-muted">{p.authorName} · {formatDate(p.createdAt)}</p>
                 </a>
-              </li>
-            ))}
-          </ul>
-        </Panel>
+              ))}
+            </div>
+          </MfdPanel>
+        </div>
       )}
 
-      {/* Feeds */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {data.events && (
-          <Panel title="Mission clock" href="/events">
-            {data.events.upcoming.length === 0 ? (
-              <p className="text-sm text-text-muted">No upcoming events.</p>
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Mission clock — upcoming events (wide) */}
+        <div className="lg:col-span-2">
+          <MfdPanel
+            chassis="neutral"
+            bodyPadding="sm"
+            title={<><Clock className="h-3 w-3 text-text-secondary" /><span>[ MISSION CLOCK ]</span></>}
+            titleAside={<span className="mfd-readout text-[10px]">{data.events?.upcoming.length ?? 0}</span>}
+          >
+            {!data.events || data.events.upcoming.length === 0 ? (
+              <p className="px-1 py-2 text-sm text-text-muted">No upcoming events.</p>
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-2">
                 {data.events.upcoming.map((e) => (
                   <li key={e.id}>
-                    <a href={`/events/${e.id}`} className="block rounded p-2 transition-colors hover:bg-surface-hover">
-                      <div className="flex items-center gap-2">
-                        <EventTypeBadge type={e.type} />
-                        <span className="truncate text-sm font-medium text-text-primary">{e.title}</span>
+                    <a href={`/events/${e.id}`} className="flex items-center justify-between border border-border bg-surface-elevated px-3 py-2 transition-colors hover:border-primary/40 hover:bg-surface-hover">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-text-primary">{e.title}</p>
+                        <p className="mfd-readout mt-0.5 text-[11px]">{formatDateTime(e.startsAt)} · {e.goingCount} going</p>
                       </div>
-                      <p className="mt-1 text-xs text-text-muted">
-                        {formatDateTime(e.startsAt)} · {e.goingCount} going
-                      </p>
+                      <EventTypeBadge type={e.type} />
                     </a>
                   </li>
                 ))}
               </ul>
             )}
-          </Panel>
-        )}
+          </MfdPanel>
+        </div>
 
-        {data.forums && (
-          <Panel title="Forum activity" href="/forums">
-            {data.forums.recent.length === 0 ? (
-              <p className="text-sm text-text-muted">No threads yet.</p>
-            ) : (
-              <ul className="space-y-3">
-                {data.forums.recent.map((t) => (
-                  <li key={t.id}>
-                    <a
-                      href={`/forums/${t.categorySlug}/${t.id}`}
-                      className="block rounded p-2 transition-colors hover:bg-surface-hover"
-                    >
-                      <p className="truncate text-sm font-medium text-text-primary">{t.title}</p>
-                      <p className="text-xs text-text-muted">
-                        {t.categoryName} · {t.authorName} · {t.postCount} posts · {timeAgo(t.lastPostAt)}
-                      </p>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Panel>
-        )}
-
+        {/* Loot standings */}
         {data.loot && (
-          <Panel title="Loot standings" href="/loot">
-            {data.loot.top.length === 0 ? (
-              <p className="text-sm text-text-muted">No loot members yet.</p>
-            ) : (
-              <ol className="space-y-2">
-                {data.loot.top.map((m, i) => (
-                  <li key={`${i}-${m.membershipId ?? m.displayName}`} className="flex items-center justify-between text-sm">
-                    <span className="truncate">
-                      <span className="mr-2 font-mono text-text-muted">#{i + 1}</span>
-                      <span className="text-text-primary">{m.displayName}</span>
-                    </span>
-                    <span className="font-mono tabular-nums text-text-secondary">{fmtPts(m.balanceTenths)}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-            {data.loot.viewer && (
-              <p className="mt-3 border-t border-border pt-3 text-xs text-text-muted">
-                You: #{data.loot.viewer.rank} · {fmtPts(data.loot.viewer.balanceTenths)} pts
-              </p>
-            )}
-          </Panel>
+          <div>
+            <MfdPanel
+              chassis="neutral"
+              bodyPadding="sm"
+              title={<><Coins className="h-3 w-3 text-amber" /><span>[ LOOT STANDINGS ]</span></>}
+              titleAside={<a href="/loot" className="flex items-center gap-1 mfd-label hover:text-primary">View All<ArrowRight className="h-3 w-3" /></a>}
+            >
+              {data.loot.top.length === 0 ? (
+                <p className="px-1 py-2 text-sm text-text-muted">No loot members yet.</p>
+              ) : (
+                <ol className="space-y-1.5">
+                  {data.loot.top.map((m, i) => (
+                    <li key={`${i}-${m.membershipId ?? m.displayName}`} className="flex items-center justify-between text-sm">
+                      <span className="truncate"><span className="mr-2 mfd-readout text-[11px]">#{i + 1}</span><span className="text-text-primary">{m.displayName}</span></span>
+                      <span className="mfd-readout text-[11px]">{fmtPts(m.balanceTenths)}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </MfdPanel>
+          </div>
         )}
 
+        {/* Forum activity */}
+        {data.forums && (
+          <div className="lg:col-span-2">
+            <MfdPanel
+              chassis="neutral"
+              bodyPadding="sm"
+              title={<><TrendingUp className="h-3 w-3 text-text-secondary" /><span>[ FORUM ACTIVITY ]</span></>}
+              titleAside={<a href="/forums" className="flex items-center gap-1 mfd-label hover:text-primary">View All<ArrowRight className="h-3 w-3" /></a>}
+            >
+              {data.forums.recent.length === 0 ? (
+                <p className="px-1 py-2 text-sm text-text-muted">No threads yet.</p>
+              ) : (
+                <div className="space-y-0.5">
+                  {data.forums.recent.map((t) => (
+                    <a key={t.id} href={`/forums/${t.categorySlug}/${t.id}`} className="block border-b border-border/40 px-1 py-2 transition-colors hover:bg-surface-hover">
+                      <p className="truncate text-sm font-medium text-text-primary">{t.title}</p>
+                      <p className="text-xs text-text-muted">{t.categoryName} · {t.authorName} · {t.postCount} posts · {timeAgo(t.lastPostAt)}</p>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </MfdPanel>
+          </div>
+        )}
+
+        {/* Tournaments */}
         {data.tournaments && data.tournaments.recent.length > 0 && (
-          <Panel title="Tournaments" href="/tournaments">
-            <ul className="space-y-2">
-              {data.tournaments.recent.map((t) => (
-                <li key={t.id} className="flex items-center justify-between text-sm">
-                  <a href={`/tournaments/${t.id}`} className="truncate text-text-primary hover:underline">
-                    {t.name}
-                  </a>
-                  <span className="ml-2 shrink-0 font-mono text-xs uppercase text-text-muted">
-                    {t.status} · {t.entryCount}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Panel>
+          <div>
+            <MfdPanel
+              chassis="neutral"
+              bodyPadding="sm"
+              title={<><Trophy className="h-3 w-3 text-warning" /><span>[ TOURNAMENTS ]</span></>}
+            >
+              <ul className="space-y-1.5">
+                {data.tournaments.recent.map((t) => (
+                  <li key={t.id} className="flex items-center justify-between text-sm">
+                    <a href={`/tournaments/${t.id}`} className="truncate text-text-primary hover:underline">{t.name}</a>
+                    <span className="ml-2 shrink-0 mfd-label">{t.status} · {t.entryCount}</span>
+                  </li>
+                ))}
+              </ul>
+            </MfdPanel>
+          </div>
         )}
       </div>
 
-      <AdSlot slot="sidebar-bottom" />
-    </main>
+      <div className="mt-6"><AdSlot slot="sidebar-bottom" /></div>
+    </div>
   );
 }

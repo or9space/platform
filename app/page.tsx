@@ -42,7 +42,6 @@ export default async function HomePage() {
       <TenantShell>
         <OrgDashboard
           tenantId={tenant.id}
-          config={full.config}
           features={full.features}
           viewer={viewer}
         />
