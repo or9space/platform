@@ -71,7 +71,14 @@ export async function TenantShell({ children }: { children: ReactNode }) {
   const profileHref = viewer?.username ? `/members/${viewer.username}` : "/members";
 
   return (
-    <TenantShellChrome brandName={brandName} userName={userName} profileHref={profileHref} sections={sections}>
+    <TenantShellChrome
+      brandName={brandName}
+      userName={userName}
+      profileHref={profileHref}
+      sections={sections}
+      logoUrl={ctx.config.branding.logoUrl}
+      palette={ctx.config.branding.palette}
+    >
       {children}
     </TenantShellChrome>
   );

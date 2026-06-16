@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, type CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -32,13 +32,17 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === path || pathname.startsWith(path + "/");
 }
 
+export interface TenantPalette { primary?: string; amber?: string; cream?: string; surface?: string }
+
 export function TenantShellChrome({
-  brandName, userName, profileHref, sections, children,
+  brandName, userName, profileHref, sections, logoUrl, palette, children,
 }: {
   brandName: string;
   userName: string;
   profileHref: string;
   sections: NavSection[];
+  logoUrl?: string | null;
+  palette?: TenantPalette;
   children: ReactNode;
 }) {
   const pathname = usePathname() ?? "";
@@ -50,8 +54,17 @@ export function TenantShellChrome({
   const first = words[0] ?? brandName;
   const rest = words.slice(1).join(" ");
 
+  // Per-tenant accent: override the theme CSS vars on the root so each org
+  // can carry its own color while sharing the tactical chassis.
+  const accentStyle = {
+    ...(palette?.primary ? { "--color-primary": palette.primary } : {}),
+    ...(palette?.amber ? { "--color-amber": palette.amber } : {}),
+    ...(palette?.cream ? { "--color-fg-cream": palette.cream } : {}),
+    ...(palette?.surface ? { "--color-surface": palette.surface } : {}),
+  } as CSSProperties;
+
   return (
-    <div className="tenant-root">
+    <div className="tenant-root" style={accentStyle}>
       {/* Navbar — MFD title bar */}
       <header className="fixed top-0 z-50 flex h-16 w-full items-center border-b-2 border-primary/40 bg-surface/95 backdrop-blur-sm">
         <nav className="flex w-full items-center justify-between px-4">
@@ -64,9 +77,13 @@ export function TenantShellChrome({
               <Menu className="h-5 w-5" />
             </button>
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/15 text-stencil text-lg text-primary">
-                {first[0]?.toUpperCase()}
-              </span>
+              {logoUrl ? (
+                <img src={logoUrl} alt={brandName} className="h-12 w-12 object-contain" />
+              ) : (
+                <span className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/15 text-stencil text-lg text-primary">
+                  {first[0]?.toUpperCase()}
+                </span>
+              )}
               <span className="fg-wordmark">
                 <span className="fg-wordmark__free">{first}</span>
                 {rest && <span className="fg-wordmark__guards">&nbsp;{rest}</span>}
