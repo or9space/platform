@@ -35,7 +35,7 @@ export default async function MembersPage({
         {canManageRanks && (
           <a
             href="/admin/members"
-            className="rounded border border-neutral-700 px-3 py-1.5 text-sm hover:border-neutral-500"
+            className="rounded border border-border-light px-3 py-1.5 text-sm hover:border-primary"
           >
             Manage ranks
           </a>
@@ -49,11 +49,11 @@ export default async function MembersPage({
             name="q"
             defaultValue={q ?? ""}
             placeholder="Search members…"
-            className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+            className="flex-1 rounded border border-border-light bg-surface px-3 py-2 text-sm"
           />
           <button
             type="submit"
-            className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500"
+            className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
           >
             Search
           </button>
@@ -61,14 +61,14 @@ export default async function MembersPage({
       </form>
 
       {members.length === 0 ? (
-        <p className="text-neutral-400">No members found.</p>
+        <p className="text-text-secondary">No members found.</p>
       ) : (
         <ul className="space-y-3">
           {members.map((m) => (
             <li key={m.id}>
               <a
                 href={`/members/${m.username}`}
-                className="flex items-center gap-4 rounded border border-neutral-800 p-4 hover:border-neutral-600"
+                className="flex items-center gap-4 rounded border border-border p-4 hover:border-primary"
               >
                 <div className="shrink-0">
                   {m.avatarUrl && m.avatarUrl.startsWith("http") ? (
@@ -78,20 +78,20 @@ export default async function MembersPage({
                       className="h-10 w-10 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-700 text-sm font-semibold uppercase">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-elevated text-sm font-semibold uppercase">
                       {(m.displayName ?? m.username).slice(0, 1)}
                     </div>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">{m.displayName ?? m.username}</p>
-                  <p className="text-sm text-neutral-400">@{m.username}</p>
+                  <p className="text-sm text-text-secondary">@{m.username}</p>
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="text-sm text-neutral-300">
+                  <p className="text-sm text-text-secondary">
                     <Rank tier={m.tier} />
                   </p>
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-text-muted">
                     Joined {m.createdAt.toISOString().slice(0, 10)}
                   </p>
                 </div>

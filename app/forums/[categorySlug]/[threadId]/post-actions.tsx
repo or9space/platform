@@ -79,12 +79,12 @@ function ThreadControls({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-fg-red-light">{error}</p>}
       <button
         type="button"
         disabled={pending}
         onClick={() => toggle({ isPinned: !isPinned })}
-        className="rounded border border-neutral-700 px-2 py-1 text-xs disabled:opacity-50 hover:border-neutral-500"
+        className="rounded border border-border-light px-2 py-1 text-xs disabled:opacity-50 hover:border-primary"
       >
         {isPinned ? "Unpin" : "Pin"}
       </button>
@@ -92,7 +92,7 @@ function ThreadControls({
         type="button"
         disabled={pending}
         onClick={() => toggle({ isLocked: !isLocked })}
-        className="rounded border border-neutral-700 px-2 py-1 text-xs disabled:opacity-50 hover:border-neutral-500"
+        className="rounded border border-border-light px-2 py-1 text-xs disabled:opacity-50 hover:border-primary"
       >
         {isLocked ? "Unlock" : "Lock"}
       </button>
@@ -147,7 +147,7 @@ function PostControls({
   if (editing) {
     return (
       <form action={handleEdit} className="space-y-2">
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-fg-red-light">{error}</p>}
         <textarea
           name="content"
           required
@@ -155,13 +155,13 @@ function PostControls({
           rows={3}
           value={editContent}
           onChange={(e) => setEditContent(e.target.value)}
-          className="w-full rounded border border-neutral-700 bg-neutral-900 p-2 text-sm"
+          className="w-full rounded border border-border-light bg-surface p-2 text-sm"
         />
         <div className="flex gap-2">
           <button
             type="submit"
             disabled={pending}
-            className="rounded bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-900 disabled:opacity-50"
+            className="rounded bg-primary px-3 py-1 text-xs font-semibold text-fg-cream disabled:opacity-50"
           >
             {pending ? "Saving…" : "Save"}
           </button>
@@ -169,7 +169,7 @@ function PostControls({
             type="button"
             disabled={pending}
             onClick={() => { setEditing(false); setEditContent(post.content); }}
-            className="rounded border border-neutral-700 px-3 py-1 text-xs disabled:opacity-50"
+            className="rounded border border-border-light px-3 py-1 text-xs disabled:opacity-50"
           >
             Cancel
           </button>
@@ -180,13 +180,13 @@ function PostControls({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-fg-red-light">{error}</p>}
       {canEdit && (
         <button
           type="button"
           disabled={pending}
           onClick={() => setEditing(true)}
-          className="rounded border border-neutral-700 px-2 py-1 text-xs disabled:opacity-50 hover:border-neutral-500"
+          className="rounded border border-border-light px-2 py-1 text-xs disabled:opacity-50 hover:border-primary"
         >
           Edit
         </button>
@@ -196,7 +196,7 @@ function PostControls({
           type="button"
           disabled={pending}
           onClick={handleDelete}
-          className="rounded border border-neutral-700 px-2 py-1 text-xs disabled:opacity-50 hover:border-neutral-500"
+          className="rounded border border-border-light px-2 py-1 text-xs disabled:opacity-50 hover:border-primary"
         >
           {pending ? "Deleting…" : "Delete"}
         </button>

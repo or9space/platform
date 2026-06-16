@@ -16,16 +16,16 @@ export default async function HangarPage({ searchParams }: { searchParams: Promi
   return (
     <Main>
       <form method="get" className="flex items-center gap-2">
-        <input name="q" defaultValue={q} placeholder="Search ships…" className="w-full rounded border border-neutral-700 bg-neutral-900 p-2 text-sm" />
-        <button type="submit" className="rounded bg-neutral-100 px-3 py-1.5 text-sm font-semibold text-neutral-900">Search</button>
+        <input name="q" defaultValue={q} placeholder="Search ships…" className="w-full rounded border border-border-light bg-surface p-2 text-sm" />
+        <button type="submit" className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream">Search</button>
       </form>
-      <p className="text-xs text-neutral-500">{rows.length} ships</p>
+      <p className="text-xs text-text-muted">{rows.length} ships</p>
       <ul className="grid gap-2 sm:grid-cols-2">
         {rows.map((v) => (
           <li key={v.id}>
-            <a href={`/sc-tools/loadouts?id=${v.id}`} className="block rounded border border-neutral-800 p-3 transition-colors hover:border-neutral-600">
-              <p className="font-medium text-neutral-100">{v.name_full ?? v.name}</p>
-              <p className="mt-0.5 text-xs text-neutral-500">
+            <a href={`/sc-tools/loadouts?id=${v.id}`} className="block rounded border border-border p-3 transition-colors hover:border-primary">
+              <p className="font-medium text-text-primary">{v.name_full ?? v.name}</p>
+              <p className="mt-0.5 text-xs text-text-muted">
                 {v.company_name ?? "—"}
                 {v.scu ? ` · ${v.scu} SCU` : ""}
                 {v.crew ? ` · crew ${v.crew}` : ""}

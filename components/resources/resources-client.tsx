@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { createResourceAction, deleteResourceAction } from "@/lib/actions/resources";
 
-const field = "w-full rounded border border-neutral-700 bg-neutral-900 p-2 text-sm";
+const field = "w-full rounded border border-border-light bg-surface p-2 text-sm";
 
 export function ResourceCreateForm() {
   const [error, setError] = useState<string | null>(null);
@@ -27,18 +27,18 @@ export function ResourceCreateForm() {
   }
 
   if (!open) {
-    return <button onClick={() => setOpen(true)} className="rounded bg-neutral-100 px-3 py-1.5 text-sm font-semibold text-neutral-900">Add resource</button>;
+    return <button onClick={() => setOpen(true)} className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream">Add resource</button>;
   }
   return (
-    <form action={submit} className="space-y-2 rounded border border-neutral-800 p-4">
-      {error && <p className="text-sm text-red-400">{error}</p>}
+    <form action={submit} className="space-y-2 rounded border border-border p-4">
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <input name="title" required placeholder="Title" maxLength={160} className={field} />
       <input name="url" placeholder="URL (optional)" maxLength={500} className={field} />
       <input name="category" placeholder="Category (optional)" maxLength={60} className={field} />
       <textarea name="body" rows={3} placeholder="Notes (optional)" maxLength={10000} className={field} />
       <div className="flex gap-2">
-        <button type="submit" disabled={pending} className="rounded bg-neutral-100 px-3 py-1.5 text-sm font-semibold text-neutral-900 disabled:opacity-50">{pending ? "Saving…" : "Save"}</button>
-        <button type="button" onClick={() => setOpen(false)} className="text-sm text-neutral-400 hover:text-neutral-200">Cancel</button>
+        <button type="submit" disabled={pending} className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream disabled:opacity-50">{pending ? "Saving…" : "Save"}</button>
+        <button type="button" onClick={() => setOpen(false)} className="text-sm text-text-secondary hover:text-text-primary">Cancel</button>
       </div>
     </form>
   );
@@ -50,7 +50,7 @@ export function DeleteResourceButton({ id }: { id: string }) {
     <button
       onClick={() => start(async () => { const r = await deleteResourceAction(id); if (r.ok) window.location.reload(); })}
       disabled={pending}
-      className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50"
+      className="text-xs text-fg-red-light hover:text-fg-red-light disabled:opacity-50"
     >
       {pending ? "…" : "Delete"}
     </button>

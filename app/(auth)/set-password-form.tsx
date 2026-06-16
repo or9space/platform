@@ -45,7 +45,7 @@ export function SetPasswordForm({
         <p className="rounded border border-green-800 bg-green-950 p-3 text-sm text-green-300">
           You can now sign in. Redirecting…
         </p>
-        <p className="text-sm text-neutral-400">
+        <p className="text-sm text-text-secondary">
           <a href="/login" className="underline">Go to sign in</a>
         </p>
       </main>
@@ -55,17 +55,17 @@ export function SetPasswordForm({
   return (
     <form action={handleSubmit} className="mx-auto mt-16 w-full max-w-sm space-y-4">
       <h1 className="text-2xl font-bold">Set your password</h1>
-      <p className="text-sm text-neutral-400">
-        For <strong className="text-neutral-200">{email}</strong> on {tenantName}.
+      <p className="text-sm text-text-secondary">
+        For <strong className="text-text-primary">{email}</strong> on {tenantName}.
       </p>
-      {error && <p className="rounded border border-red-800 bg-red-950 p-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="rounded border border-danger bg-surface p-2 text-sm text-fg-red-light">{error}</p>}
       <input
         name="password"
         type="password"
         required
         placeholder="New password (10+ chars)"
         autoComplete="new-password"
-        className="w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+        className="w-full rounded border border-border-light bg-surface p-2"
       />
       <input
         name="confirm"
@@ -73,13 +73,13 @@ export function SetPasswordForm({
         required
         placeholder="Confirm password"
         autoComplete="new-password"
-        className="w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+        className="w-full rounded border border-border-light bg-surface p-2"
       />
       <button
         type="submit"
         disabled={pending}
         aria-busy={pending}
-        className="w-full rounded bg-neutral-100 p-2 font-semibold text-neutral-900 disabled:opacity-50"
+        className="w-full rounded bg-primary p-2 font-semibold text-fg-cream disabled:opacity-50"
       >
         {pending ? "Working…" : "Set password"}
       </button>

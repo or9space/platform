@@ -1,8 +1,8 @@
 const STYLES: Record<string, { label: string; cls: string }> = {
-  ANNOUNCEMENT: { label: "Announcement", cls: "border-red-800 bg-red-950 text-red-300" },
-  PATCH_NOTES: { label: "Patch notes", cls: "border-sky-800 bg-sky-950 text-sky-300" },
+  ANNOUNCEMENT: { label: "Announcement", cls: "border-danger bg-surface text-fg-red-light" },
+  PATCH_NOTES: { label: "Patch notes", cls: "border-sky-800 bg-sky-950 text-info" },
   COMMUNITY: { label: "Community", cls: "border-green-800 bg-green-950 text-green-300" },
-  GUIDE: { label: "Guide", cls: "border-amber-800 bg-amber-950 text-amber-300" },
+  GUIDE: { label: "Guide", cls: "border-amber bg-amber-soft text-amber" },
 };
 
 export function CategoryBadge({ category }: { category: string }) {

@@ -50,18 +50,18 @@ export default async function InventoryPage({
             name="q"
             defaultValue={q ?? ""}
             placeholder="Search items…"
-            className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+            className="flex-1 rounded border border-border-light bg-surface px-3 py-2 text-sm"
           />
           <button
             type="submit"
-            className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500"
+            className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
           >
             Search
           </button>
           {q && (
             <a
               href="/inventory"
-              className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500"
+              className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
             >
               Clear
             </a>
@@ -76,12 +76,12 @@ export default async function InventoryPage({
       )}
 
       {items.length === 0 ? (
-        <p className="text-neutral-400">No items found.</p>
+        <p className="text-text-secondary">No items found.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-800 text-left text-neutral-500">
+              <tr className="border-b border-border text-left text-text-muted">
                 <th className="pb-2 pr-4 font-normal">Name</th>
                 <th className="pb-2 pr-4 font-normal">Category</th>
                 <th className="pb-2 pr-4 font-normal">Kind</th>
@@ -90,22 +90,22 @@ export default async function InventoryPage({
             </thead>
             <tbody>
               {items.map((item) => (
-                <tr key={item.id} className="border-b border-neutral-900 hover:bg-neutral-900/40">
+                <tr key={item.id} className="border-b border-border hover:bg-surface-hover/40">
                   <td className="py-2 pr-4">
                     <a
                       href={`/inventory/${item.id}`}
-                      className="font-medium hover:text-neutral-100 hover:underline"
+                      className="font-medium hover:text-text-primary hover:underline"
                     >
                       {item.name}
                     </a>
                   </td>
-                  <td className="py-2 pr-4 text-neutral-300">
+                  <td className="py-2 pr-4 text-text-secondary">
                     {CATEGORY_LABELS[item.category]}
                   </td>
-                  <td className="py-2 pr-4 text-neutral-400">
+                  <td className="py-2 pr-4 text-text-secondary">
                     {item.kind === "UNIQUE" ? "Unique" : "Fungible"}
                   </td>
-                  <td className="py-2 font-mono text-neutral-300">
+                  <td className="py-2 font-mono text-text-secondary">
                     {quantityByItem.get(item.id) ?? 0}
                   </td>
                 </tr>

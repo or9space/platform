@@ -49,11 +49,11 @@ export function AddEntryForm() {
   }
 
   return (
-    <div className="rounded border border-neutral-800 p-4">
+    <div className="rounded border border-border p-4">
       <h2 className="mb-4 font-semibold">Add entry</h2>
       <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
         {error && (
-          <p className="w-full text-sm text-red-400">{error}</p>
+          <p className="w-full text-sm text-fg-red-light">{error}</p>
         )}
         <label className="flex flex-col gap-1 text-sm">
           Type
@@ -62,7 +62,7 @@ export function AddEntryForm() {
             value={type}
             onChange={(e) => setType(e.target.value as TreasuryType)}
             disabled={pending}
-            className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           >
             {TREASURY_TYPES.map((t) => (
               <option key={t} value={t}>
@@ -78,7 +78,7 @@ export function AddEntryForm() {
             value={category}
             onChange={(e) => setCategory(e.target.value as TreasuryCategory)}
             disabled={pending}
-            className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           >
             {TREASURY_CATEGORIES.map((c) => (
               <option key={c} value={c}>
@@ -98,7 +98,7 @@ export function AddEntryForm() {
             onChange={(e) => setAmount(e.target.value)}
             disabled={pending}
             placeholder="0"
-            className="w-32 rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="w-32 rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm flex-1 min-w-48">
@@ -111,13 +111,13 @@ export function AddEntryForm() {
             disabled={pending}
             placeholder="Brief description…"
             maxLength={500}
-            className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           />
         </label>
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50"
+          className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
         >
           {pending ? "Adding…" : "Add"}
         </button>

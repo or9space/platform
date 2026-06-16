@@ -40,7 +40,7 @@ export function CategoryManager({ categories }: { categories: CategoryItem[] }) 
       <section>
         <h2 className="mb-3 font-semibold">Existing categories</h2>
         {categories.length === 0 ? (
-          <p className="text-sm text-neutral-400">No categories yet.</p>
+          <p className="text-sm text-text-secondary">No categories yet.</p>
         ) : (
           <ul className="space-y-2">
             {categories.map((cat) => (
@@ -53,7 +53,7 @@ export function CategoryManager({ categories }: { categories: CategoryItem[] }) 
       <section>
         <h2 className="mb-3 font-semibold">Create category</h2>
         <form action={handleCreate} className="space-y-3">
-          {createError && <p className="text-sm text-red-400">{createError}</p>}
+          {createError && <p className="text-sm text-fg-red-light">{createError}</p>}
           <label className="block text-sm">
             Name
             <input
@@ -62,7 +62,7 @@ export function CategoryManager({ categories }: { categories: CategoryItem[] }) 
               maxLength={100}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+              className="mt-1 w-full rounded border border-border-light bg-surface p-2"
             />
           </label>
           <label className="block text-sm">
@@ -74,7 +74,7 @@ export function CategoryManager({ categories }: { categories: CategoryItem[] }) 
               pattern="[a-z0-9-]+"
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
-              className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+              className="mt-1 w-full rounded border border-border-light bg-surface p-2"
             />
           </label>
           <label className="block text-sm">
@@ -84,13 +84,13 @@ export function CategoryManager({ categories }: { categories: CategoryItem[] }) 
               maxLength={300}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+              className="mt-1 w-full rounded border border-border-light bg-surface p-2"
             />
           </label>
           <button
             type="submit"
             disabled={createPending}
-            className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50"
+            className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
           >
             {createPending ? "Creating…" : "Create category"}
           </button>
@@ -121,20 +121,20 @@ function CategoryRow({
   }
 
   return (
-    <li className="flex items-center justify-between rounded border border-neutral-800 p-3">
+    <li className="flex items-center justify-between rounded border border-border p-3">
       <div>
         <p className="font-medium">{category.name}</p>
-        <p className="text-xs text-neutral-500">/forums/{category.slug}</p>
+        <p className="text-xs text-text-muted">/forums/{category.slug}</p>
         {category.description && (
-          <p className="text-xs text-neutral-400">{category.description}</p>
+          <p className="text-xs text-text-secondary">{category.description}</p>
         )}
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-fg-red-light">{error}</p>}
       </div>
       <button
         type="button"
         disabled={pending}
         onClick={handleDelete}
-        className="rounded border border-neutral-700 px-3 py-1 text-sm disabled:opacity-50 hover:border-neutral-500"
+        className="rounded border border-border-light px-3 py-1 text-sm disabled:opacity-50 hover:border-primary"
       >
         {pending ? "Deleting…" : "Delete"}
       </button>

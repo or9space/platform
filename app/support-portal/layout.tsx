@@ -14,7 +14,7 @@ import type { ReactNode } from "react";
 export default function SupportLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen">
-      <header className="border-b border-neutral-800 p-4">
+      <header className="border-b border-border p-4">
         <a href="/" className="font-bold">or9.space support</a>
       </header>
       <main className="mx-auto max-w-2xl p-6">{children}</main>

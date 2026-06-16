@@ -44,7 +44,7 @@ export function RankControls({ membershipId, currentTier, username }: RankContro
             setSelected(e.target.value as RankTier);
           }}
           disabled={isPending}
-          className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-sm text-neutral-100 disabled:opacity-50"
+          className="rounded border border-border-light bg-surface px-2 py-1 text-sm text-text-primary disabled:opacity-50"
         >
           {TIERS.map((tier) => (
             <option key={tier} value={tier}>
@@ -56,13 +56,13 @@ export function RankControls({ membershipId, currentTier, username }: RankContro
           type="button"
           onClick={handleApply}
           disabled={isPending || unchanged}
-          className="rounded bg-neutral-700 px-3 py-1 text-sm font-medium text-neutral-100 hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded bg-surface-elevated px-3 py-1 text-sm font-medium text-text-primary hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-40"
         >
           {isPending ? "Applying…" : "Apply"}
         </button>
       </div>
       {error && (
-        <p role="alert" className="text-xs text-red-400">
+        <p role="alert" className="text-xs text-fg-red-light">
           {error}
         </p>
       )}

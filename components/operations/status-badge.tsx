@@ -1,10 +1,10 @@
 const STYLES: Record<string, { label: string; cls: string }> = {
-  PLANNING: { label: "Planning", cls: "border-neutral-700 bg-neutral-900 text-neutral-300" },
-  BRIEFING: { label: "Briefing", cls: "border-sky-800 bg-sky-950 text-sky-300" },
+  PLANNING: { label: "Planning", cls: "border-border-light bg-surface text-text-secondary" },
+  BRIEFING: { label: "Briefing", cls: "border-sky-800 bg-sky-950 text-info" },
   ACTIVE: { label: "Active", cls: "border-green-800 bg-green-950 text-green-300" },
-  DEBRIEFING: { label: "Debriefing", cls: "border-amber-800 bg-amber-950 text-amber-300" },
-  COMPLETED: { label: "Completed", cls: "border-neutral-700 bg-neutral-900 text-neutral-400" },
-  ARCHIVED: { label: "Archived", cls: "border-neutral-800 bg-neutral-950 text-neutral-600" },
+  DEBRIEFING: { label: "Debriefing", cls: "border-amber bg-amber-soft text-amber" },
+  COMPLETED: { label: "Completed", cls: "border-border-light bg-surface text-text-secondary" },
+  ARCHIVED: { label: "Archived", cls: "border-border bg-surface text-text-muted" },
 };
 
 export function StatusBadge({ status }: { status: string }) {

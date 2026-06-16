@@ -21,7 +21,7 @@ export default async function SettingsPage() {
     <main className="mx-auto max-w-lg space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-sm text-neutral-500">Your profile in {ctx.config.branding.name} (@{me?.username})</p>
+        <p className="text-sm text-text-muted">Your profile in {ctx.config.branding.name} (@{me?.username})</p>
       </div>
       <ProfileForm
         initial={{

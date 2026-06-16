@@ -23,18 +23,18 @@ export default async function LogisticsPage({ searchParams }: { searchParams: Pr
   return (
     <Main>
       <form method="get" className="flex items-center gap-2">
-        <input name="q" defaultValue={q} placeholder="Search terminals / locations…" className="w-full rounded border border-neutral-700 bg-neutral-900 p-2 text-sm" />
-        <button type="submit" className="rounded bg-neutral-100 px-3 py-1.5 text-sm font-semibold text-neutral-900">Search</button>
+        <input name="q" defaultValue={q} placeholder="Search terminals / locations…" className="w-full rounded border border-border-light bg-surface p-2 text-sm" />
+        <button type="submit" className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream">Search</button>
       </form>
-      <p className="text-xs text-neutral-500">{rows.length} terminals</p>
+      <p className="text-xs text-text-muted">{rows.length} terminals</p>
       {systems.map(([sys, ts]) => (
         <section key={sys} className="space-y-1">
-          <h2 className="text-sm font-semibold text-neutral-200">{sys}</h2>
-          <ul className="divide-y divide-neutral-900 rounded border border-neutral-800">
+          <h2 className="text-sm font-semibold text-text-primary">{sys}</h2>
+          <ul className="divide-y divide-border rounded border border-border">
             {ts.slice(0, 300).map((t) => (
               <li key={t.id} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
-                <span className="text-neutral-100">{t.name}</span>
-                <span className="text-xs text-neutral-500">{[t.planet_name, t.type].filter(Boolean).join(" · ")}</span>
+                <span className="text-text-primary">{t.name}</span>
+                <span className="text-xs text-text-muted">{[t.planet_name, t.type].filter(Boolean).join(" · ")}</span>
               </li>
             ))}
           </ul>

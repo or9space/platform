@@ -14,7 +14,7 @@ export default async function ClaimPage({
   return (
     <main className="mx-auto mt-16 w-full max-w-sm space-y-4">
       <h1 className="text-2xl font-bold">Claim {tenant.name}</h1>
-      <p className="text-sm text-neutral-400">
+      <p className="text-sm text-text-secondary">
         You are creating the founding admin account for <code>{tenant.slug}.or9.space</code>.
       </p>
       <ClaimForm tenantSlug={tenant.slug} token={token} />

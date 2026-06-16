@@ -1,10 +1,10 @@
 const STYLES: Record<string, { label: string; cls: string }> = {
-  OP: { label: "Op", cls: "border-red-800 bg-red-950 text-red-300" },
-  MEETING: { label: "Meeting", cls: "border-sky-800 bg-sky-950 text-sky-300" },
+  OP: { label: "Op", cls: "border-danger bg-surface text-fg-red-light" },
+  MEETING: { label: "Meeting", cls: "border-sky-800 bg-sky-950 text-info" },
   TRAINING: { label: "Training", cls: "border-green-800 bg-green-950 text-green-300" },
-  SOCIAL: { label: "Social", cls: "border-neutral-700 bg-neutral-900 text-neutral-300" },
-  TOURNAMENT: { label: "Tournament", cls: "border-amber-800 bg-amber-950 text-amber-300" },
-  OTHER: { label: "Other", cls: "border-neutral-700 bg-neutral-900 text-neutral-400" },
+  SOCIAL: { label: "Social", cls: "border-border-light bg-surface text-text-secondary" },
+  TOURNAMENT: { label: "Tournament", cls: "border-amber bg-amber-soft text-amber" },
+  OTHER: { label: "Other", cls: "border-border-light bg-surface text-text-secondary" },
 };
 
 export function EventTypeBadge({ type }: { type: string }) {

@@ -50,10 +50,10 @@ export function CreateHoldingForm({ itemId }: CreateHoldingFormProps) {
   }
 
   return (
-    <div className="rounded border border-neutral-800 p-4">
+    <div className="rounded border border-border p-4">
       <h2 className="mb-4 font-semibold">Add holding</h2>
       <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
-        {error && <p className="w-full text-sm text-red-400">{error}</p>}
+        {error && <p className="w-full text-sm text-fg-red-light">{error}</p>}
         <label className="flex flex-col gap-1 text-sm">
           Quantity
           <input
@@ -64,7 +64,7 @@ export function CreateHoldingForm({ itemId }: CreateHoldingFormProps) {
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             disabled={pending}
-            className="w-24 rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="w-24 rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -74,7 +74,7 @@ export function CreateHoldingForm({ itemId }: CreateHoldingFormProps) {
             value={state}
             onChange={(e) => setState(e.target.value as HoldingState)}
             disabled={pending}
-            className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           >
             {HOLDING_STATES.map((s) => (
               <option key={s} value={s}>
@@ -93,13 +93,13 @@ export function CreateHoldingForm({ itemId }: CreateHoldingFormProps) {
             disabled={pending}
             placeholder="Optional notes…"
             maxLength={500}
-            className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           />
         </label>
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50"
+          className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
         >
           {pending ? "Adding…" : "Add"}
         </button>

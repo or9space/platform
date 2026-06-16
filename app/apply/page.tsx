@@ -17,7 +17,7 @@ export default async function ApplyPage() {
     <main className="mx-auto max-w-xl space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-bold">Join {orgName}</h1>
-        <p className="mt-1 text-sm text-neutral-400">
+        <p className="mt-1 text-sm text-text-secondary">
           Fill out the form below to apply. Leadership will review your application.
         </p>
       </div>

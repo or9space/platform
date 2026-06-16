@@ -86,10 +86,10 @@ export function ShipActions({ ship }: ShipActionsProps) {
 
   if (editing) {
     return (
-      <div className="rounded border border-neutral-700 p-4 mt-2">
+      <div className="rounded border border-border-light p-4 mt-2">
         <h3 className="mb-3 text-sm font-semibold">Edit ship</h3>
         <form action={handleSave} className="flex flex-wrap gap-3 items-end">
-          {error && <p className="w-full text-sm text-red-400">{error}</p>}
+          {error && <p className="w-full text-sm text-fg-red-light">{error}</p>}
 
           <label className="flex flex-col gap-1 text-sm flex-1 min-w-40">
             Ship name
@@ -100,7 +100,7 @@ export function ShipActions({ ship }: ShipActionsProps) {
               onChange={(e) => setShipName(e.target.value)}
               disabled={pending}
               maxLength={200}
-              className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
             />
           </label>
 
@@ -113,7 +113,7 @@ export function ShipActions({ ship }: ShipActionsProps) {
               onChange={(e) => setManufacturer(e.target.value)}
               disabled={pending}
               maxLength={200}
-              className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
             />
           </label>
 
@@ -126,7 +126,7 @@ export function ShipActions({ ship }: ShipActionsProps) {
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
               disabled={pending}
-              className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
             />
           </label>
 
@@ -139,7 +139,7 @@ export function ShipActions({ ship }: ShipActionsProps) {
               onChange={(e) => setImageUrl(e.target.value)}
               disabled={pending}
               maxLength={500}
-              className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
             />
           </label>
 
@@ -152,7 +152,7 @@ export function ShipActions({ ship }: ShipActionsProps) {
               onChange={(e) => setNotes(e.target.value)}
               disabled={pending}
               maxLength={1000}
-              className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
             />
           </label>
 
@@ -172,7 +172,7 @@ export function ShipActions({ ship }: ShipActionsProps) {
             <button
               type="submit"
               disabled={pending}
-              className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50"
+              className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
             >
               {pending ? "Saving…" : "Save"}
             </button>
@@ -180,7 +180,7 @@ export function ShipActions({ ship }: ShipActionsProps) {
               type="button"
               onClick={() => setEditing(false)}
               disabled={pending}
-              className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500 disabled:opacity-50"
+              className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary disabled:opacity-50"
             >
               Cancel
             </button>
@@ -192,12 +192,12 @@ export function ShipActions({ ship }: ShipActionsProps) {
 
   return (
     <div className="flex items-center gap-2">
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <button
         type="button"
         onClick={openEdit}
         disabled={pending}
-        className="rounded border border-neutral-700 px-3 py-1 text-sm hover:border-neutral-500 disabled:opacity-50"
+        className="rounded border border-border-light px-3 py-1 text-sm hover:border-primary disabled:opacity-50"
       >
         Edit
       </button>
@@ -205,7 +205,7 @@ export function ShipActions({ ship }: ShipActionsProps) {
         type="button"
         onClick={handleDelete}
         disabled={pending}
-        className="rounded border border-red-900 px-3 py-1 text-sm text-red-400 hover:border-red-700 disabled:opacity-50"
+        className="rounded border border-danger px-3 py-1 text-sm text-fg-red-light hover:border-danger disabled:opacity-50"
       >
         {pending ? "Deleting…" : "Delete"}
       </button>

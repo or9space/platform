@@ -17,7 +17,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_CLASSES: Record<string, string> = {
-  DRAFT: "rounded px-1.5 py-0.5 text-xs font-semibold bg-neutral-800 text-neutral-400",
+  DRAFT: "rounded px-1.5 py-0.5 text-xs font-semibold bg-surface-elevated text-text-secondary",
   OPEN: "rounded px-1.5 py-0.5 text-xs font-semibold bg-green-900/50 text-green-300",
   IN_PROGRESS: "rounded px-1.5 py-0.5 text-xs font-semibold bg-yellow-900/50 text-yellow-300",
   COMPLETE: "rounded px-1.5 py-0.5 text-xs font-semibold bg-blue-900/50 text-blue-300",
@@ -58,7 +58,7 @@ export default async function TournamentDetailPage({
       <div className="mb-6">
         <a
           href="/tournaments"
-          className="text-sm text-neutral-400 hover:text-neutral-100"
+          className="text-sm text-text-secondary hover:text-text-primary"
         >
           &larr; Tournaments
         </a>
@@ -70,7 +70,7 @@ export default async function TournamentDetailPage({
             <h1 className="text-2xl font-bold">{tournament.name}</h1>
             <span className={statusClass}>{statusLabel}</span>
           </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-neutral-400">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-secondary">
             {tournament.format && <span>{tournament.format}</span>}
             {tournament.startsAt && (
               <span>
@@ -83,7 +83,7 @@ export default async function TournamentDetailPage({
             )}
           </div>
           {tournament.description && (
-            <p className="mt-3 max-w-prose text-sm text-neutral-300 whitespace-pre-wrap">
+            <p className="mt-3 max-w-prose text-sm text-text-secondary whitespace-pre-wrap">
               {tournament.description}
             </p>
           )}
@@ -101,18 +101,18 @@ export default async function TournamentDetailPage({
 
       <h2 className="mb-3 font-semibold">
         Entries{" "}
-        <span className="text-neutral-500 font-normal text-sm">
+        <span className="text-text-muted font-normal text-sm">
           ({tournament.entries.length})
         </span>
       </h2>
 
       {tournament.entries.length === 0 ? (
-        <p className="mb-8 text-sm text-neutral-400">No entries yet.</p>
+        <p className="mb-8 text-sm text-text-secondary">No entries yet.</p>
       ) : (
         <div className="mb-8 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-800 text-left text-neutral-500">
+              <tr className="border-b border-border text-left text-text-muted">
                 <th className="pb-2 pr-4 font-normal">Place</th>
                 <th className="pb-2 pr-4 font-normal">Name</th>
                 <th className="pb-2 font-normal">Seed</th>
@@ -120,27 +120,27 @@ export default async function TournamentDetailPage({
             </thead>
             <tbody>
               {tournament.entries.map((entry) => (
-                <tr key={entry.id} className="border-b border-neutral-900 hover:bg-neutral-900/40">
-                  <td className="py-2 pr-4 font-mono text-neutral-300">
+                <tr key={entry.id} className="border-b border-border hover:bg-surface-hover/40">
+                  <td className="py-2 pr-4 font-mono text-text-secondary">
                     {entry.placement != null ? (
                       entry.placement
                     ) : (
-                      <span className="text-neutral-600">&mdash;</span>
+                      <span className="text-text-muted">&mdash;</span>
                     )}
                   </td>
                   <td className="py-2 pr-4">
                     <span className="font-medium">{entry.displayName}</span>
                     {entry.participantMembershipId === viewer.id && (
-                      <span className="ml-2 rounded bg-neutral-800 px-1.5 py-0.5 text-xs text-neutral-400">
+                      <span className="ml-2 rounded bg-surface-elevated px-1.5 py-0.5 text-xs text-text-secondary">
                         you
                       </span>
                     )}
                   </td>
-                  <td className="py-2 text-neutral-400">
+                  <td className="py-2 text-text-secondary">
                     {entry.seed != null ? (
                       entry.seed
                     ) : (
-                      <span className="text-neutral-600">&mdash;</span>
+                      <span className="text-text-muted">&mdash;</span>
                     )}
                   </td>
                 </tr>

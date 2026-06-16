@@ -26,21 +26,21 @@ export default async function AdminMembersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Members</h1>
-        <a href="/members" className="text-sm text-neutral-400 hover:text-neutral-100 underline">
+        <a href="/members" className="text-sm text-text-secondary hover:text-text-primary underline">
           ← Back to members
         </a>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-neutral-800 text-left text-neutral-400">
+            <tr className="border-b border-border text-left text-text-secondary">
               <th className="pb-2 pr-4 font-medium">Member</th>
               <th className="pb-2 pr-4 font-medium">Rank</th>
               <th className="pb-2 pr-4 font-medium">Change rank</th>
               <th className="pb-2 font-medium">Login link</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-800">
+          <tbody className="divide-y divide-border">
             {members.map((member) => {
               const initials = (member.displayName ?? member.username)
                 .slice(0, 2)
@@ -56,7 +56,7 @@ export default async function AdminMembersPage() {
                           className="h-8 w-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-700 text-xs font-semibold">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-elevated text-xs font-semibold">
                           {initials}
                         </div>
                       )}
@@ -64,11 +64,11 @@ export default async function AdminMembersPage() {
                         <div className="font-medium">
                           {member.displayName ?? member.username}
                         </div>
-                        <div className="text-neutral-400">@{member.username}</div>
+                        <div className="text-text-secondary">@{member.username}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="py-3 pr-4 text-neutral-300">
+                  <td className="py-3 pr-4 text-text-secondary">
                     <Rank tier={member.tier} />
                   </td>
                   <td className="py-3 pr-4">

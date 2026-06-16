@@ -32,10 +32,10 @@ export function AddParticipantForm() {
   }
 
   return (
-    <div className="rounded border border-neutral-800 p-4">
+    <div className="rounded border border-border p-4">
       <h2 className="mb-4 font-semibold">Add participant</h2>
       <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
-        {error && <p className="w-full text-sm text-red-400">{error}</p>}
+        {error && <p className="w-full text-sm text-fg-red-light">{error}</p>}
         <label className="flex flex-col gap-1 text-sm flex-1 min-w-48">
           Display name
           <input
@@ -46,13 +46,13 @@ export function AddParticipantForm() {
             disabled={pending}
             placeholder="Handle or callsign…"
             maxLength={100}
-            className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           />
         </label>
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50"
+          className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
         >
           {pending ? "Adding…" : "Add"}
         </button>

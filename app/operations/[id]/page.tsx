@@ -26,42 +26,42 @@ export default async function OperationDetailPage({ params }: { params: Promise<
   return (
     <main className="mx-auto max-w-2xl space-y-8 p-6">
       <div>
-        <a href="/operations" className="text-sm text-neutral-400 underline hover:text-neutral-100">← Operations</a>
+        <a href="/operations" className="text-sm text-text-secondary underline hover:text-text-primary">← Operations</a>
         <div className="mt-3 flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <StatusBadge status={op.status} />
               <h1 className="text-2xl font-bold">{op.title}</h1>
             </div>
-            <p className="mt-2 text-neutral-300">
+            <p className="mt-2 text-text-secondary">
               {op.scheduledAt ? formatDateTime(op.scheduledAt) : "Unscheduled"}{op.location ? ` · ${op.location}` : ""}
             </p>
-            <p className="mt-1 text-xs text-neutral-500">Created by {op.createdByName}</p>
+            <p className="mt-1 text-xs text-text-muted">Created by {op.createdByName}</p>
           </div>
         </div>
       </div>
 
       {canManage && <StatusControl operationId={op.id} current={op.status} />}
 
-      {op.description && <p className="whitespace-pre-wrap text-neutral-200">{op.description}</p>}
+      {op.description && <p className="whitespace-pre-wrap text-text-primary">{op.description}</p>}
 
       <section className="space-y-3">
-        <h2 className="font-mono text-xs uppercase tracking-widest text-neutral-500">[ Sign up ]</h2>
+        <h2 className="font-mono text-xs uppercase tracking-widest text-text-muted">[ Sign up ]</h2>
         <SignupControl operationId={op.id} joined={mine !== null} currentRole={mine?.role ?? null} />
       </section>
 
       <section>
-        <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-neutral-500">
+        <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-text-muted">
           [ Crew · {op.signups.length} ]
         </h2>
         {op.signups.length === 0 ? (
-          <p className="text-sm text-neutral-500">No one signed up yet.</p>
+          <p className="text-sm text-text-muted">No one signed up yet.</p>
         ) : (
           <ul className="space-y-1 text-sm">
             {op.signups.map((s) => (
               <li key={s.membershipId} className="flex items-center justify-between">
-                <a href={`/members/${s.username}`} className="text-neutral-200 hover:underline">{s.name}</a>
-                {s.role && <span className="font-mono text-xs text-neutral-500">{s.role}</span>}
+                <a href={`/members/${s.username}`} className="text-text-primary hover:underline">{s.name}</a>
+                {s.role && <span className="font-mono text-xs text-text-muted">{s.role}</span>}
               </li>
             ))}
           </ul>

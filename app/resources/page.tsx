@@ -23,21 +23,21 @@ export default async function ResourcesPage() {
       {canManage && <ResourceCreateForm />}
 
       {resources.length === 0 ? (
-        <p className="text-sm text-neutral-500">No resources yet.</p>
+        <p className="text-sm text-text-muted">No resources yet.</p>
       ) : (
         <ul className="space-y-3">
           {resources.map((r) => (
-            <li key={r.id} className="rounded border border-neutral-800 p-4">
+            <li key={r.id} className="rounded border border-border p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  {r.category && <span className="mr-2 rounded border border-neutral-700 px-2 py-0.5 text-xs uppercase text-neutral-400">{r.category}</span>}
+                  {r.category && <span className="mr-2 rounded border border-border-light px-2 py-0.5 text-xs uppercase text-text-secondary">{r.category}</span>}
                   {r.url ? (
-                    <a href={r.url} target="_blank" rel="noopener noreferrer" className="font-medium text-neutral-100 underline hover:text-white">{r.title}</a>
+                    <a href={r.url} target="_blank" rel="noopener noreferrer" className="font-medium text-text-primary underline hover:text-white">{r.title}</a>
                   ) : (
-                    <span className="font-medium text-neutral-100">{r.title}</span>
+                    <span className="font-medium text-text-primary">{r.title}</span>
                   )}
-                  {r.body && <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-400">{r.body}</p>}
-                  <p className="mt-1 text-xs text-neutral-600">Added by {r.authorName}</p>
+                  {r.body && <p className="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{r.body}</p>}
+                  <p className="mt-1 text-xs text-text-muted">Added by {r.authorName}</p>
                 </div>
                 {canManage && <DeleteResourceButton id={r.id} />}
               </div>

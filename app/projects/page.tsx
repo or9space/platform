@@ -22,15 +22,15 @@ export default async function ProjectsPage() {
       {canManage && <ProjectCreateForm />}
 
       {projects.length === 0 ? (
-        <p className="text-sm text-neutral-500">No boards yet.</p>
+        <p className="text-sm text-text-muted">No boards yet.</p>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {projects.map((p) => (
             <li key={p.id}>
-              <a href={`/projects/${p.id}`} className="block rounded border border-neutral-800 p-4 transition-colors hover:border-neutral-600">
-                <p className="font-medium text-neutral-100">{p.name}</p>
-                {p.description && <p className="mt-1 text-sm text-neutral-400">{p.description}</p>}
-                <p className="mt-2 font-mono text-xs text-neutral-500">{p.doneCount}/{p.ticketCount} done</p>
+              <a href={`/projects/${p.id}`} className="block rounded border border-border p-4 transition-colors hover:border-primary">
+                <p className="font-medium text-text-primary">{p.name}</p>
+                {p.description && <p className="mt-1 text-sm text-text-secondary">{p.description}</p>}
+                <p className="mt-2 font-mono text-xs text-text-muted">{p.doneCount}/{p.ticketCount} done</p>
               </a>
             </li>
           ))}

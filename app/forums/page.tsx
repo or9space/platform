@@ -25,7 +25,7 @@ export default async function ForumsPage() {
         {canManageCategories && (
           <a
             href="/forums/admin-categories"
-            className="rounded border border-neutral-700 px-3 py-1.5 text-sm hover:border-neutral-500"
+            className="rounded border border-border-light px-3 py-1.5 text-sm hover:border-primary"
           >
             Manage categories
           </a>
@@ -33,18 +33,18 @@ export default async function ForumsPage() {
       </div>
 
       {categories.length === 0 ? (
-        <p className="text-neutral-400">No categories yet.</p>
+        <p className="text-text-secondary">No categories yet.</p>
       ) : (
         <ul className="space-y-3">
           {categories.map((cat) => (
             <li key={cat.id}>
               <a
                 href={`/forums/${cat.slug}`}
-                className="block rounded border border-neutral-800 p-4 hover:border-neutral-600"
+                className="block rounded border border-border p-4 hover:border-primary"
               >
                 <p className="font-semibold">{cat.name}</p>
                 {cat.description && (
-                  <p className="mt-1 text-sm text-neutral-400">{cat.description}</p>
+                  <p className="mt-1 text-sm text-text-secondary">{cat.description}</p>
                 )}
               </a>
             </li>

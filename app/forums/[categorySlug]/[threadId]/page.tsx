@@ -36,22 +36,22 @@ export default async function ThreadPage({
   return (
     <main className="mx-auto max-w-3xl p-6">
       <div className="mb-1 text-sm">
-        <a href="/forums" className="text-neutral-400 hover:text-neutral-200">Forums</a>
-        <span className="mx-2 text-neutral-600">/</span>
-        <a href={`/forums/${categorySlug}`} className="text-neutral-400 hover:text-neutral-200">
+        <a href="/forums" className="text-text-secondary hover:text-text-primary">Forums</a>
+        <span className="mx-2 text-text-muted">/</span>
+        <a href={`/forums/${categorySlug}`} className="text-text-secondary hover:text-text-primary">
           {categorySlug}
         </a>
-        <span className="mx-2 text-neutral-600">/</span>
-        <span className="text-neutral-300">{thread.title}</span>
+        <span className="mx-2 text-text-muted">/</span>
+        <span className="text-text-secondary">{thread.title}</span>
       </div>
 
       <div className="mb-6">
         <div className="flex flex-wrap items-center gap-2">
           {thread.isPinned && (
-            <span className="rounded bg-neutral-700 px-1.5 py-0.5 text-xs">Pinned</span>
+            <span className="rounded bg-surface-elevated px-1.5 py-0.5 text-xs">Pinned</span>
           )}
           {thread.isLocked && (
-            <span className="rounded bg-neutral-700 px-1.5 py-0.5 text-xs">Locked</span>
+            <span className="rounded bg-surface-elevated px-1.5 py-0.5 text-xs">Locked</span>
           )}
           <h1 className="text-2xl font-bold">{thread.title}</h1>
         </div>
@@ -73,15 +73,15 @@ export default async function ThreadPage({
 
       <ul className="mb-8 space-y-4">
         {thread.posts.map((post) => (
-          <li key={post.id} className="rounded border border-neutral-800 p-4">
+          <li key={post.id} className="rounded border border-border p-4">
             <div className="mb-2 flex items-center justify-between gap-2">
               <p className="text-sm font-semibold">
                 {post.authorName}
                 {post.isEdited && (
-                  <span className="ml-2 text-xs font-normal text-neutral-500">(edited)</span>
+                  <span className="ml-2 text-xs font-normal text-text-muted">(edited)</span>
                 )}
               </p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-text-muted">
                 {post.createdAt.toISOString().slice(0, 16).replace("T", " ")}
               </p>
             </div>
@@ -104,12 +104,12 @@ export default async function ThreadPage({
       </ul>
 
       {isLoggedIn ? (
-        <div className="rounded border border-neutral-800 p-4">
+        <div className="rounded border border-border p-4">
           <h2 className="mb-3 font-semibold">Reply</h2>
           <ReplyForm threadId={thread.id} disabled={thread.isLocked} />
         </div>
       ) : (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-text-muted">
           <a href="/login" className="underline">Sign in</a> to reply.
         </p>
       )}

@@ -40,15 +40,15 @@ export function RsvpButtons({ eventId, current }: { eventId: string; current: st
             className={
               "rounded border px-3 py-1.5 text-sm transition-colors disabled:opacity-50 " +
               (selected === o.status
-                ? "border-neutral-300 bg-neutral-100 font-semibold text-neutral-900"
-                : "border-neutral-700 text-neutral-300 hover:border-neutral-500")
+                ? "border-border-light bg-primary font-semibold text-fg-cream"
+                : "border-border-light text-text-secondary hover:border-primary")
             }
           >
             {o.label}
           </button>
         ))}
       </div>
-      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+      {error && <p className="mt-2 text-sm text-fg-red-light">{error}</p>}
     </div>
   );
 }

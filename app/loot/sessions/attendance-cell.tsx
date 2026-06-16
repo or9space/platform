@@ -35,7 +35,7 @@ export function AttendanceCell({ sessionId, memberId, currentStatus }: Props) {
       value={currentStatus ?? ""}
       onChange={handleChange}
       disabled={pending}
-      className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-sm disabled:opacity-50"
+      className="rounded border border-border-light bg-surface px-2 py-1 text-sm disabled:opacity-50"
     >
       <option value="" disabled>
         — set —

@@ -26,12 +26,12 @@ export default async function BillingPage() {
       <h2 className="text-xl font-semibold">Billing</h2>
 
       {!hasProvider && (
-        <div className="rounded border border-neutral-700 bg-neutral-900 p-5 space-y-2">
+        <div className="rounded border border-border-light bg-surface p-5 space-y-2">
           <p className="font-medium">Self-hosted deployment</p>
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-text-secondary">
             This deployment doesn&apos;t have hosted billing. The platform is free and
             open-source to self-host (AGPL). Paid plans are available on the hosted{" "}
-            <a href="/pricing" className="underline hover:text-neutral-100">
+            <a href="/pricing" className="underline hover:text-text-primary">
               or9.space
             </a>
             .
@@ -40,10 +40,10 @@ export default async function BillingPage() {
       )}
 
       {hasProvider && plan === "FREE" && (
-        <div className="rounded border border-neutral-700 bg-neutral-900 p-5 space-y-4">
+        <div className="rounded border border-border-light bg-surface p-5 space-y-4">
           <div>
             <p className="font-medium">Current plan: Free</p>
-            <p className="text-sm text-neutral-400 mt-1">
+            <p className="text-sm text-text-secondary mt-1">
               Upgrade to unlock paid features including the Discord bot, custom
               domains, and more.
             </p>
@@ -51,7 +51,7 @@ export default async function BillingPage() {
           {priceId ? (
             <UpgradeButton tenantId={tenant.id} priceId={priceId} />
           ) : (
-            <p className="text-sm text-amber-400">
+            <p className="text-sm text-amber">
               Billing price not configured — contact your platform administrator.
             </p>
           )}
@@ -59,9 +59,9 @@ export default async function BillingPage() {
       )}
 
       {hasProvider && plan === "PAID" && (
-        <div className="rounded border border-neutral-700 bg-neutral-900 p-5 space-y-2">
+        <div className="rounded border border-border-light bg-surface p-5 space-y-2">
           <p className="font-medium">Current plan: Paid</p>
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-text-secondary">
             You&apos;re on the Paid plan. To manage or cancel your subscription,
             use the customer portal (available via your billing confirmation email
             or contact support).

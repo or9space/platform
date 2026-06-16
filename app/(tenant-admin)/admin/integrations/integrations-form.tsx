@@ -49,7 +49,7 @@ export function IntegrationsForm({ tenantId, initial, canSetToken }: Integration
       <section className="space-y-3">
         <h3 className="text-base font-medium">Discord</h3>
         <div className="space-y-2">
-          <label className="block text-sm text-neutral-400" htmlFor="discordGuildId">
+          <label className="block text-sm text-text-secondary" htmlFor="discordGuildId">
             Guild ID
           </label>
           <input
@@ -58,12 +58,12 @@ export function IntegrationsForm({ tenantId, initial, canSetToken }: Integration
             value={discordGuildId}
             onChange={(e) => setDiscordGuildId(e.target.value)}
             disabled={isPending}
-            className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500"
+            className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="e.g. 123456789012345678"
           />
         </div>
         <div className="space-y-2">
-          <label className="block text-sm text-neutral-400" htmlFor="discordBotToken">
+          <label className="block text-sm text-text-secondary" htmlFor="discordBotToken">
             Bot Token
           </label>
           <input
@@ -72,11 +72,11 @@ export function IntegrationsForm({ tenantId, initial, canSetToken }: Integration
             value={discordBotToken}
             onChange={(e) => setDiscordBotToken(e.target.value)}
             disabled={isPending || !canSetToken}
-            className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 disabled:opacity-40"
+            className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-40"
             placeholder={initial.botTokenSet ? "•••• (set)" : ""}
           />
           {!canSetToken && (
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-text-muted">
               Upgrade to a paid plan to set a bot token.
             </p>
           )}
@@ -86,7 +86,7 @@ export function IntegrationsForm({ tenantId, initial, canSetToken }: Integration
       <section className="space-y-3">
         <h3 className="text-base font-medium">Google Calendar</h3>
         <div className="space-y-2">
-          <label className="block text-sm text-neutral-400" htmlFor="calendarId">
+          <label className="block text-sm text-text-secondary" htmlFor="calendarId">
             Calendar ID
           </label>
           <input
@@ -95,14 +95,14 @@ export function IntegrationsForm({ tenantId, initial, canSetToken }: Integration
             value={calendarId}
             onChange={(e) => setCalendarId(e.target.value)}
             disabled={isPending}
-            className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500"
+            className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="e.g. your-org@group.calendar.google.com"
           />
         </div>
       </section>
 
       {error && (
-        <p className="rounded border border-red-800 bg-red-950 px-3 py-2 text-sm text-red-400">
+        <p className="rounded border border-danger bg-surface px-3 py-2 text-sm text-fg-red-light">
           {error}
         </p>
       )}
@@ -110,7 +110,7 @@ export function IntegrationsForm({ tenantId, initial, canSetToken }: Integration
       <button
         type="submit"
         disabled={isPending}
-        className="rounded bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-white disabled:opacity-50"
+        className="rounded bg-primary px-4 py-2 text-sm font-medium text-fg-cream hover:bg-white disabled:opacity-50"
       >
         {isPending ? "Saving…" : "Save integrations"}
       </button>

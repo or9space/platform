@@ -41,9 +41,9 @@ export function LoginLinkButton({ tenantId, membershipId }: { tenantId: string; 
           readOnly
           value={url}
           onFocus={(e) => e.currentTarget.select()}
-          className="w-56 rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-xs text-neutral-300"
+          className="w-56 rounded border border-border-light bg-surface px-2 py-1 text-xs text-text-secondary"
         />
-        <button onClick={copy} className="rounded border border-neutral-700 px-2 py-1 text-xs hover:border-neutral-500">
+        <button onClick={copy} className="rounded border border-border-light px-2 py-1 text-xs hover:border-primary">
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
@@ -55,11 +55,11 @@ export function LoginLinkButton({ tenantId, membershipId }: { tenantId: string; 
       <button
         onClick={generate}
         disabled={pending}
-        className="rounded border border-neutral-700 px-3 py-1 text-xs hover:border-neutral-500 disabled:opacity-50"
+        className="rounded border border-border-light px-3 py-1 text-xs hover:border-primary disabled:opacity-50"
       >
         {pending ? "…" : "Login link"}
       </button>
-      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-1 text-xs text-fg-red-light">{error}</p>}
     </div>
   );
 }

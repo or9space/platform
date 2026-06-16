@@ -18,7 +18,7 @@ export function AcknowledgeButton({ handbookId, version, ack }: Props) {
 
   if (ack && !ack.isStale) {
     return (
-      <span className="text-sm text-neutral-400">
+      <span className="text-sm text-text-secondary">
         Acknowledged ✓ (v{ack.versionRead})
       </span>
     );
@@ -45,11 +45,11 @@ export function AcknowledgeButton({ handbookId, version, ack }: Props) {
       <button
         onClick={handleClick}
         disabled={isPending}
-        className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500 disabled:opacity-50"
+        className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary disabled:opacity-50"
       >
         {isPending ? "Saving…" : label}
       </button>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
     </div>
   );
 }

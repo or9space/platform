@@ -37,28 +37,28 @@ export default async function HandbookPage() {
       )}
 
       {handbooks.length === 0 ? (
-        <p className="text-neutral-400">No handbooks available.</p>
+        <p className="text-text-secondary">No handbooks available.</p>
       ) : (
         <ul className="space-y-3">
           {handbooks.map((h) => (
             <li key={h.id}>
               <a
                 href={`/handbook/${h.slug}`}
-                className="flex items-start justify-between rounded border border-neutral-800 p-4 hover:border-neutral-600"
+                className="flex items-start justify-between rounded border border-border p-4 hover:border-primary"
               >
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">{h.title}</p>
                   {h.subtitle && (
-                    <p className="mt-1 text-sm text-neutral-400">{h.subtitle}</p>
+                    <p className="mt-1 text-sm text-text-secondary">{h.subtitle}</p>
                   )}
-                  <p className="mt-1 text-xs text-neutral-500">v{h.version}</p>
+                  <p className="mt-1 text-xs text-text-muted">v{h.version}</p>
                 </div>
                 {isCommand && h.status !== "PUBLISHED" && (
                   <span
                     className={
                       h.status === "DRAFT"
                         ? "ml-4 shrink-0 rounded px-2 py-0.5 text-xs font-semibold bg-yellow-900/50 text-yellow-300"
-                        : "ml-4 shrink-0 rounded px-2 py-0.5 text-xs font-semibold bg-neutral-800 text-neutral-400"
+                        : "ml-4 shrink-0 rounded px-2 py-0.5 text-xs font-semibold bg-surface-elevated text-text-secondary"
                     }
                   >
                     {h.status}

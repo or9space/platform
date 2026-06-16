@@ -31,20 +31,20 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   return (
     <main className="mx-auto max-w-2xl space-y-8 p-6">
       <div>
-        <a href="/events" className="text-sm text-neutral-400 underline hover:text-neutral-100">← Events</a>
+        <a href="/events" className="text-sm text-text-secondary underline hover:text-text-primary">← Events</a>
         <div className="mt-3 flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <EventTypeBadge type={event.type} />
               <h1 className="text-2xl font-bold">{event.title}</h1>
             </div>
-            <p className="mt-2 text-neutral-300">{formatDateTime(event.startsAt)}{event.endsAt ? ` – ${formatDateTime(event.endsAt)}` : ""}</p>
-            {event.location && <p className="text-sm text-neutral-400">{event.location}</p>}
-            <p className="mt-1 text-xs text-neutral-500">Created by {event.createdByName}</p>
+            <p className="mt-2 text-text-secondary">{formatDateTime(event.startsAt)}{event.endsAt ? ` – ${formatDateTime(event.endsAt)}` : ""}</p>
+            {event.location && <p className="text-sm text-text-secondary">{event.location}</p>}
+            <p className="mt-1 text-xs text-text-muted">Created by {event.createdByName}</p>
           </div>
           {canManage && (
             <div className="flex shrink-0 items-center gap-2">
-              <a href={`/events/${event.id}/edit`} className="rounded border border-neutral-700 px-3 py-1.5 text-sm hover:border-neutral-500">Edit</a>
+              <a href={`/events/${event.id}/edit`} className="rounded border border-border-light px-3 py-1.5 text-sm hover:border-primary">Edit</a>
               <DeleteEventButton eventId={event.id} />
             </div>
           )}
@@ -52,42 +52,42 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       </div>
 
       {event.description && (
-        <p className="whitespace-pre-wrap text-neutral-200">{event.description}</p>
+        <p className="whitespace-pre-wrap text-text-primary">{event.description}</p>
       )}
 
       <section className="space-y-3">
-        <h2 className="font-mono text-xs uppercase tracking-widest text-neutral-500">[ Your RSVP ]</h2>
+        <h2 className="font-mono text-xs uppercase tracking-widest text-text-muted">[ Your RSVP ]</h2>
         <RsvpButtons eventId={event.id} current={myRsvp} />
       </section>
 
       <section className="grid gap-6 sm:grid-cols-2">
         <div>
-          <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-neutral-500">
+          <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-text-muted">
             [ Going · {event.counts.GOING} ]
           </h2>
           {going.length === 0 ? (
-            <p className="text-sm text-neutral-500">No one yet.</p>
+            <p className="text-sm text-text-muted">No one yet.</p>
           ) : (
             <ul className="space-y-1 text-sm">
               {going.map((r) => (
                 <li key={r.membershipId}>
-                  <a href={`/members/${r.username}`} className="text-neutral-200 hover:underline">{r.name}</a>
+                  <a href={`/members/${r.username}`} className="text-text-primary hover:underline">{r.name}</a>
                 </li>
               ))}
             </ul>
           )}
         </div>
         <div>
-          <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-neutral-500">
+          <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-text-muted">
             [ Maybe · {event.counts.MAYBE} ]
           </h2>
           {maybe.length === 0 ? (
-            <p className="text-sm text-neutral-500">No one yet.</p>
+            <p className="text-sm text-text-muted">No one yet.</p>
           ) : (
             <ul className="space-y-1 text-sm">
               {maybe.map((r) => (
                 <li key={r.membershipId}>
-                  <a href={`/members/${r.username}`} className="text-neutral-200 hover:underline">{r.name}</a>
+                  <a href={`/members/${r.username}`} className="text-text-primary hover:underline">{r.name}</a>
                 </li>
               ))}
             </ul>

@@ -22,14 +22,14 @@ export default async function StarMapPage() {
         {list.map((s) => {
           const ps = (byId.get(s.id) ?? []).sort((a, b) => a.name.localeCompare(b.name));
           return (
-            <section key={s.id} className="rounded border border-neutral-800 p-4">
-              <h2 className="font-semibold text-neutral-100">{s.name} <span className="text-xs text-neutral-500">{s.code}</span></h2>
+            <section key={s.id} className="rounded border border-border p-4">
+              <h2 className="font-semibold text-text-primary">{s.name} <span className="text-xs text-text-muted">{s.code}</span></h2>
               {ps.length === 0 ? (
-                <p className="mt-1 text-xs text-neutral-500">No planets listed.</p>
+                <p className="mt-1 text-xs text-text-muted">No planets listed.</p>
               ) : (
                 <ul className="mt-2 flex flex-wrap gap-1.5">
                   {ps.map((p) => (
-                    <li key={p.id} className="rounded bg-neutral-900 px-2 py-0.5 text-xs text-neutral-300">{p.name}</li>
+                    <li key={p.id} className="rounded bg-surface px-2 py-0.5 text-xs text-text-secondary">{p.name}</li>
                   ))}
                 </ul>
               )}

@@ -20,10 +20,10 @@ const TXN_LABELS: Record<LootTxnType, string> = {
 };
 
 const TXN_COLORS: Record<LootTxnType, string> = {
-  SPEND: "bg-red-900/50 text-red-300",
+  SPEND: "bg-red-900/50 text-fg-red-light",
   TRANSFER_IN: "bg-green-900/50 text-green-300",
   TRANSFER_OUT: "bg-yellow-900/50 text-yellow-300",
-  ADJUST: "bg-neutral-800 text-neutral-300",
+  ADJUST: "bg-surface-elevated text-text-secondary",
 };
 
 export default async function LootMemberPage({
@@ -72,20 +72,20 @@ export default async function LootMemberPage({
   return (
     <main className="mx-auto max-w-2xl p-6">
       <div className="mb-4 text-sm">
-        <a href="/loot" className="text-neutral-400 hover:text-neutral-200">
+        <a href="/loot" className="text-text-secondary hover:text-text-primary">
           Leaderboard
         </a>
-        <span className="mx-2 text-neutral-600">/</span>
-        <span className="text-neutral-300">{lootMember.displayName}</span>
+        <span className="mx-2 text-text-muted">/</span>
+        <span className="text-text-secondary">{lootMember.displayName}</span>
       </div>
 
-      <div className="mb-6 rounded border border-neutral-800 p-5">
+      <div className="mb-6 rounded border border-border p-5">
         <h1 className="text-xl font-bold mb-1">{lootMember.displayName}</h1>
         <div className="flex items-baseline gap-2">
           <span className="text-3xl font-bold font-mono">
             {formatPoints(balanceTenths)}
           </span>
-          <span className="text-neutral-400 text-sm">points</span>
+          <span className="text-text-secondary text-sm">points</span>
         </div>
       </div>
 
@@ -104,14 +104,14 @@ export default async function LootMemberPage({
 
       {/* Transaction history */}
       <section>
-        <h2 className="mb-3 font-semibold text-neutral-300">Transaction history</h2>
+        <h2 className="mb-3 font-semibold text-text-secondary">Transaction history</h2>
         {transactions.length === 0 ? (
-          <p className="text-neutral-500 text-sm">No transactions yet.</p>
+          <p className="text-text-muted text-sm">No transactions yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-800 text-left text-neutral-500">
+                <tr className="border-b border-border text-left text-text-muted">
                   <th className="pb-2 pr-4 font-normal">Date</th>
                   <th className="pb-2 pr-4 font-normal">Type</th>
                   <th className="pb-2 pr-4 font-normal text-right">Amount</th>
@@ -126,9 +126,9 @@ export default async function LootMemberPage({
                   return (
                     <tr
                       key={t.id}
-                      className="border-b border-neutral-900 hover:bg-neutral-900/40"
+                      className="border-b border-border hover:bg-surface-hover/40"
                     >
-                      <td className="py-2 pr-4 text-neutral-400">
+                      <td className="py-2 pr-4 text-text-secondary">
                         {t.createdAt.toISOString().slice(0, 10)}
                       </td>
                       <td className="py-2 pr-4">
@@ -139,21 +139,21 @@ export default async function LootMemberPage({
                             {TXN_LABELS[txnType]}
                           </span>
                         ) : (
-                          <span className="text-neutral-500 text-xs">{t.type}</span>
+                          <span className="text-text-muted text-xs">{t.type}</span>
                         )}
                       </td>
                       <td className="py-2 pr-4 font-mono text-right">
                         <span
                           className={
-                            t.amountTenths < 0 ? "text-red-400" : "text-green-400"
+                            t.amountTenths < 0 ? "text-fg-red-light" : "text-green-400"
                           }
                         >
                           {t.amountTenths >= 0 ? "+" : ""}
                           {formatPoints(t.amountTenths)}
                         </span>
                       </td>
-                      <td className="py-2 text-neutral-400 max-w-xs truncate">
-                        {t.note ?? <span className="text-neutral-600">—</span>}
+                      <td className="py-2 text-text-secondary max-w-xs truncate">
+                        {t.note ?? <span className="text-text-muted">—</span>}
                       </td>
                     </tr>
                   );

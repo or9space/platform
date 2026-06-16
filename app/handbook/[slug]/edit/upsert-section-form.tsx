@@ -42,19 +42,19 @@ export function UpsertSectionForm({ handbookId, sectionId }: Props) {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <input
         name="title"
         required
         placeholder="Section title"
-        className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+        className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
       />
       <textarea
         name="body"
         required
         rows={6}
         placeholder="Section body…"
-        className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+        className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
       />
       <input
         name="orderIndex"
@@ -62,12 +62,12 @@ export function UpsertSectionForm({ handbookId, sectionId }: Props) {
         required
         defaultValue={0}
         placeholder="Order index"
-        className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+        className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
       />
       <button
         type="submit"
         disabled={isPending}
-        className="rounded border border-neutral-600 px-4 py-2 text-sm hover:border-neutral-400 disabled:opacity-50"
+        className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary disabled:opacity-50"
       >
         {isPending ? "Saving…" : sectionId ? "Update Section" : "Add Section"}
       </button>

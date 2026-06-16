@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 /** Friendly empty/error state when UEX is unreachable or returns nothing. */
 export function UexNotice({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded border border-amber-900/60 bg-amber-950/20 p-4 text-sm text-amber-200">
+    <div className="rounded border border-amber bg-amber-soft p-4 text-sm text-amber">
       {children}
     </div>
   );

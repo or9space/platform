@@ -42,21 +42,21 @@ export function AuthForm({
       <h1 className="text-2xl font-bold">
         {mode === "login" ? `Sign in to ${tenantName}` : `Join ${tenantName}`}
       </h1>
-      {error && <p className="rounded border border-red-800 bg-red-950 p-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="rounded border border-danger bg-surface p-2 text-sm text-fg-red-light">{error}</p>}
       {mode === "register" && (
         <input name="username" required placeholder="Username" autoComplete="username"
-          className="w-full rounded border border-neutral-700 bg-neutral-900 p-2" />
+          className="w-full rounded border border-border-light bg-surface p-2" />
       )}
       <input name="email" type="email" required placeholder="Email" autoComplete="email"
-        className="w-full rounded border border-neutral-700 bg-neutral-900 p-2" />
+        className="w-full rounded border border-border-light bg-surface p-2" />
       <input name="password" type="password" required placeholder="Password (10+ chars)"
         autoComplete={mode === "login" ? "current-password" : "new-password"}
-        className="w-full rounded border border-neutral-700 bg-neutral-900 p-2" />
+        className="w-full rounded border border-border-light bg-surface p-2" />
       <button type="submit" disabled={pending} aria-busy={pending}
-        className="w-full rounded bg-neutral-100 p-2 font-semibold text-neutral-900 disabled:opacity-50">
+        className="w-full rounded bg-primary p-2 font-semibold text-fg-cream disabled:opacity-50">
         {pending ? "Working…" : mode === "login" ? "Sign in" : "Create account"}
       </button>
-      <p className="text-sm text-neutral-400">
+      <p className="text-sm text-text-secondary">
         {mode === "login" ? <a href="/register" className="underline">Need an account?</a>
                           : <a href="/login" className="underline">Already a member?</a>}
       </p>

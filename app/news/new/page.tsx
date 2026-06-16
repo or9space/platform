@@ -15,7 +15,7 @@ export default async function NewNewsPage() {
     <main className="mx-auto max-w-2xl space-y-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">New post</h1>
-        <a href="/news" className="text-sm text-neutral-400 underline hover:text-neutral-100">← News</a>
+        <a href="/news" className="text-sm text-text-secondary underline hover:text-text-primary">← News</a>
       </div>
       <NewsForm />
     </main>

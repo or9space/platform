@@ -21,20 +21,20 @@ export default async function TradePage({ searchParams }: { searchParams: Promis
       {!routes.ok ? (
         <UexNotice>Couldn&apos;t load routes for this commodity.</UexNotice>
       ) : rows.length === 0 ? (
-        <p className="text-sm text-neutral-500">No profitable routes reported.</p>
+        <p className="text-sm text-text-muted">No profitable routes reported.</p>
       ) : (
         <table className="w-full text-sm">
-          <thead className="text-left text-xs text-neutral-500">
+          <thead className="text-left text-xs text-text-muted">
             <tr><th className="py-1">Buy at</th><th>Sell at</th><th className="text-right">Profit/SCU</th><th className="text-right">ROI</th><th className="text-right">Jump</th></tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className="border-t border-neutral-900">
-                <td className="py-1 pr-2">{r.origin_terminal_code} <span className="text-neutral-500">@ {aUEC(r.price_origin)}</span></td>
-                <td className="pr-2">{r.destination_terminal_code} <span className="text-neutral-500">@ {aUEC(r.price_destination)}</span></td>
-                <td className="text-right font-mono text-emerald-300">{aUEC(r.profit)}</td>
+              <tr key={r.id} className="border-t border-border">
+                <td className="py-1 pr-2">{r.origin_terminal_code} <span className="text-text-muted">@ {aUEC(r.price_origin)}</span></td>
+                <td className="pr-2">{r.destination_terminal_code} <span className="text-text-muted">@ {aUEC(r.price_destination)}</span></td>
+                <td className="text-right font-mono text-success">{aUEC(r.profit)}</td>
                 <td className="text-right font-mono">{r.price_roi ? `${r.price_roi.toFixed(1)}%` : "—"}</td>
-                <td className="text-right text-neutral-400">{r.distance}</td>
+                <td className="text-right text-text-secondary">{r.distance}</td>
               </tr>
             ))}
           </tbody>

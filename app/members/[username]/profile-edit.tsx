@@ -47,10 +47,10 @@ export function ProfileEdit({ initial }: ProfileEditProps) {
   }
 
   return (
-    <div className="mt-6 rounded border border-neutral-800 p-4">
+    <div className="mt-6 rounded border border-border p-4">
       <h2 className="mb-4 font-semibold">Edit profile</h2>
       <form action={handleSubmit} className="space-y-4">
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm text-fg-red-light">{error}</p>}
         {saved && <p className="text-sm text-green-400">Profile updated.</p>}
         <label className="block text-sm">
           Display name
@@ -59,7 +59,7 @@ export function ProfileEdit({ initial }: ProfileEditProps) {
             maxLength={80}
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+            className="mt-1 w-full rounded border border-border-light bg-surface p-2"
           />
         </label>
         <label className="block text-sm">
@@ -70,7 +70,7 @@ export function ProfileEdit({ initial }: ProfileEditProps) {
             rows={4}
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+            className="mt-1 w-full rounded border border-border-light bg-surface p-2"
           />
         </label>
         <label className="block text-sm">
@@ -82,13 +82,13 @@ export function ProfileEdit({ initial }: ProfileEditProps) {
             value={avatarUrl}
             onChange={(e) => setAvatarUrl(e.target.value)}
             placeholder="https://…"
-            className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+            className="mt-1 w-full rounded border border-border-light bg-surface p-2"
           />
         </label>
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50"
+          className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
         >
           {pending ? "Saving…" : "Save"}
         </button>

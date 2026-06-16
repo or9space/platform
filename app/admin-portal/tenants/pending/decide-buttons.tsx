@@ -12,14 +12,14 @@ export function DecideButtons({ pendingId }: { pendingId: string }) {
     return (
       <div className="text-xs">
         <p className="text-green-400">Approved. Claim URL (also emailed):</p>
-        <code className="block break-all rounded bg-neutral-900 p-1">{claimUrl}</code>
+        <code className="block break-all rounded bg-surface p-1">{claimUrl}</code>
       </div>
     );
   }
 
   return (
     <div className="flex items-center gap-2">
-      {error && <span className="text-xs text-red-400">{error}</span>}
+      {error && <span className="text-xs text-fg-red-light">{error}</span>}
       <button
         disabled={pending}
         onClick={() =>

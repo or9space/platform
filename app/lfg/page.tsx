@@ -23,21 +23,21 @@ export default async function LfgPage() {
       <LfgCreateForm />
 
       {posts.length === 0 ? (
-        <p className="text-sm text-neutral-500">No posts yet.</p>
+        <p className="text-sm text-text-muted">No posts yet.</p>
       ) : (
         <ul className="space-y-3">
           {posts.map((p) => {
             const canManage = isOfficer || p.authorId === viewer.id;
             return (
-              <li key={p.id} className={`rounded border p-4 ${p.status === "CLOSED" ? "border-neutral-900 opacity-60" : "border-neutral-800"}`}>
+              <li key={p.id} className={`rounded border p-4 ${p.status === "CLOSED" ? "border-border opacity-60" : "border-border"}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      {p.status === "CLOSED" && <span className="text-xs uppercase text-neutral-500">Closed</span>}
-                      <p className="font-medium text-neutral-100">{p.title}</p>
+                      {p.status === "CLOSED" && <span className="text-xs uppercase text-text-muted">Closed</span>}
+                      <p className="font-medium text-text-primary">{p.title}</p>
                     </div>
-                    {p.body && <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-400">{p.body}</p>}
-                    <p className="mt-1 text-xs text-neutral-600">
+                    {p.body && <p className="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{p.body}</p>}
+                    <p className="mt-1 text-xs text-text-muted">
                       <a href={`/members/${p.authorUsername}`} className="hover:underline">{p.authorName}</a> · {formatDate(p.createdAt)}
                     </p>
                   </div>

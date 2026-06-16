@@ -35,7 +35,7 @@ export function CreateHandbookForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500"
+        className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
       >
         + New Handbook
       </button>
@@ -46,41 +46,41 @@ export function CreateHandbookForm() {
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="rounded border border-neutral-700 p-4 space-y-3"
+      className="rounded border border-border-light p-4 space-y-3"
     >
       <p className="text-sm font-semibold">New Handbook</p>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <div className="space-y-2">
         <input
           name="slug"
           required
           placeholder="slug (e.g. onboarding)"
-          className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+          className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
         />
         <input
           name="title"
           required
           placeholder="Title"
-          className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+          className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
         />
         <input
           name="subtitle"
           placeholder="Subtitle (optional)"
-          className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+          className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
         />
       </div>
       <div className="flex gap-2">
         <button
           type="submit"
           disabled={isPending}
-          className="rounded border border-neutral-600 px-4 py-2 text-sm hover:border-neutral-400 disabled:opacity-50"
+          className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary disabled:opacity-50"
         >
           {isPending ? "Creating…" : "Create"}
         </button>
         <button
           type="button"
           onClick={() => { setOpen(false); setError(null); }}
-          className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500"
+          className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
         >
           Cancel
         </button>

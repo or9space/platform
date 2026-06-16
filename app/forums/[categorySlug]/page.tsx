@@ -30,32 +30,32 @@ export default async function CategoryPage({
   return (
     <main className="mx-auto max-w-3xl p-6">
       <div className="mb-1">
-        <a href="/forums" className="text-sm text-neutral-400 hover:text-neutral-200">Forums</a>
-        <span className="mx-2 text-neutral-600">/</span>
-        <span className="text-sm text-neutral-300">{category.name}</span>
+        <a href="/forums" className="text-sm text-text-secondary hover:text-text-primary">Forums</a>
+        <span className="mx-2 text-text-muted">/</span>
+        <span className="text-sm text-text-secondary">{category.name}</span>
       </div>
 
       <div className="mb-6">
         <h1 className="text-2xl font-bold">{category.name}</h1>
         {category.description && (
-          <p className="mt-1 text-neutral-400">{category.description}</p>
+          <p className="mt-1 text-text-secondary">{category.description}</p>
         )}
       </div>
 
       {threads.length === 0 ? (
-        <p className="mb-6 text-neutral-400">No threads yet. Be the first to post.</p>
+        <p className="mb-6 text-text-secondary">No threads yet. Be the first to post.</p>
       ) : (
         <ul className="mb-8 space-y-2">
           {threads.map((t) => (
-            <li key={t.id} className="rounded border border-neutral-800 p-4 hover:border-neutral-600">
+            <li key={t.id} className="rounded border border-border p-4 hover:border-primary">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     {t.isPinned && (
-                      <span className="rounded bg-neutral-700 px-1.5 py-0.5 text-xs">Pinned</span>
+                      <span className="rounded bg-surface-elevated px-1.5 py-0.5 text-xs">Pinned</span>
                     )}
                     {t.isLocked && (
-                      <span className="rounded bg-neutral-700 px-1.5 py-0.5 text-xs">Locked</span>
+                      <span className="rounded bg-surface-elevated px-1.5 py-0.5 text-xs">Locked</span>
                     )}
                     <a
                       href={`/forums/${categorySlug}/${t.id}`}
@@ -64,7 +64,7 @@ export default async function CategoryPage({
                       {t.title}
                     </a>
                   </div>
-                  <p className="mt-1 text-xs text-neutral-500">
+                  <p className="mt-1 text-xs text-text-muted">
                     by {t.authorName} · {t.postCount} {t.postCount === 1 ? "reply" : "replies"}
                     {t.lastPostAt && (
                       <> · last post {t.lastPostAt.toISOString().slice(0, 16).replace("T", " ")}</>
@@ -78,12 +78,12 @@ export default async function CategoryPage({
       )}
 
       {isLoggedIn ? (
-        <div className="rounded border border-neutral-800 p-4">
+        <div className="rounded border border-border p-4">
           <h2 className="mb-3 font-semibold">New thread</h2>
           <NewThreadForm categoryId={category.id} />
         </div>
       ) : (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-text-muted">
           <a href="/login" className="underline">Sign in</a> to start a thread.
         </p>
       )}

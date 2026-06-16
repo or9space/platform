@@ -22,7 +22,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
     <main className="mx-auto max-w-lg space-y-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Edit event</h1>
-        <a href={`/events/${id}`} className="text-sm text-neutral-400 underline hover:text-neutral-100">← Cancel</a>
+        <a href={`/events/${id}`} className="text-sm text-text-secondary underline hover:text-text-primary">← Cancel</a>
       </div>
       <EventForm
         eventId={id}

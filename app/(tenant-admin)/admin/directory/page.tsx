@@ -17,9 +17,9 @@ export default async function DirectoryPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold">Public directory</h2>
-        <p className="mt-1 text-sm text-neutral-400">
+        <p className="mt-1 text-sm text-text-secondary">
           Control whether your org appears on the{" "}
-          <a href="/orgs" className="underline hover:text-neutral-200">
+          <a href="/orgs" className="underline hover:text-text-primary">
             public or9.space directory
           </a>.
         </p>

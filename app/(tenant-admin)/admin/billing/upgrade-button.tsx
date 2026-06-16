@@ -33,7 +33,7 @@ export function UpgradeButton({ tenantId, priceId }: UpgradeButtonProps) {
       >
         {isPending ? "Redirecting…" : "Upgrade to Paid"}
       </button>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
     </div>
   );
 }

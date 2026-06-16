@@ -23,17 +23,17 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-4 p-6">
       <div className="flex items-center gap-2">
-        <a href="/messages" className="text-sm text-neutral-400 hover:text-neutral-200">← Messages</a>
+        <a href="/messages" className="text-sm text-text-secondary hover:text-text-primary">← Messages</a>
         <h1 className="text-xl font-bold">{thread.otherName}</h1>
       </div>
 
       <div className="space-y-2">
         {thread.messages.length === 0 ? (
-          <p className="text-sm text-neutral-500">No messages yet — say hello.</p>
+          <p className="text-sm text-text-muted">No messages yet — say hello.</p>
         ) : (
           thread.messages.map((m) => (
             <div key={m.id} className={m.mine ? "flex justify-end" : "flex justify-start"}>
-              <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${m.mine ? "bg-neutral-100 text-neutral-900" : "border border-neutral-800 bg-neutral-900/40 text-neutral-100"}`}>
+              <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${m.mine ? "bg-primary text-fg-cream" : "border border-border bg-surface/40 text-text-primary"}`}>
                 <p className="whitespace-pre-wrap">{m.body}</p>
               </div>
             </div>

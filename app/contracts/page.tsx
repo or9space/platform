@@ -9,9 +9,9 @@ import { ContractCreateForm, ContractActions } from "@/components/contracts/cont
 
 const STATUS_CLS: Record<string, string> = {
   OPEN: "border-green-800 bg-green-950 text-green-300",
-  CLAIMED: "border-sky-800 bg-sky-950 text-sky-300",
-  COMPLETED: "border-neutral-700 bg-neutral-900 text-neutral-400",
-  CANCELLED: "border-neutral-800 bg-neutral-950 text-neutral-600",
+  CLAIMED: "border-sky-800 bg-sky-950 text-info",
+  COMPLETED: "border-border-light bg-surface text-text-secondary",
+  CANCELLED: "border-border bg-surface text-text-muted",
 };
 
 export default async function ContractsPage() {
@@ -29,21 +29,21 @@ export default async function ContractsPage() {
       {canManage && <ContractCreateForm />}
 
       {contracts.length === 0 ? (
-        <p className="text-sm text-neutral-500">No contracts yet.</p>
+        <p className="text-sm text-text-muted">No contracts yet.</p>
       ) : (
         <ul className="space-y-3">
           {contracts.map((c) => (
-            <li key={c.id} className="rounded border border-neutral-800 p-4">
+            <li key={c.id} className="rounded border border-border p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={`rounded border px-2 py-0.5 text-xs font-medium uppercase ${STATUS_CLS[c.status] ?? STATUS_CLS.OPEN}`}>{c.status}</span>
-                    <p className="font-medium text-neutral-100">{c.title}</p>
+                    <p className="font-medium text-text-primary">{c.title}</p>
                   </div>
-                  {c.reward && <p className="mt-1 text-sm text-amber-400">Reward: {c.reward}</p>}
-                  {c.description && <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-400">{c.description}</p>}
+                  {c.reward && <p className="mt-1 text-sm text-amber">Reward: {c.reward}</p>}
+                  {c.description && <p className="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{c.description}</p>}
                   {c.claimedByName && (
-                    <p className="mt-1 text-xs text-neutral-500">
+                    <p className="mt-1 text-xs text-text-muted">
                       Claimed by <a href={`/members/${c.claimedByUsername}`} className="hover:underline">{c.claimedByName}</a>
                     </p>
                   )}

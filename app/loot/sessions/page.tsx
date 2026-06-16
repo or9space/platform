@@ -51,11 +51,11 @@ export default async function LootSessionsPage({
   return (
     <main className="mx-auto max-w-4xl p-6">
       <div className="mb-4 text-sm">
-        <a href="/loot" className="text-neutral-400 hover:text-neutral-200">
+        <a href="/loot" className="text-text-secondary hover:text-text-primary">
           Leaderboard
         </a>
-        <span className="mx-2 text-neutral-600">/</span>
-        <span className="text-neutral-300">Sessions</span>
+        <span className="mx-2 text-text-muted">/</span>
+        <span className="text-text-secondary">Sessions</span>
       </div>
 
       <div className="mb-6 flex items-center justify-between">
@@ -67,12 +67,12 @@ export default async function LootSessionsPage({
       </div>
 
       {sessions.length === 0 ? (
-        <p className="text-neutral-400">No sessions yet.</p>
+        <p className="text-text-secondary">No sessions yet.</p>
       ) : (
         <div className="mb-8 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-800 text-left text-neutral-500">
+              <tr className="border-b border-border text-left text-text-muted">
                 <th className="pb-2 pr-4 font-normal">Date</th>
                 <th className="pb-2 pr-4 font-normal">Label</th>
                 <th className="pb-2 font-normal">Notes</th>
@@ -82,23 +82,23 @@ export default async function LootSessionsPage({
               {sessions.map((s) => (
                 <tr
                   key={s.id}
-                  className={`border-b border-neutral-900 hover:bg-neutral-900/40 ${
-                    selectedSessionId === s.id ? "bg-neutral-900/60" : ""
+                  className={`border-b border-border hover:bg-surface-hover/40 ${
+                    selectedSessionId === s.id ? "bg-surface/60" : ""
                   }`}
                 >
-                  <td className="py-2 pr-4 text-neutral-400">
+                  <td className="py-2 pr-4 text-text-secondary">
                     {s.sessionDate.toISOString().slice(0, 10)}
                   </td>
                   <td className="py-2 pr-4">
                     <a
                       href={`/loot/sessions?session=${s.id}`}
-                      className="hover:text-neutral-300 text-neutral-100"
+                      className="hover:text-text-secondary text-text-primary"
                     >
                       {s.label}
                     </a>
                   </td>
-                  <td className="py-2 text-neutral-400 max-w-xs truncate">
-                    {s.notes ?? <span className="text-neutral-600">—</span>}
+                  <td className="py-2 text-text-secondary max-w-xs truncate">
+                    {s.notes ?? <span className="text-text-muted">—</span>}
                   </td>
                 </tr>
               ))}
@@ -110,20 +110,20 @@ export default async function LootSessionsPage({
       {grid && (
         <section>
           <h2 className="mb-1 font-semibold text-lg">{grid.label}</h2>
-          <p className="mb-4 text-sm text-neutral-500">
+          <p className="mb-4 text-sm text-text-muted">
             {grid.sessionDate.toISOString().slice(0, 10)}
             {grid.notes && (
-              <span className="ml-3 text-neutral-400">{grid.notes}</span>
+              <span className="ml-3 text-text-secondary">{grid.notes}</span>
             )}
           </p>
 
           {members.length === 0 ? (
-            <p className="text-neutral-500 text-sm">No loot participants.</p>
+            <p className="text-text-muted text-sm">No loot participants.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-neutral-800 text-left text-neutral-500">
+                  <tr className="border-b border-border text-left text-text-muted">
                     <th className="pb-2 pr-4 font-normal">Member</th>
                     <th className="pb-2 font-normal">Attendance</th>
                   </tr>
@@ -139,9 +139,9 @@ export default async function LootSessionsPage({
                     return (
                       <tr
                         key={m.id}
-                        className="border-b border-neutral-900 hover:bg-neutral-900/40"
+                        className="border-b border-border hover:bg-surface-hover/40"
                       >
-                        <td className="py-2 pr-4 text-neutral-200">
+                        <td className="py-2 pr-4 text-text-primary">
                           {m.displayName}
                         </td>
                         <td className="py-2">

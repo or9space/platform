@@ -30,14 +30,14 @@ export default async function MemberProfilePage({
   return (
     <main className="mx-auto max-w-2xl p-6">
       <div className="mb-4 text-sm">
-        <a href="/members" className="text-neutral-400 hover:text-neutral-200">
+        <a href="/members" className="text-text-secondary hover:text-text-primary">
           Members
         </a>
-        <span className="mx-2 text-neutral-600">/</span>
-        <span className="text-neutral-300">{member.displayName ?? member.username}</span>
+        <span className="mx-2 text-text-muted">/</span>
+        <span className="text-text-secondary">{member.displayName ?? member.username}</span>
       </div>
 
-      <div className="rounded border border-neutral-800 p-6">
+      <div className="rounded border border-border p-6">
         <div className="flex items-start gap-4">
           <div className="shrink-0">
             {member.avatarUrl && member.avatarUrl.startsWith("http") ? (
@@ -47,7 +47,7 @@ export default async function MemberProfilePage({
                 className="h-16 w-16 rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-700 text-xl font-semibold uppercase">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-elevated text-xl font-semibold uppercase">
                 {(member.displayName ?? member.username).slice(0, 1)}
               </div>
             )}
@@ -55,31 +55,31 @@ export default async function MemberProfilePage({
 
           <div className="min-w-0 flex-1">
             <h1 className="text-xl font-bold">{member.displayName ?? member.username}</h1>
-            <p className="text-sm text-neutral-400">@{member.username}</p>
-            <p className="mt-1 text-sm text-neutral-300">
+            <p className="text-sm text-text-secondary">@{member.username}</p>
+            <p className="mt-1 text-sm text-text-secondary">
               <Rank tier={member.tier} />
             </p>
-            <p className="mt-1 text-xs text-neutral-500">
+            <p className="mt-1 text-xs text-text-muted">
               Joined {member.createdAt.toISOString().slice(0, 10)}
             </p>
           </div>
         </div>
 
-        <div className="mt-4 border-t border-neutral-800 pt-4">
+        <div className="mt-4 border-t border-border pt-4">
           {member.bio ? (
             <p className="whitespace-pre-wrap text-sm">{member.bio}</p>
           ) : (
-            <p className="text-sm text-neutral-500">No bio yet.</p>
+            <p className="text-sm text-text-muted">No bio yet.</p>
           )}
         </div>
 
-        <div className="mt-4 flex gap-6 text-sm text-neutral-400">
+        <div className="mt-4 flex gap-6 text-sm text-text-secondary">
           <span>
-            <span className="font-semibold text-neutral-200">{member.threadCount}</span>{" "}
+            <span className="font-semibold text-text-primary">{member.threadCount}</span>{" "}
             {member.threadCount === 1 ? "thread" : "threads"}
           </span>
           <span>
-            <span className="font-semibold text-neutral-200">{member.postCount}</span>{" "}
+            <span className="font-semibold text-text-primary">{member.postCount}</span>{" "}
             {member.postCount === 1 ? "post" : "posts"}
           </span>
         </div>

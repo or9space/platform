@@ -22,18 +22,18 @@ export default async function MessagesPage() {
       </div>
 
       {convos.length === 0 ? (
-        <p className="text-sm text-neutral-500">No conversations yet. Start one above.</p>
+        <p className="text-sm text-text-muted">No conversations yet. Start one above.</p>
       ) : (
-        <ul className="divide-y divide-neutral-800 rounded border border-neutral-800">
+        <ul className="divide-y divide-border rounded border border-border">
           {convos.map((c) => (
             <li key={c.id}>
-              <a href={`/messages/${c.id}`} className="flex items-center justify-between gap-3 p-4 transition-colors hover:bg-neutral-900/50">
+              <a href={`/messages/${c.id}`} className="flex items-center justify-between gap-3 p-4 transition-colors hover:bg-surface-hover/50">
                 <div className="min-w-0">
-                  <p className="font-medium text-neutral-100">
+                  <p className="font-medium text-text-primary">
                     {c.otherName}
-                    {c.unread > 0 && <span className="ml-2 rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-300">{c.unread}</span>}
+                    {c.unread > 0 && <span className="ml-2 rounded-full bg-success/20 px-2 py-0.5 text-xs font-semibold text-success">{c.unread}</span>}
                   </p>
-                  {c.lastMessage && <p className="mt-0.5 truncate text-sm text-neutral-500">{c.lastMessage}</p>}
+                  {c.lastMessage && <p className="mt-0.5 truncate text-sm text-text-muted">{c.lastMessage}</p>}
                 </div>
               </a>
             </li>

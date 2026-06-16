@@ -30,8 +30,8 @@ export function StatusControls({ handbookId, currentStatus }: Props) {
   }
 
   return (
-    <div className="rounded border border-neutral-800 p-3">
-      <p className="mb-2 text-xs text-neutral-500 uppercase tracking-wide">Status</p>
+    <div className="rounded border border-border p-3">
+      <p className="mb-2 text-xs text-text-muted uppercase tracking-wide">Status</p>
       <div className="flex flex-wrap gap-2">
         {STATUSES.map((s) => (
           <button
@@ -40,15 +40,15 @@ export function StatusControls({ handbookId, currentStatus }: Props) {
             disabled={isPending || s === currentStatus}
             className={
               s === currentStatus
-                ? "rounded border border-neutral-600 px-3 py-1.5 text-sm font-semibold text-neutral-100 cursor-default"
-                : "rounded border border-neutral-700 px-3 py-1.5 text-sm text-neutral-400 hover:border-neutral-500 hover:text-neutral-200 disabled:opacity-50"
+                ? "rounded border border-border-light px-3 py-1.5 text-sm font-semibold text-text-primary cursor-default"
+                : "rounded border border-border-light px-3 py-1.5 text-sm text-text-secondary hover:border-primary hover:text-text-primary disabled:opacity-50"
             }
           >
             {s}
           </button>
         ))}
       </div>
-      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+      {error && <p className="mt-2 text-sm text-fg-red-light">{error}</p>}
     </div>
   );
 }

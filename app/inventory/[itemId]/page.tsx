@@ -21,8 +21,8 @@ const STATE_LABELS: Record<HoldingState, string> = {
 const STATE_CLASSES: Record<HoldingState, string> = {
   ACTIVE: "rounded px-1.5 py-0.5 text-xs font-semibold bg-green-900/50 text-green-300",
   LOST: "rounded px-1.5 py-0.5 text-xs font-semibold bg-yellow-900/50 text-yellow-300",
-  DESTROYED: "rounded px-1.5 py-0.5 text-xs font-semibold bg-red-900/50 text-red-300",
-  RETIRED: "rounded px-1.5 py-0.5 text-xs font-semibold bg-neutral-800 text-neutral-400",
+  DESTROYED: "rounded px-1.5 py-0.5 text-xs font-semibold bg-red-900/50 text-fg-red-light",
+  RETIRED: "rounded px-1.5 py-0.5 text-xs font-semibold bg-surface-elevated text-text-secondary",
 };
 
 export default async function ItemDetailPage({
@@ -56,7 +56,7 @@ export default async function ItemDetailPage({
       <div className="mb-6">
         <a
           href="/inventory"
-          className="text-sm text-neutral-400 hover:text-neutral-100"
+          className="text-sm text-text-secondary hover:text-text-primary"
         >
           &larr; Inventory
         </a>
@@ -65,12 +65,12 @@ export default async function ItemDetailPage({
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">{item.name}</h1>
-          <p className="mt-1 text-sm text-neutral-400">
+          <p className="mt-1 text-sm text-text-secondary">
             {CATEGORY_LABELS[item.category]} &middot;{" "}
             {item.kind === "UNIQUE" ? "Unique" : "Fungible"}
           </p>
           {item.description && (
-            <p className="mt-3 max-w-prose text-sm text-neutral-300 whitespace-pre-wrap">
+            <p className="mt-3 max-w-prose text-sm text-text-secondary whitespace-pre-wrap">
               {item.description}
             </p>
           )}
@@ -89,12 +89,12 @@ export default async function ItemDetailPage({
       <h2 className="mb-3 font-semibold">Holdings</h2>
 
       {holdings.length === 0 ? (
-        <p className="text-neutral-400 text-sm">No holdings recorded.</p>
+        <p className="text-text-secondary text-sm">No holdings recorded.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-800 text-left text-neutral-500">
+              <tr className="border-b border-border text-left text-text-muted">
                 <th className="pb-2 pr-4 font-normal">Qty</th>
                 <th className="pb-2 pr-4 font-normal">State</th>
                 <th className="pb-2 pr-4 font-normal">Custodian</th>
@@ -104,18 +104,18 @@ export default async function ItemDetailPage({
             </thead>
             <tbody>
               {holdings.map((h) => (
-                <tr key={h.id} className="border-b border-neutral-900 hover:bg-neutral-900/40">
+                <tr key={h.id} className="border-b border-border hover:bg-surface-hover/40">
                   <td className="py-2 pr-4 font-mono">{h.quantity}</td>
                   <td className="py-2 pr-4">
                     <span className={STATE_CLASSES[h.state]}>
                       {STATE_LABELS[h.state]}
                     </span>
                   </td>
-                  <td className="py-2 pr-4 text-neutral-400">
-                    {h.custodianName ?? <span className="text-neutral-600">&mdash;</span>}
+                  <td className="py-2 pr-4 text-text-secondary">
+                    {h.custodianName ?? <span className="text-text-muted">&mdash;</span>}
                   </td>
-                  <td className="py-2 pr-4 max-w-xs text-neutral-300 whitespace-pre-wrap">
-                    {h.notes ?? <span className="text-neutral-600">&mdash;</span>}
+                  <td className="py-2 pr-4 max-w-xs text-text-secondary whitespace-pre-wrap">
+                    {h.notes ?? <span className="text-text-muted">&mdash;</span>}
                   </td>
                   {canManage && (
                     <td className="py-2">

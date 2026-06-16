@@ -31,9 +31,9 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
           <Card title="Cheapest to buy" tone="sky" p={bestBuy} field="buy" />
           <Card title="Best to sell" tone="emerald" p={bestSell} field="sell" />
           {spread !== null && (
-            <div className="sm:col-span-2 rounded border border-neutral-800 p-4">
-              <p className="text-sm text-neutral-400">Spread (sell − buy)</p>
-              <p className={`text-2xl font-bold ${spread > 0 ? "text-emerald-300" : "text-red-300"}`}>{aUEC(spread)} / SCU</p>
+            <div className="sm:col-span-2 rounded border border-border p-4">
+              <p className="text-sm text-text-secondary">Spread (sell − buy)</p>
+              <p className={`text-2xl font-bold ${spread > 0 ? "text-success" : "text-fg-red-light"}`}>{aUEC(spread)} / SCU</p>
             </div>
           )}
         </div>
@@ -47,17 +47,17 @@ function Card({ title, tone, p, field }: {
   p: { terminal_name: string; planet_name: string | null; star_system_name: string | null; price_buy: number; price_sell: number } | undefined;
   field: "buy" | "sell";
 }) {
-  const color = tone === "sky" ? "text-sky-300" : "text-emerald-300";
+  const color = tone === "sky" ? "text-info" : "text-success";
   return (
-    <div className="rounded border border-neutral-800 p-4">
-      <p className="text-sm text-neutral-400">{title}</p>
+    <div className="rounded border border-border p-4">
+      <p className="text-sm text-text-secondary">{title}</p>
       {p ? (
         <>
           <p className={`text-2xl font-bold ${color}`}>{aUEC(field === "buy" ? p.price_buy : p.price_sell)}</p>
-          <p className="mt-1 text-sm text-neutral-300">{p.terminal_name}</p>
-          <p className="text-xs text-neutral-500">{[p.planet_name, p.star_system_name].filter(Boolean).join(", ")}</p>
+          <p className="mt-1 text-sm text-text-secondary">{p.terminal_name}</p>
+          <p className="text-xs text-text-muted">{[p.planet_name, p.star_system_name].filter(Boolean).join(", ")}</p>
         </>
-      ) : <p className="mt-1 text-sm text-neutral-500">No data.</p>}
+      ) : <p className="mt-1 text-sm text-text-muted">No data.</p>}
     </div>
   );
 }

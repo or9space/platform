@@ -22,9 +22,9 @@ export default async function AdminCategoriesPage() {
   return (
     <main className="mx-auto max-w-2xl p-6">
       <div className="mb-1">
-        <a href="/forums" className="text-sm text-neutral-400 hover:text-neutral-200">Forums</a>
-        <span className="mx-2 text-neutral-600">/</span>
-        <span className="text-sm text-neutral-300">Manage categories</span>
+        <a href="/forums" className="text-sm text-text-secondary hover:text-text-primary">Forums</a>
+        <span className="mx-2 text-text-muted">/</span>
+        <span className="text-sm text-text-secondary">Manage categories</span>
       </div>
 
       <h1 className="mb-6 text-2xl font-bold">Forum categories</h1>

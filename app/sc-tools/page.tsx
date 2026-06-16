@@ -17,20 +17,20 @@ export default function ScToolsHub() {
     <main className="mx-auto max-w-5xl space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-bold">SC Tools</h1>
-        <p className="mt-1 text-sm text-neutral-400">
+        <p className="mt-1 text-sm text-text-secondary">
           Live Star Citizen market &amp; ship data, powered by{" "}
-          <a href="https://uexcorp.space" className="underline hover:text-neutral-200" target="_blank" rel="noreferrer">UEX Corp</a>.
+          <a href="https://uexcorp.space" className="underline hover:text-text-primary" target="_blank" rel="noreferrer">UEX Corp</a>.
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {CARDS.map((c) => (
-          <a key={c.href} href={c.href} className="block rounded border border-neutral-800 p-4 transition-colors hover:border-neutral-600">
-            <p className="font-semibold text-neutral-100">{c.title}</p>
-            <p className="mt-1 text-sm text-neutral-400">{c.desc}</p>
+          <a key={c.href} href={c.href} className="block rounded border border-border p-4 transition-colors hover:border-primary">
+            <p className="font-semibold text-text-primary">{c.title}</p>
+            <p className="mt-1 text-sm text-text-secondary">{c.desc}</p>
           </a>
         ))}
       </div>
-      <p className="text-xs text-neutral-600">
+      <p className="text-xs text-text-muted">
         Data source: UEX Corp API 2.0 · cached 10 min (prices) / 24 h (catalogs)
         {tokened ? " · application token active" : " · using public access (set UEX_API_TOKEN for higher limits)"}
       </p>

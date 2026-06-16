@@ -22,7 +22,7 @@ export default async function AdminHome() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Platform overview</h1>
-      <ul className="space-y-1 text-neutral-300">
+      <ul className="space-y-1 text-text-secondary">
         <li>Live tenants: {tenantCount}</li>
         <li><a className="underline" href="/tenants/pending">Pending sign-ups: {pendingCount}</a></li>
         <li><a className="underline" href="/support">Open support tickets: {openTickets}</a></li>

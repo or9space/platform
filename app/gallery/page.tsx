@@ -22,17 +22,17 @@ export default async function GalleryPage() {
       <GalleryUploadForm />
 
       {items.length === 0 ? (
-        <p className="text-sm text-neutral-500">No images yet.</p>
+        <p className="text-sm text-text-muted">No images yet.</p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {items.map((g) => (
-            <figure key={g.id} className="relative overflow-hidden rounded border border-neutral-800">
+            <figure key={g.id} className="relative overflow-hidden rounded border border-border">
               {(isOfficer || g.authorId === viewer.id) && <DeleteGalleryButton id={g.id} />}
               <img src={g.imageUrl} alt={g.title ?? g.caption ?? "Gallery image"} className="aspect-video w-full object-cover" />
               <figcaption className="p-2">
-                {g.title && <p className="text-sm font-medium text-neutral-200">{g.title}</p>}
-                {g.caption && <p className="text-xs text-neutral-400">{g.caption}</p>}
-                <p className="mt-1 text-xs text-neutral-600">{g.authorName}</p>
+                {g.title && <p className="text-sm font-medium text-text-primary">{g.title}</p>}
+                {g.caption && <p className="text-xs text-text-secondary">{g.caption}</p>}
+                <p className="mt-1 text-xs text-text-muted">{g.authorName}</p>
               </figcaption>
             </figure>
           ))}

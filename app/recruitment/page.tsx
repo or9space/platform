@@ -16,9 +16,9 @@ export default async function RecruitmentPage() {
     <main className="mx-auto max-w-3xl space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-bold">Recruitment</h1>
-        <p className="mt-1 text-sm text-neutral-400">
+        <p className="mt-1 text-sm text-text-secondary">
           {pending} pending · public apply form at{" "}
-          <a href={applyUrl} className="underline hover:text-neutral-200">/apply</a>
+          <a href={applyUrl} className="underline hover:text-text-primary">/apply</a>
         </p>
       </div>
       <ReviewList apps={apps} />

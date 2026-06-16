@@ -18,23 +18,23 @@ export default async function IndustryPage({ searchParams }: { searchParams: Pro
     <Main>
       <nav className="flex gap-3 text-sm">
         {[["mineral", "Minerals"], ["raw", "Raw ores"], ["refined", "Refined"], ["harvest", "Harvestable"]].map(([key, label]) => (
-          <a key={key} href={`/sc-tools/industry?kind=${key}`} className={k === key ? "font-bold text-neutral-100" : "text-neutral-400 hover:text-neutral-100"}>{label}</a>
+          <a key={key} href={`/sc-tools/industry?kind=${key}`} className={k === key ? "font-bold text-text-primary" : "text-text-secondary hover:text-text-primary"}>{label}</a>
         ))}
       </nav>
       {rows.length === 0 ? (
-        <p className="text-sm text-neutral-500">No commodities in this category.</p>
+        <p className="text-sm text-text-muted">No commodities in this category.</p>
       ) : (
         <table className="w-full text-sm">
-          <thead className="text-left text-xs text-neutral-500">
+          <thead className="text-left text-xs text-text-muted">
             <tr><th className="py-1">Commodity</th><th className="text-right">Base buy</th><th className="text-right">Base sell</th><th></th></tr>
           </thead>
           <tbody>
             {rows.map((c) => (
-              <tr key={c.id} className="border-t border-neutral-900">
-                <td className="py-1 pr-2">{c.name}{c.is_illegal ? <span className="ml-2 text-xs text-red-400">illegal</span> : null}</td>
+              <tr key={c.id} className="border-t border-border">
+                <td className="py-1 pr-2">{c.name}{c.is_illegal ? <span className="ml-2 text-xs text-fg-red-light">illegal</span> : null}</td>
                 <td className="text-right font-mono">{c.price_buy ? aUEC(c.price_buy) : "—"}</td>
-                <td className="text-right font-mono text-emerald-300">{c.price_sell ? aUEC(c.price_sell) : "—"}</td>
-                <td className="text-right"><a href={`/sc-tools/prices?id=${c.id}`} className="text-xs underline text-neutral-400 hover:text-neutral-200">terminals</a></td>
+                <td className="text-right font-mono text-success">{c.price_sell ? aUEC(c.price_sell) : "—"}</td>
+                <td className="text-right"><a href={`/sc-tools/prices?id=${c.id}`} className="text-xs underline text-text-secondary hover:text-text-primary">terminals</a></td>
               </tr>
             ))}
           </tbody>

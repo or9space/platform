@@ -119,16 +119,16 @@ export function ManageTournament({ tournamentId, currentStatus, entries }: Props
   return (
     <div className="space-y-6">
       {/* Status */}
-      <div className="rounded border border-neutral-800 p-4">
-        <h3 className="mb-3 font-semibold text-sm text-neutral-300">Status</h3>
-        {statusError && <p className="mb-2 text-sm text-red-400">{statusError}</p>}
+      <div className="rounded border border-border p-4">
+        <h3 className="mb-3 font-semibold text-sm text-text-secondary">Status</h3>
+        {statusError && <p className="mb-2 text-sm text-fg-red-light">{statusError}</p>}
         <label className="flex items-center gap-3 text-sm">
-          <span className="text-neutral-400">Set status:</span>
+          <span className="text-text-secondary">Set status:</span>
           <select
             value={currentStatus}
             onChange={handleStatusChange}
             disabled={statusPending}
-            className="rounded border border-neutral-700 bg-neutral-900 px-3 py-1.5 disabled:opacity-50"
+            className="rounded border border-border-light bg-surface px-3 py-1.5 disabled:opacity-50"
           >
             {STATUS_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -136,15 +136,15 @@ export function ManageTournament({ tournamentId, currentStatus, entries }: Props
               </option>
             ))}
           </select>
-          {statusPending && <span className="text-neutral-500 text-xs">Saving…</span>}
+          {statusPending && <span className="text-text-muted text-xs">Saving…</span>}
         </label>
       </div>
 
       {/* Add entry */}
-      <div className="rounded border border-neutral-800 p-4">
-        <h3 className="mb-3 font-semibold text-sm text-neutral-300">Add entry</h3>
+      <div className="rounded border border-border p-4">
+        <h3 className="mb-3 font-semibold text-sm text-text-secondary">Add entry</h3>
         <form action={handleAddEntry} className="flex flex-wrap gap-3 items-end">
-          {addEntryError && <p className="w-full text-sm text-red-400">{addEntryError}</p>}
+          {addEntryError && <p className="w-full text-sm text-fg-red-light">{addEntryError}</p>}
           <label className="flex flex-col gap-1 text-sm flex-1 min-w-40">
             Display name
             <input
@@ -155,7 +155,7 @@ export function ManageTournament({ tournamentId, currentStatus, entries }: Props
               disabled={addEntryPending}
               placeholder="e.g. Player One…"
               maxLength={200}
-              className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm flex-1 min-w-48">
@@ -167,13 +167,13 @@ export function ManageTournament({ tournamentId, currentStatus, entries }: Props
               onChange={(e) => setEntryMembershipId(e.target.value)}
               disabled={addEntryPending}
               placeholder="Link to a member…"
-              className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
             />
           </label>
           <button
             type="submit"
             disabled={addEntryPending}
-            className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50"
+            className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
           >
             {addEntryPending ? "Adding…" : "Add entry"}
           </button>
@@ -182,20 +182,20 @@ export function ManageTournament({ tournamentId, currentStatus, entries }: Props
 
       {/* Per-entry controls */}
       {entries.length > 0 && (
-        <div className="rounded border border-neutral-800 p-4">
-          <h3 className="mb-3 font-semibold text-sm text-neutral-300">Entry controls</h3>
+        <div className="rounded border border-border p-4">
+          <h3 className="mb-3 font-semibold text-sm text-text-secondary">Entry controls</h3>
           <div className="space-y-3">
             {entries.map((entry) => (
               <div
                 key={entry.id}
-                className="flex flex-wrap items-center gap-3 rounded border border-neutral-900 p-3"
+                className="flex flex-wrap items-center gap-3 rounded border border-border p-3"
               >
                 <span className="flex-1 min-w-32 text-sm font-medium">{entry.displayName}</span>
                 {entryErrors[entry.id] && (
-                  <span className="w-full text-xs text-red-400">{entryErrors[entry.id]}</span>
+                  <span className="w-full text-xs text-fg-red-light">{entryErrors[entry.id]}</span>
                 )}
                 <label className="flex items-center gap-2 text-sm">
-                  <span className="text-neutral-400">Place:</span>
+                  <span className="text-text-secondary">Place:</span>
                   <input
                     type="number"
                     min={1}
@@ -205,13 +205,13 @@ export function ManageTournament({ tournamentId, currentStatus, entries }: Props
                     }
                     disabled={placementPending}
                     placeholder="#"
-                    className="w-16 rounded border border-neutral-700 bg-neutral-900 px-2 py-1 text-sm disabled:opacity-50"
+                    className="w-16 rounded border border-border-light bg-surface px-2 py-1 text-sm disabled:opacity-50"
                   />
                   <button
                     type="button"
                     onClick={() => handleRecordPlacement(entry.id)}
                     disabled={placementPending}
-                    className="rounded border border-neutral-700 px-2 py-1 text-xs text-neutral-300 hover:bg-neutral-800 disabled:opacity-50"
+                    className="rounded border border-border-light px-2 py-1 text-xs text-text-secondary hover:bg-surface-hover disabled:opacity-50"
                   >
                     Save
                   </button>
@@ -220,7 +220,7 @@ export function ManageTournament({ tournamentId, currentStatus, entries }: Props
                   type="button"
                   onClick={() => handleRemove(entry.id)}
                   disabled={removePending}
-                  className="rounded border border-red-900 px-2 py-1 text-xs text-red-400 hover:bg-red-900/30 disabled:opacity-50"
+                  className="rounded border border-danger px-2 py-1 text-xs text-fg-red-light hover:bg-red-900/30 disabled:opacity-50"
                 >
                   Remove
                 </button>

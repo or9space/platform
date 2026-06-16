@@ -42,21 +42,21 @@ export function SignupControl({
           onChange={(e) => setRole(e.target.value)}
           placeholder="Role (optional, e.g. Pilot)"
           maxLength={80}
-          className="w-48 rounded border border-neutral-700 bg-neutral-900 px-2 py-1.5 text-sm"
+          className="w-48 rounded border border-border-light bg-surface px-2 py-1.5 text-sm"
         />
         <button onClick={join} disabled={pending}
-          className="rounded bg-neutral-100 px-3 py-1.5 text-sm font-semibold text-neutral-900 disabled:opacity-50">
+          className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream disabled:opacity-50">
           {isJoined ? "Update role" : "Sign up"}
         </button>
         {isJoined && (
           <button onClick={withdraw} disabled={pending}
-            className="rounded border border-neutral-700 px-3 py-1.5 text-sm hover:border-neutral-500 disabled:opacity-50">
+            className="rounded border border-border-light px-3 py-1.5 text-sm hover:border-primary disabled:opacity-50">
             Withdraw
           </button>
         )}
       </div>
       {isJoined && <p className="text-xs text-green-400">You're signed up{role.trim() ? ` as ${role.trim()}` : ""}.</p>}
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
     </div>
   );
 }

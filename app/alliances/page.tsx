@@ -9,9 +9,9 @@ import { AllianceCreateForm, DeleteAllianceButton } from "@/components/alliances
 
 const STATUS_CLS: Record<string, string> = {
   ALLY: "border-green-800 bg-green-950 text-green-300",
-  NEUTRAL: "border-neutral-700 bg-neutral-900 text-neutral-300",
-  HOSTILE: "border-red-800 bg-red-950 text-red-300",
-  PENDING: "border-amber-800 bg-amber-950 text-amber-300",
+  NEUTRAL: "border-border-light bg-surface text-text-secondary",
+  HOSTILE: "border-danger bg-surface text-fg-red-light",
+  PENDING: "border-amber bg-amber-soft text-amber",
 };
 
 export default async function AlliancesPage() {
@@ -28,22 +28,22 @@ export default async function AlliancesPage() {
       {canManage && <AllianceCreateForm />}
 
       {alliances.length === 0 ? (
-        <p className="text-sm text-neutral-500">No alliances yet.</p>
+        <p className="text-sm text-text-muted">No alliances yet.</p>
       ) : (
         <ul className="space-y-3">
           {alliances.map((a) => (
-            <li key={a.id} className="rounded border border-neutral-800 p-4">
+            <li key={a.id} className="rounded border border-border p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={`rounded border px-2 py-0.5 text-xs font-medium uppercase ${STATUS_CLS[a.status] ?? STATUS_CLS.NEUTRAL}`}>{a.status}</span>
                     {a.link ? (
-                      <a href={a.link} target="_blank" rel="noopener noreferrer" className="font-medium text-neutral-100 underline hover:text-white">{a.name}</a>
+                      <a href={a.link} target="_blank" rel="noopener noreferrer" className="font-medium text-text-primary underline hover:text-white">{a.name}</a>
                     ) : (
-                      <span className="font-medium text-neutral-100">{a.name}</span>
+                      <span className="font-medium text-text-primary">{a.name}</span>
                     )}
                   </div>
-                  {a.description && <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-400">{a.description}</p>}
+                  {a.description && <p className="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{a.description}</p>}
                 </div>
                 {canManage && <DeleteAllianceButton id={a.id} />}
               </div>

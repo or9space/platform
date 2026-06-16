@@ -24,12 +24,12 @@ export function ClaimForm({ tenantSlug, token }: { tenantSlug: string; token: st
 
   return (
     <form action={handleSubmit} className="space-y-4">
-      {error && <p className="rounded border border-red-800 bg-red-950 p-2 text-sm text-red-300">{error}</p>}
-      <input name="username" required placeholder="Your username" className="w-full rounded border border-neutral-700 bg-neutral-900 p-2" />
-      <input name="email" type="email" required placeholder="Email" className="w-full rounded border border-neutral-700 bg-neutral-900 p-2" />
-      <input name="password" type="password" required placeholder="Password (10+ chars)" className="w-full rounded border border-neutral-700 bg-neutral-900 p-2" />
+      {error && <p className="rounded border border-danger bg-surface p-2 text-sm text-fg-red-light">{error}</p>}
+      <input name="username" required placeholder="Your username" className="w-full rounded border border-border-light bg-surface p-2" />
+      <input name="email" type="email" required placeholder="Email" className="w-full rounded border border-border-light bg-surface p-2" />
+      <input name="password" type="password" required placeholder="Password (10+ chars)" className="w-full rounded border border-border-light bg-surface p-2" />
       <button type="submit" disabled={pending} aria-busy={pending}
-        className="w-full rounded bg-neutral-100 p-2 font-semibold text-neutral-900 disabled:opacity-50">
+        className="w-full rounded bg-primary p-2 font-semibold text-fg-cream disabled:opacity-50">
         {pending ? "Claiming…" : "Claim founder seat"}
       </button>
     </form>

@@ -38,11 +38,11 @@ export function OperationForm({ operationId, initial }: { operationId?: string; 
   }
 
   const i = initial;
-  const field = "mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2 text-sm";
+  const field = "mt-1 w-full rounded border border-border-light bg-surface p-2 text-sm";
 
   return (
     <form action={submit} className="max-w-lg space-y-4">
-      {error && <p className="rounded border border-red-800 bg-red-950 p-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="rounded border border-danger bg-surface p-2 text-sm text-fg-red-light">{error}</p>}
       <label className="block text-sm">
         Title
         <input name="title" required defaultValue={i?.title ?? ""} maxLength={160} className={field} />
@@ -68,7 +68,7 @@ export function OperationForm({ operationId, initial }: { operationId?: string; 
         <textarea name="description" rows={5} defaultValue={i?.description ?? ""} maxLength={10000} className={field} />
       </label>
       <button type="submit" disabled={pending}
-        className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50">
+        className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50">
         {pending ? "Saving…" : operationId ? "Save changes" : "Create operation"}
       </button>
     </form>

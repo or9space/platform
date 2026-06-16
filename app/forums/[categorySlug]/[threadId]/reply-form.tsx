@@ -17,7 +17,7 @@ export function ReplyForm({
   const router = useRouter();
 
   if (disabled) {
-    return <p className="text-sm text-neutral-500">This thread is locked.</p>;
+    return <p className="text-sm text-text-muted">This thread is locked.</p>;
   }
 
   function handleSubmit(formData: FormData) {
@@ -37,7 +37,7 @@ export function ReplyForm({
 
   return (
     <form action={handleSubmit} className="space-y-3">
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <textarea
         name="content"
         required
@@ -45,12 +45,12 @@ export function ReplyForm({
         rows={4}
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+        className="w-full rounded border border-border-light bg-surface p-2"
       />
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50"
+        className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
       >
         {pending ? "Posting…" : "Post reply"}
       </button>

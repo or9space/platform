@@ -30,12 +30,12 @@ export function ProfileForm({ initial }: { initial: ProfileInitial }) {
     });
   }
 
-  const field = "mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2 text-sm";
+  const field = "mt-1 w-full rounded border border-border-light bg-surface p-2 text-sm";
 
   return (
     <form action={submit} className="max-w-lg space-y-4">
       {msg && <p className="rounded border border-green-800 bg-green-950 p-2 text-sm text-green-300">{msg}</p>}
-      {error && <p className="rounded border border-red-800 bg-red-950 p-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="rounded border border-danger bg-surface p-2 text-sm text-fg-red-light">{error}</p>}
       <label className="block text-sm">
         Display name
         <input name="displayName" defaultValue={initial.displayName} maxLength={120} className={field} />
@@ -49,7 +49,7 @@ export function ProfileForm({ initial }: { initial: ProfileInitial }) {
         <textarea name="bio" rows={4} defaultValue={initial.bio} maxLength={500} className={field} />
       </label>
       <button type="submit" disabled={pending}
-        className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50">
+        className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50">
         {pending ? "Saving…" : "Save profile"}
       </button>
     </form>

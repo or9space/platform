@@ -29,12 +29,12 @@ export function ModerateDeleteButton({ shipId, shipName }: ModerateDeleteButtonP
 
   return (
     <span>
-      {error && <span className="mr-2 text-xs text-red-400">{error}</span>}
+      {error && <span className="mr-2 text-xs text-fg-red-light">{error}</span>}
       <button
         type="button"
         onClick={handleDelete}
         disabled={pending}
-        className="rounded border border-red-900 px-2 py-0.5 text-xs text-red-400 hover:border-red-700 disabled:opacity-50"
+        className="rounded border border-danger px-2 py-0.5 text-xs text-fg-red-light hover:border-danger disabled:opacity-50"
       >
         {pending ? "Removing…" : "Remove"}
       </button>

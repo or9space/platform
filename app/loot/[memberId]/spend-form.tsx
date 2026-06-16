@@ -43,10 +43,10 @@ export function SpendForm({ memberId }: { memberId: string }) {
   }
 
   return (
-    <div className="rounded border border-neutral-800 p-4">
-      <h3 className="mb-3 font-semibold text-sm text-neutral-300">Spend points</h3>
+    <div className="rounded border border-border p-4">
+      <h3 className="mb-3 font-semibold text-sm text-text-secondary">Spend points</h3>
       <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
-        {error && <p className="w-full text-sm text-red-400">{error}</p>}
+        {error && <p className="w-full text-sm text-fg-red-light">{error}</p>}
         <label className="flex flex-col gap-1 text-sm">
           Points
           <input
@@ -58,7 +58,7 @@ export function SpendForm({ memberId }: { memberId: string }) {
             onChange={(e) => setPoints(e.target.value)}
             disabled={pending}
             placeholder="0.0"
-            className="w-28 rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="w-28 rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm flex-1 min-w-40">
@@ -71,7 +71,7 @@ export function SpendForm({ memberId }: { memberId: string }) {
             disabled={pending}
             placeholder="Reason…"
             maxLength={500}
-            className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 disabled:opacity-50"
+            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
           />
         </label>
         <button

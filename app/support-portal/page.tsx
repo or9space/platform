@@ -10,7 +10,7 @@ export default async function SupportHome({
   const accountId = await getSessionAccountId();
   if (!accountId) {
     return (
-      <p className="text-neutral-400">
+      <p className="text-text-secondary">
         Sign in to open a ticket: <a className="underline" href="/login-direct">sign in here</a>.
       </p>
     );
@@ -33,12 +33,12 @@ export default async function SupportHome({
       </section>
       <section>
         <h2 className="mb-2 text-lg font-semibold">Your tickets</h2>
-        {myTickets.length === 0 && <p className="text-neutral-400">None yet.</p>}
-        <ul className="divide-y divide-neutral-800">
+        {myTickets.length === 0 && <p className="text-text-secondary">None yet.</p>}
+        <ul className="divide-y divide-border">
           {myTickets.map((t) => (
             <li key={t.id} className="py-2">
               <a href={`/tickets/${t.id}`} className="hover:underline">{t.subject}</a>
-              <span className="ml-2 text-xs text-neutral-500">{t.status}</span>
+              <span className="ml-2 text-xs text-text-muted">{t.status}</span>
             </li>
           ))}
         </ul>

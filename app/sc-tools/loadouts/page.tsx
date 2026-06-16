@@ -12,8 +12,8 @@ export default async function LoadoutsPage({ searchParams }: { searchParams: Pro
   if (!ship) {
     return (
       <Main>
-        <p className="text-sm text-neutral-400">
-          Pick a ship from the <a href="/sc-tools/hangar" className="underline hover:text-neutral-200">Hangar</a> to see its specs and where to buy or rent it.
+        <p className="text-sm text-text-secondary">
+          Pick a ship from the <a href="/sc-tools/hangar" className="underline hover:text-text-primary">Hangar</a> to see its specs and where to buy or rent it.
         </p>
       </Main>
     );
@@ -24,34 +24,34 @@ export default async function LoadoutsPage({ searchParams }: { searchParams: Pro
 
   return (
     <Main>
-      <div className="rounded border border-neutral-800 p-4">
+      <div className="rounded border border-border p-4">
         <h2 className="text-lg font-semibold">{ship.name_full ?? ship.name}</h2>
-        <p className="mt-1 text-sm text-neutral-400">
+        <p className="mt-1 text-sm text-text-secondary">
           {ship.company_name ?? "—"}
           {ship.scu ? ` · ${ship.scu} SCU cargo` : ""}
           {ship.crew ? ` · crew ${ship.crew}` : ""}
           {ship.mass ? ` · ${ship.mass.toLocaleString()} kg` : ""}
         </p>
-        {ship.url_store && <a href={ship.url_store} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs underline text-neutral-400 hover:text-neutral-200">Pledge store ↗</a>}
+        {ship.url_store && <a href={ship.url_store} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs underline text-text-secondary hover:text-text-primary">Pledge store ↗</a>}
       </div>
 
-      <h3 className="text-sm font-semibold text-neutral-300">Buy / rent locations</h3>
+      <h3 className="text-sm font-semibold text-text-secondary">Buy / rent locations</h3>
       {!prices.ok ? (
         <UexNotice>Couldn&apos;t load prices for this ship.</UexNotice>
       ) : rows.length === 0 ? (
-        <p className="text-sm text-neutral-500">No in-game purchase locations reported (may be pledge-only).</p>
+        <p className="text-sm text-text-muted">No in-game purchase locations reported (may be pledge-only).</p>
       ) : (
         <table className="w-full text-sm">
-          <thead className="text-left text-xs text-neutral-500">
+          <thead className="text-left text-xs text-text-muted">
             <tr><th className="py-1">Terminal</th><th>Location</th><th className="text-right">Buy</th><th className="text-right">Rent</th></tr>
           </thead>
           <tbody>
             {rows.map((p, i) => (
-              <tr key={i} className="border-t border-neutral-900">
+              <tr key={i} className="border-t border-border">
                 <td className="py-1 pr-2">{p.terminal_name}</td>
-                <td className="pr-2 text-neutral-400">{[p.planet_name, p.star_system_name].filter(Boolean).join(", ")}</td>
+                <td className="pr-2 text-text-secondary">{[p.planet_name, p.star_system_name].filter(Boolean).join(", ")}</td>
                 <td className="text-right font-mono">{p.price_buy ? aUEC(p.price_buy) : "—"}</td>
-                <td className="text-right font-mono text-sky-300">{p.price_rent ? aUEC(p.price_rent) : "—"}</td>
+                <td className="text-right font-mono text-info">{p.price_rent ? aUEC(p.price_rent) : "—"}</td>
               </tr>
             ))}
           </tbody>

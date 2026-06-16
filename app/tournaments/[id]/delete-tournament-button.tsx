@@ -23,11 +23,11 @@ export function DeleteTournamentButton({ tournamentId }: { tournamentId: string 
 
   return (
     <div>
-      {error && <p className="mb-2 text-sm text-red-400">{error}</p>}
+      {error && <p className="mb-2 text-sm text-fg-red-light">{error}</p>}
       <button
         onClick={handleClick}
         disabled={pending}
-        className="rounded border border-red-800 px-3 py-1.5 text-sm text-red-400 hover:bg-red-900/30 disabled:opacity-50"
+        className="rounded border border-danger px-3 py-1.5 text-sm text-fg-red-light hover:bg-red-900/30 disabled:opacity-50"
       >
         {pending ? "Deleting…" : "Delete tournament"}
       </button>

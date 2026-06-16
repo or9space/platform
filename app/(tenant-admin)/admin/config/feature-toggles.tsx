@@ -21,17 +21,17 @@ export function FeatureToggles({ tenantId, plan, flags }: { tenantId: string; pl
 
   return (
     <div className="space-y-2">
-      {msg && <p className="text-sm text-red-400">{msg}</p>}
+      {msg && <p className="text-sm text-fg-red-light">{msg}</p>}
       {flags.map((f) => {
         const locked = !f.tenantEditable || (f.paidOnly && plan === "FREE");
         return (
-          <div key={f.key} className="flex items-center justify-between rounded border border-neutral-800 p-3">
+          <div key={f.key} className="flex items-center justify-between rounded border border-border p-3">
             <span className="text-sm">{f.label}
-              {!f.tenantEditable && <span className="ml-2 text-xs text-neutral-500">managed by or9.space</span>}
-              {f.paidOnly && plan === "FREE" && <span className="ml-2 text-xs text-amber-400">Paid</span>}
+              {!f.tenantEditable && <span className="ml-2 text-xs text-text-muted">managed by or9.space</span>}
+              {f.paidOnly && plan === "FREE" && <span className="ml-2 text-xs text-amber">Paid</span>}
             </span>
             <button disabled={locked || pending} onClick={() => toggle(f)}
-              className={`rounded px-3 py-1 text-sm disabled:opacity-40 ${state[f.key] ? "bg-green-700" : "border border-neutral-700"}`}>
+              className={`rounded px-3 py-1 text-sm disabled:opacity-40 ${state[f.key] ? "bg-green-700" : "border border-border-light"}`}>
               {state[f.key] ? "On" : "Off"}
             </button>
           </div>

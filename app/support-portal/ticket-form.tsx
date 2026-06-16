@@ -23,13 +23,13 @@ export function TicketForm({ tenantContextId }: { tenantContextId: string | null
 
   return (
     <form action={handleSubmit} className="space-y-3">
-      {error && <p className="rounded border border-red-800 bg-red-950 p-2 text-sm text-red-300">{error}</p>}
+      {error && <p className="rounded border border-danger bg-surface p-2 text-sm text-fg-red-light">{error}</p>}
       <input name="subject" required maxLength={200} placeholder="Subject"
-        className="w-full rounded border border-neutral-700 bg-neutral-900 p-2" />
+        className="w-full rounded border border-border-light bg-surface p-2" />
       <textarea name="body" required maxLength={5000} rows={5} placeholder="Describe the problem…"
-        className="w-full rounded border border-neutral-700 bg-neutral-900 p-2" />
+        className="w-full rounded border border-border-light bg-surface p-2" />
       <button type="submit" disabled={pending} aria-busy={pending}
-        className="rounded bg-neutral-100 px-4 py-2 font-semibold text-neutral-900 disabled:opacity-50">
+        className="rounded bg-primary px-4 py-2 font-semibold text-fg-cream disabled:opacity-50">
         {pending ? "Submitting…" : "Open ticket"}
       </button>
     </form>

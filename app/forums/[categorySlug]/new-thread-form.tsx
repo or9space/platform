@@ -30,7 +30,7 @@ export function NewThreadForm({ categoryId }: { categoryId: string }) {
 
   return (
     <form action={handleSubmit} className="space-y-3">
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <label className="block text-sm">
         Title
         <input
@@ -39,7 +39,7 @@ export function NewThreadForm({ categoryId }: { categoryId: string }) {
           maxLength={300}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+          className="mt-1 w-full rounded border border-border-light bg-surface p-2"
         />
       </label>
       <label className="block text-sm">
@@ -51,13 +51,13 @@ export function NewThreadForm({ categoryId }: { categoryId: string }) {
           rows={4}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+          className="mt-1 w-full rounded border border-border-light bg-surface p-2"
         />
       </label>
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-neutral-100 px-4 py-2 text-sm font-semibold text-neutral-900 disabled:opacity-50"
+        className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
       >
         {pending ? "Posting…" : "Post thread"}
       </button>

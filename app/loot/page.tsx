@@ -28,7 +28,7 @@ export default async function LootPage() {
         {isOfficer && (
           <a
             href="/loot/sessions"
-            className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500"
+            className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
           >
             Sessions
           </a>
@@ -42,12 +42,12 @@ export default async function LootPage() {
       )}
 
       {members.length === 0 ? (
-        <p className="text-neutral-400">No loot participants yet.</p>
+        <p className="text-text-secondary">No loot participants yet.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-800 text-left text-neutral-500">
+              <tr className="border-b border-border text-left text-text-muted">
                 <th className="pb-2 pr-4 font-normal w-12">#</th>
                 <th className="pb-2 pr-4 font-normal">Name</th>
                 <th className="pb-2 font-normal text-right">Points</th>
@@ -57,19 +57,19 @@ export default async function LootPage() {
               {members.map((m, i) => (
                 <tr
                   key={m.id}
-                  className="border-b border-neutral-900 hover:bg-neutral-900/40"
+                  className="border-b border-border hover:bg-surface-hover/40"
                 >
-                  <td className="py-2 pr-4 text-neutral-500">{i + 1}</td>
+                  <td className="py-2 pr-4 text-text-muted">{i + 1}</td>
                   <td className="py-2 pr-4">
                     <a
                       href={`/loot/${m.id}`}
-                      className="hover:text-neutral-300 text-neutral-100"
+                      className="hover:text-text-secondary text-text-primary"
                     >
                       {m.displayName}
                     </a>
                   </td>
                   <td className="py-2 font-mono text-right">
-                    <span className={m.balanceTenths < 0 ? "text-red-400" : "text-neutral-100"}>
+                    <span className={m.balanceTenths < 0 ? "text-fg-red-light" : "text-text-primary"}>
                       {formatPoints(m.balanceTenths)}
                     </span>
                   </td>

@@ -55,12 +55,12 @@ export default async function TreasuryPage({
       </div>
 
       {/* Balance summary */}
-      <div className="mb-6 rounded border border-neutral-800 p-5">
+      <div className="mb-6 rounded border border-border p-5">
         <div className="mb-4 flex flex-col gap-1">
-          <span className="text-sm text-neutral-400">Balance</span>
+          <span className="text-sm text-text-secondary">Balance</span>
           <span className="text-3xl font-bold">
             {summary.balance.toLocaleString()}{" "}
-            <span className="text-lg font-normal text-neutral-400">
+            <span className="text-lg font-normal text-text-secondary">
               <L k="currencyCode" fallback="aUEC" />
             </span>
           </span>
@@ -69,20 +69,20 @@ export default async function TreasuryPage({
           <span className="text-green-400">
             Income: {summary.totalIncome.toLocaleString()}
           </span>
-          <span className="text-red-400">
+          <span className="text-fg-red-light">
             Expenses: {summary.totalExpense.toLocaleString()}
           </span>
         </div>
         {nonzeroCategories.length > 0 && (
-          <div className="border-t border-neutral-800 pt-3">
-            <p className="mb-2 text-xs text-neutral-500">By category (net)</p>
+          <div className="border-t border-border pt-3">
+            <p className="mb-2 text-xs text-text-muted">By category (net)</p>
             <div className="flex flex-wrap gap-3">
               {nonzeroCategories.map(([cat, net]) => (
                 <span key={cat} className="text-sm">
-                  <span className="text-neutral-400">
+                  <span className="text-text-secondary">
                     {CATEGORY_LABELS[cat as TreasuryCategory] ?? cat}:
                   </span>{" "}
-                  <span className={net >= 0 ? "text-green-400" : "text-red-400"}>
+                  <span className={net >= 0 ? "text-green-400" : "text-fg-red-light"}>
                     {net.toLocaleString()}
                   </span>
                 </span>
@@ -102,7 +102,7 @@ export default async function TreasuryPage({
         <select
           name="type"
           defaultValue={filterType ?? ""}
-          className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+          className="rounded border border-border-light bg-surface px-3 py-2 text-sm"
         >
           <option value="">All types</option>
           {TREASURY_TYPES.map((t) => (
@@ -114,7 +114,7 @@ export default async function TreasuryPage({
         <select
           name="category"
           defaultValue={filterCategory ?? ""}
-          className="rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm"
+          className="rounded border border-border-light bg-surface px-3 py-2 text-sm"
         >
           <option value="">All categories</option>
           {TREASURY_CATEGORIES.map((c) => (
@@ -125,14 +125,14 @@ export default async function TreasuryPage({
         </select>
         <button
           type="submit"
-          className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500"
+          className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
         >
           Filter
         </button>
         {(filterType || filterCategory) && (
           <a
             href="/treasury"
-            className="rounded border border-neutral-700 px-4 py-2 text-sm hover:border-neutral-500"
+            className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
           >
             Clear
           </a>
@@ -141,12 +141,12 @@ export default async function TreasuryPage({
 
       {/* Ledger */}
       {entries.length === 0 ? (
-        <p className="text-neutral-400">No entries found.</p>
+        <p className="text-text-secondary">No entries found.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-800 text-left text-neutral-500">
+              <tr className="border-b border-border text-left text-text-muted">
                 <th className="pb-2 pr-4 font-normal">Date</th>
                 <th className="pb-2 pr-4 font-normal">Type</th>
                 <th className="pb-2 pr-4 font-normal">Category</th>
@@ -158,8 +158,8 @@ export default async function TreasuryPage({
             </thead>
             <tbody>
               {entries.map((e) => (
-                <tr key={e.id} className="border-b border-neutral-900 hover:bg-neutral-900/40">
-                  <td className="py-2 pr-4 text-neutral-400">
+                <tr key={e.id} className="border-b border-border hover:bg-surface-hover/40">
+                  <td className="py-2 pr-4 text-text-secondary">
                     {e.createdAt.toISOString().slice(0, 10)}
                   </td>
                   <td className="py-2 pr-4">
@@ -167,28 +167,28 @@ export default async function TreasuryPage({
                       className={
                         e.type === "INCOME"
                           ? "rounded px-1.5 py-0.5 text-xs font-semibold bg-green-900/50 text-green-300"
-                          : "rounded px-1.5 py-0.5 text-xs font-semibold bg-red-900/50 text-red-300"
+                          : "rounded px-1.5 py-0.5 text-xs font-semibold bg-red-900/50 text-fg-red-light"
                       }
                     >
                       {e.type === "INCOME" ? "Income" : "Expense"}
                     </span>
                   </td>
-                  <td className="py-2 pr-4 text-neutral-300">
+                  <td className="py-2 pr-4 text-text-secondary">
                     {CATEGORY_LABELS[e.category]}
                   </td>
                   <td className="py-2 pr-4 font-mono">
-                    <span className={e.type === "INCOME" ? "text-green-400" : "text-red-400"}>
+                    <span className={e.type === "INCOME" ? "text-green-400" : "text-fg-red-light"}>
                       {e.type === "EXPENSE" ? "-" : ""}
                       {e.amount.toLocaleString()}
                     </span>{" "}
-                    <span className="text-neutral-500 text-xs">
+                    <span className="text-text-muted text-xs">
                       <L k="currencyCode" fallback="aUEC" />
                     </span>
                   </td>
-                  <td className="py-2 pr-4 text-neutral-300 max-w-xs truncate">
+                  <td className="py-2 pr-4 text-text-secondary max-w-xs truncate">
                     {e.description}
                   </td>
-                  <td className="py-2 pr-4 text-neutral-400">{e.authorName}</td>
+                  <td className="py-2 pr-4 text-text-secondary">{e.authorName}</td>
                   {canDelete && (
                     <td className="py-2">
                       <EntryActions entryId={e.id} />

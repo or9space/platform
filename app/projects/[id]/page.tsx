@@ -27,11 +27,11 @@ export default async function ProjectBoardPage({ params }: { params: Promise<{ i
   return (
     <main className="mx-auto max-w-5xl space-y-6 p-6">
       <div>
-        <a href="/projects" className="text-sm text-neutral-400 underline hover:text-neutral-100">← Projects</a>
+        <a href="/projects" className="text-sm text-text-secondary underline hover:text-text-primary">← Projects</a>
         <div className="mt-2 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">{project.name}</h1>
-            {project.description && <p className="text-sm text-neutral-400">{project.description}</p>}
+            {project.description && <p className="text-sm text-text-secondary">{project.description}</p>}
           </div>
           <div className="flex shrink-0 items-center gap-3">
             <TicketCreateForm projectId={project.id} />
@@ -43,12 +43,12 @@ export default async function ProjectBoardPage({ params }: { params: Promise<{ i
       <div className="grid gap-4 md:grid-cols-3">
         {TICKET_STATUSES.map((status) => (
           <section key={status}>
-            <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-neutral-500">
+            <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-text-muted">
               {COLUMN_LABEL[status]} · {byStatus.get(status)!.length}
             </h2>
             <div className="space-y-2">
               {byStatus.get(status)!.length === 0 ? (
-                <p className="text-xs text-neutral-600">—</p>
+                <p className="text-xs text-text-muted">—</p>
               ) : (
                 byStatus.get(status)!.map((t) => (
                   <TicketCard

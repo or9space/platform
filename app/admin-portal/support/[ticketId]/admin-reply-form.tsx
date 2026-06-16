@@ -7,7 +7,7 @@ export function AdminReplyForm({ ticketId, closed }: { ticketId: string; closed:
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  if (closed) return <p className="text-sm text-neutral-500">Closed.</p>;
+  if (closed) return <p className="text-sm text-text-muted">Closed.</p>;
 
   function handleSubmit(formData: FormData) {
     if (pending) return;
@@ -21,9 +21,9 @@ export function AdminReplyForm({ ticketId, closed }: { ticketId: string; closed:
 
   return (
     <form action={handleSubmit} className="space-y-2">
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <textarea name="body" required maxLength={5000} rows={3}
-        className="w-full rounded border border-neutral-700 bg-neutral-900 p-2" />
+        className="w-full rounded border border-border-light bg-surface p-2" />
       <div className="flex gap-2">
         <button type="submit" disabled={pending}
           className="rounded bg-blue-700 px-3 py-1.5 text-sm font-semibold disabled:opacity-50">
@@ -31,7 +31,7 @@ export function AdminReplyForm({ ticketId, closed }: { ticketId: string; closed:
         </button>
         <button type="button" disabled={pending}
           onClick={() => startTransition(async () => { await adminCloseTicketAction(ticketId); window.location.href = "/support"; })}
-          className="rounded border border-neutral-700 px-3 py-1.5 text-sm disabled:opacity-50">
+          className="rounded border border-border-light px-3 py-1.5 text-sm disabled:opacity-50">
           Close
         </button>
       </div>

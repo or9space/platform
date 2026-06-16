@@ -15,7 +15,7 @@ export default async function NewOperationPage() {
     <main className="mx-auto max-w-lg space-y-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">New operation</h1>
-        <a href="/operations" className="text-sm text-neutral-400 underline hover:text-neutral-100">← Operations</a>
+        <a href="/operations" className="text-sm text-text-secondary underline hover:text-text-primary">← Operations</a>
       </div>
       <OperationForm />
     </main>

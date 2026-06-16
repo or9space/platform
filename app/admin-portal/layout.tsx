@@ -15,7 +15,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <main className="flex min-h-screen items-center justify-center p-8">
         <div className="max-w-md space-y-3 text-center">
           <h1 className="text-2xl font-bold">or9.space admin</h1>
-          <p className="text-neutral-400">
+          <p className="text-text-secondary">
             Platform admin only. Sign in with an admin account at
             <a className="mx-1 underline" href="/login-direct">admin.or9.space/login-direct</a>
             — admin sessions are host-scoped.
@@ -27,11 +27,11 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-neutral-800 p-4">
+      <header className="border-b border-border p-4">
         <nav className="flex gap-6 text-sm">
           <a href="/" className="font-bold">or9 admin</a>
-          <a href="/tenants/pending" className="text-neutral-400 hover:text-neutral-100">Pending tenants</a>
-          <a href="/support" className="text-neutral-400 hover:text-neutral-100">Support</a>
+          <a href="/tenants/pending" className="text-text-secondary hover:text-text-primary">Pending tenants</a>
+          <a href="/support" className="text-text-secondary hover:text-text-primary">Support</a>
         </nav>
       </header>
       <main className="p-6">{children}</main>

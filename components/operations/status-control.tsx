@@ -36,23 +36,23 @@ export function StatusControl({ operationId, current }: { operationId: string; c
         value={status}
         onChange={(e) => change(e.target.value)}
         disabled={pending}
-        className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1.5 text-sm"
+        className="rounded border border-border-light bg-surface px-2 py-1.5 text-sm"
       >
         {STATUSES.map((s) => <option key={s} value={s}>{s.charAt(0) + s.slice(1).toLowerCase()}</option>)}
       </select>
-      <a href={`/operations/${operationId}/edit`} className="rounded border border-neutral-700 px-3 py-1.5 text-sm hover:border-neutral-500">Edit</a>
+      <a href={`/operations/${operationId}/edit`} className="rounded border border-border-light px-3 py-1.5 text-sm hover:border-primary">Edit</a>
       {confirming ? (
         <>
           <button onClick={remove} disabled={pending}
-            className="rounded border border-red-700 bg-red-950 px-3 py-1.5 text-sm text-red-200 disabled:opacity-50">
+            className="rounded border border-danger bg-surface px-3 py-1.5 text-sm text-red-200 disabled:opacity-50">
             {pending ? "Deleting…" : "Confirm"}
           </button>
-          <button onClick={() => setConfirming(false)} className="text-sm text-neutral-400 hover:text-neutral-200">Cancel</button>
+          <button onClick={() => setConfirming(false)} className="text-sm text-text-secondary hover:text-text-primary">Cancel</button>
         </>
       ) : (
-        <button onClick={() => setConfirming(true)} className="rounded border border-red-900 px-3 py-1.5 text-sm text-red-400 hover:border-red-700">Delete</button>
+        <button onClick={() => setConfirming(true)} className="rounded border border-danger px-3 py-1.5 text-sm text-fg-red-light hover:border-danger">Delete</button>
       )}
-      {error && <span className="text-sm text-red-400">{error}</span>}
+      {error && <span className="text-sm text-fg-red-light">{error}</span>}
     </div>
   );
 }
