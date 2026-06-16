@@ -62,6 +62,11 @@ export function PricingTable() {
                     Hosted
                   </span>
                 </th>
+                <th className="px-5 py-3 text-center" style={{ color: "var(--muted)" }}>
+                  <span className="font-display text-xs font-semibold uppercase tracking-wide">
+                    Self-Hosted
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -99,6 +104,13 @@ export function PricingTable() {
                       <span style={{ color: "var(--ink-line)" }}>—</span>
                     )}
                   </td>
+                  <td className="px-5 py-3.5 text-center">
+                    {row.selfHosted ? (
+                      <span style={{ color: "var(--signal)" }}>✓</span>
+                    ) : (
+                      <span style={{ color: "var(--ink-line)" }}>—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {/* Ads row */}
@@ -115,6 +127,9 @@ export function PricingTable() {
                 <td className="px-5 py-3.5 text-center" style={{ color: "var(--signal)" }}>
                   ✓ removed
                 </td>
+                <td className="px-5 py-3.5 text-center" style={{ color: "var(--signal)" }}>
+                  ✓ removed
+                </td>
               </tr>
             </tbody>
           </table>
@@ -122,7 +137,7 @@ export function PricingTable() {
 
         {/* Column footers */}
         <div
-          className="mt-8 grid gap-6 border-t pt-8 sm:grid-cols-2"
+          className="mt-8 grid gap-6 border-t pt-8 sm:grid-cols-3"
           style={{ borderColor: "var(--ink-line)" }}
         >
           <div
@@ -166,6 +181,30 @@ export function PricingTable() {
               className="font-display inline-block rounded px-5 py-2 text-sm font-semibold transition-colors hover:opacity-90"
             >
               Start your org
+            </a>
+          </div>
+
+          <div
+            className="border-t-2 pt-4"
+            style={{ borderColor: "var(--ink-line)" }}
+          >
+            <p
+              className="font-display mb-1 text-base font-semibold"
+              style={{ color: "var(--cream)" }}
+            >
+              Self-Hosted
+            </p>
+            <p className="mb-4 text-sm" style={{ color: "var(--muted)" }}>
+              Run it yourself under AGPL. Full features, ads off, no billing.
+            </p>
+            <a
+              href="https://github.com/or9space/platform"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ borderColor: "var(--ink-line)", color: "var(--muted)" }}
+              className="font-display inline-block rounded border px-5 py-2 text-sm font-semibold transition-colors hover:border-[color:var(--cream)] hover:text-[color:var(--cream)]"
+            >
+              View on GitHub
             </a>
           </div>
         </div>

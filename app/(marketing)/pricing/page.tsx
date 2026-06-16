@@ -32,7 +32,7 @@ export default function PricingPage() {
               Transparent pricing.
             </h1>
             <p className="mt-3 max-w-xl text-base leading-relaxed" style={{ color: "var(--muted)" }}>
-              Free covers everything most orgs need. Paid removes ads and activates advanced integrations.
+              Free runs a real community. Paid unlocks the full operations HQ and removes ads. Self-host the whole thing under AGPL.
             </p>
           </div>
         </section>
@@ -43,15 +43,20 @@ export default function PricingPage() {
         >
           <div className="mx-auto max-w-6xl space-y-3 text-sm" style={{ color: "var(--muted)" }}>
             <p>
-              <strong style={{ color: "var(--cream)" }}>Free tier</strong> — ad-supported.
-              All core modules (forums, handbook, loot, inventory, treasury, and more) at no cost.
+              <strong style={{ color: "var(--cream)" }}>Free tier</strong> — ad-supported community
+              starter: forums, events, news, activity feed, handbook, and recruitment, plus the
+              members roster and org directory. No cost.
             </p>
             <p>
-              <strong style={{ color: "var(--cream)" }}>Paid tier</strong> — removes ads across
-              the entire org and activates paid-only features
+              <strong style={{ color: "var(--cream)" }}>Paid tier</strong> — removes ads across the
+              entire org and unlocks the full operations HQ
               {paidOnlyFeatures.length > 0 && (
-                <> including {paidOnlyFeatures.join(" and ")}</>
+                <> ({paidOnlyFeatures.join(", ")})</>
               )}.
+            </p>
+            <p>
+              <strong style={{ color: "var(--cream)" }}>Self-hosted</strong> — run the open-core
+              build yourself under AGPL: every feature, no ads, no billing.
             </p>
             <p>
               Questions? Reach us on{" "}

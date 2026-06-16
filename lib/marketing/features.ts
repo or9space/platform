@@ -59,6 +59,7 @@ export interface PlanRow {
   label: string;
   free: boolean;
   paid: boolean;
+  selfHosted: boolean;
   paidOnly: boolean;
 }
 
@@ -68,6 +69,8 @@ export function buildPlanMatrix(): PlanRow[] {
     label: f.label,
     free: f.defaultFree,
     paid: f.defaultPaid,
+    // Self-hosted (open-core) gets the full feature set — same defaults as paid.
+    selfHosted: f.defaultPaid,
     paidOnly: f.paidOnly,
   }));
 }
