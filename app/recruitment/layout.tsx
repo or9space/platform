@@ -5,7 +5,7 @@ import { isFeatureEnabled } from "@/lib/features";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
-import { TenantNav } from "@/components/tenant-nav";
+import { TenantShell } from "@/components/tenant-shell";
 
 export default async function RecruitmentLayout({ children }: { children: ReactNode }) {
   const ctx = await getFullTenantContext();
@@ -13,9 +13,6 @@ export default async function RecruitmentLayout({ children }: { children: ReactN
   const viewer = await getViewerMembership(ctx.tenant.id, await getSessionAccountId());
   if (!viewer || !hasTier(viewer.tier, "OFFICER")) notFound();
   return (
-    <div className="min-h-screen">
-      <TenantNav active="recruitment" />
-      {children}
-    </div>
+    <TenantShell>{children}</TenantShell>
   );
 }

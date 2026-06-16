@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
-import { TenantNav } from "@/components/tenant-nav";
+import { TenantShell } from "@/components/tenant-shell";
 
 export default async function MembersLayout({ children }: { children: ReactNode }) {
   const full = await getFullTenantContext();
@@ -15,9 +15,6 @@ export default async function MembersLayout({ children }: { children: ReactNode 
   if (!viewer) redirect("/login");
 
   return (
-    <div className="min-h-screen">
-      <TenantNav active="members" />
-      {children}
-    </div>
+    <TenantShell>{children}</TenantShell>
   );
 }

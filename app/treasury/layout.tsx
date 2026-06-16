@@ -5,7 +5,7 @@ import { isFeatureEnabled } from "@/lib/features";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
-import { TenantNav } from "@/components/tenant-nav";
+import { TenantShell } from "@/components/tenant-shell";
 
 export default async function TreasuryLayout({ children }: { children: ReactNode }) {
   const ctx = await getFullTenantContext();
@@ -16,9 +16,6 @@ export default async function TreasuryLayout({ children }: { children: ReactNode
   if (!m || !hasTier(m.tier, "OFFICER")) notFound();
 
   return (
-    <div className="min-h-screen">
-      <TenantNav active="treasury" />
-      {children}
-    </div>
+    <TenantShell>{children}</TenantShell>
   );
 }

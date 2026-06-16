@@ -4,7 +4,7 @@ import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { isFeatureEnabled } from "@/lib/features";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
-import { TenantNav } from "@/components/tenant-nav";
+import { TenantShell } from "@/components/tenant-shell";
 
 const TOOLS = [
   { href: "/sc-tools", label: "Overview" },
@@ -24,16 +24,15 @@ export default async function ScToolsLayout({ children }: { children: ReactNode 
   const viewer = await getViewerMembership(ctx.tenant.id, await getSessionAccountId());
   if (!viewer) notFound();
   return (
-    <div className="min-h-screen">
-      <TenantNav active="sc-tools" />
-      <div className="border-b border-neutral-900 bg-neutral-950/60">
+    <TenantShell>
+      <div className="border-b border-border bg-surface/40">
         <nav className="mx-auto flex max-w-5xl flex-wrap gap-3 px-6 py-2 text-xs">
           {TOOLS.map((t) => (
-            <a key={t.href} href={t.href} className="text-neutral-400 hover:text-neutral-100">{t.label}</a>
+            <a key={t.href} href={t.href} className="text-text-secondary hover:text-text-primary">{t.label}</a>
           ))}
         </nav>
       </div>
       {children}
-    </div>
+    </TenantShell>
   );
 }
