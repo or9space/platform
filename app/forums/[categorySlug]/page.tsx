@@ -8,6 +8,19 @@ import { NewThreadForm } from "./new-thread-form";
 import { MfdPanel, MfdReadout } from "@/components/ui/mfd";
 import { ArrowLeft, Pin, Lock, MessageSquare } from "lucide-react";
 
+function relativeTime(d: Date): string {
+  const diff = Date.now() - d.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months}mo ago`;
+  return `${Math.floor(months / 12)}y ago`;
+}
+
 export default async function CategoryPage({
   params,
 }: {
@@ -109,15 +122,21 @@ export default async function CategoryPage({
                       {t.lastPostAt && (
                         <>
                           {" "}
-                          <span className="mfd-label">LAST</span>{" "}
-                          {t.lastPostAt.toISOString().slice(0, 16).replace("T", " ")}
+                          &bull;{" "}
+                          {relativeTime(t.lastPostAt)}
                         </>
                       )}
                     </p>
                   </div>
-                  <div className="shrink-0 flex items-center gap-1 text-xs text-text-muted">
-                    <MessageSquare className="h-3 w-3" />
-                    <span className="font-mono tabular-nums">{t.postCount}</span>
+                  {/* Post count + lock/pin indicators */}
+                  <div className="shrink-0 flex items-center gap-3 text-xs text-text-muted">
+                    <span className="flex items-center gap-1">
+                      <MessageSquare className="h-3 w-3" />
+                      <span className="font-mono tabular-nums">{t.postCount}</span>
+                    </span>
+                    {t.isLocked && (
+                      <span className="mfd-label opacity-60">LOCKED</span>
+                    )}
                   </div>
                 </a>
               </li>

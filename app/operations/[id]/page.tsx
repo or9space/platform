@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Swords, Users } from "lucide-react";
+import { Swords, Users, Calendar, MapPin, User, FileText } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -35,9 +35,9 @@ export default async function OperationDetailPage({ params }: { params: Promise<
         ← Operations
       </a>
 
-      {/* Page header */}
+      {/* Page header — icon + title + StatusBadge, matching FG detail header */}
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
           <Swords className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">
@@ -50,9 +50,9 @@ export default async function OperationDetailPage({ params }: { params: Promise<
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main column */}
+        {/* Main column (2/3) — mirrors FG's lg:col-span-2 */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Mission data panel */}
+          {/* Mission data panel — primary chassis, FG-style meta readouts + description */}
           <MfdPanel
             chassis="primary"
             title={<span>[ MISSION DATA ]</span>}
@@ -62,42 +62,68 @@ export default async function OperationDetailPage({ params }: { params: Promise<
             bodyPadding="md"
           >
             <div className="space-y-4">
-              {/* Readouts row */}
+              {/* Meta readouts row — matches FG's Calendar / MapPin / User row */}
               <div className="flex flex-wrap gap-6 border-b border-border/60 pb-4">
                 <MfdReadout
                   label="SCHEDULED"
-                  value={op.scheduledAt ? formatDateTime(op.scheduledAt) : "TBD"}
+                  value={
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-amber opacity-70" aria-hidden="true" />
+                      {op.scheduledAt ? formatDateTime(op.scheduledAt) : "TBD"}
+                    </span>
+                  }
                   tone="amber"
                   size="sm"
                 />
                 {op.location && (
-                  <MfdReadout label="LOCATION" value={op.location} tone="primary" size="sm" />
+                  <MfdReadout
+                    label="LOCATION"
+                    value={
+                      <span className="flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5 text-primary opacity-70" aria-hidden="true" />
+                        {op.location}
+                      </span>
+                    }
+                    tone="primary"
+                    size="sm"
+                  />
                 )}
                 <MfdReadout
                   label="CREATED BY"
-                  value={op.createdByName}
+                  value={
+                    <span className="flex items-center gap-1.5">
+                      <User className="h-3.5 w-3.5 opacity-50" aria-hidden="true" />
+                      {op.createdByName}
+                    </span>
+                  }
                   tone="muted"
                   size="sm"
                 />
               </div>
 
+              {/* Briefing text — FG shows description in CardContent */}
               {op.description && (
-                <p className="whitespace-pre-wrap text-sm text-text-secondary">{op.description}</p>
+                <p className="whitespace-pre-wrap text-sm text-text-secondary leading-relaxed">{op.description}</p>
               )}
             </div>
           </MfdPanel>
 
-          {/* Sign up panel */}
+          {/* Sign-up panel — neutral chassis, FG SignupButton equivalent */}
           <MfdPanel
             chassis="neutral"
-            title={<span>[ SIGN UP ]</span>}
+            title={
+              <span className="flex items-center gap-1.5">
+                <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+                [ SIGN UP ]
+              </span>
+            }
             bodyPadding="md"
           >
             <SignupControl operationId={op.id} joined={mine !== null} currentRole={mine?.role ?? null} />
           </MfdPanel>
         </div>
 
-        {/* Sidebar — crew roster */}
+        {/* Sidebar (1/3) — crew roster, matches FG's Signups card */}
         <div className="space-y-4">
           <MfdPanel
             chassis="neutral"
@@ -112,17 +138,19 @@ export default async function OperationDetailPage({ params }: { params: Promise<
             {op.signups.length === 0 ? (
               <p className="py-2 text-sm text-text-muted">No one signed up yet.</p>
             ) : (
-              <ul className="space-y-1 py-1">
+              <ul className="divide-y divide-border/40 py-1">
                 {op.signups.map((s) => (
-                  <li key={s.membershipId} className="flex items-center justify-between py-1">
+                  <li key={s.membershipId} className="flex items-center justify-between gap-2 py-2">
                     <a
                       href={`/members/${s.username}`}
-                      className="text-sm text-text-primary hover:text-primary hover:underline transition-colors"
+                      className="min-w-0 flex-1 truncate text-sm text-text-primary hover:text-primary transition-colors"
                     >
                       {s.name}
                     </a>
                     {s.role && (
-                      <span className="font-mono text-xs text-text-muted">{s.role}</span>
+                      <span className="shrink-0 rounded border border-border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-text-muted">
+                        {s.role}
+                      </span>
                     )}
                   </li>
                 ))}

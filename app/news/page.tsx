@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Newspaper, Pin } from "lucide-react";
+import { Newspaper, Pin, Calendar, User } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -22,9 +22,9 @@ export default async function NewsPage() {
   const rest = posts.filter((p) => !p.isPinned);
 
   return (
-    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* MFD page header */}
-      <div className="flex items-start justify-between gap-3">
+    <div className="p-3 sm:p-6 animate-page-enter">
+      {/* Page header — icon + title block matching FG layout */}
+      <div className="mb-6 flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
             <Newspaper className="h-5 w-5" />
@@ -46,7 +46,7 @@ export default async function NewsPage() {
           <p className="text-sm text-text-muted">No posts yet.</p>
         </MfdPanel>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {/* Pinned posts — primary chassis */}
           {pinned.map((p) => (
             <a key={p.id} href={`/news/${p.id}`} className="block transition-opacity hover:opacity-90">
@@ -61,11 +61,18 @@ export default async function NewsPage() {
                 }
                 bodyPadding="md"
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="mb-2 flex items-center gap-2">
                   <CategoryBadge category={p.category} />
                 </div>
-                <p className="font-medium text-text-primary">{p.title}</p>
-                <p className="mt-1 text-xs text-text-muted">{p.authorName} · {formatDate(p.createdAt)}</p>
+                <p className="mb-1 text-lg font-semibold text-text-primary">{p.title}</p>
+                <div className="flex items-center gap-4 text-xs text-text-muted">
+                  <span className="flex items-center gap-1">
+                    <User className="h-3 w-3" /> {p.authorName}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" /> {formatDate(p.createdAt)}
+                  </span>
+                </div>
               </MfdPanel>
             </a>
           ))}
@@ -79,11 +86,18 @@ export default async function NewsPage() {
                 title={<span>[ NEWS ]</span>}
                 bodyPadding="md"
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="mb-2 flex items-center gap-2">
                   <CategoryBadge category={p.category} />
                 </div>
-                <p className="font-medium text-text-primary">{p.title}</p>
-                <p className="mt-1 text-xs text-text-muted">{p.authorName} · {formatDate(p.createdAt)}</p>
+                <p className="mb-1 text-lg font-semibold text-text-primary">{p.title}</p>
+                <div className="flex items-center gap-4 text-xs text-text-muted">
+                  <span className="flex items-center gap-1">
+                    <User className="h-3 w-3" /> {p.authorName}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" /> {formatDate(p.createdAt)}
+                  </span>
+                </div>
               </MfdPanel>
             </a>
           ))}

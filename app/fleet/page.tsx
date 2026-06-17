@@ -7,9 +7,10 @@ import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { listOrgFleet, fleetStats } from "@/lib/queries/fleet";
 import { MfdPanel } from "@/components/ui/mfd";
+import { FleetStats } from "@/components/fleet/fleet-stats";
+import { FleetViewer } from "@/components/fleet/fleet-viewer";
 import { AddShipForm } from "./add-ship-form";
 import { ShipActions } from "./ship-actions";
-import { ModerateDeleteButton } from "./moderate-delete-button";
 
 export default async function FleetPage() {
   const full = await getFullTenantContext();
@@ -29,7 +30,6 @@ export default async function FleetPage() {
 
   const canCommand = hasTier(viewer.tier, "COMMAND");
   const myShips = ships.filter((s) => s.ownerMembershipId === viewer.id);
-  const orgShips = ships;
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
@@ -42,6 +42,20 @@ export default async function FleetPage() {
           <h1 className="text-2xl font-bold text-text-primary">Fleet</h1>
           <p className="text-sm text-text-muted">Org ship registry</p>
         </div>
+      </div>
+
+      {/* Count line + My Hangar shortcut */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-text-muted">
+          {stats.totalQuantity} ship{stats.totalQuantity !== 1 ? "s" : ""} across{" "}
+          {stats.totalShips} record{stats.totalShips !== 1 ? "s" : ""}
+        </p>
+        <a
+          href="#my-hangar"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-fg-cream hover:bg-primary/90 transition-colors"
+        >
+          My Hangar
+        </a>
       </div>
 
       {/* KPI strip */}
@@ -66,131 +80,93 @@ export default async function FleetPage() {
         </div>
       </MfdPanel>
 
-      {/* Org Fleet */}
-      <MfdPanel
-        chassis="neutral"
-        title={<span>[ ORG FLEET ]</span>}
-        titleAside={<span className="mfd-label">{orgShips.length} RECORDS</span>}
-        bodyPadding="none"
-      >
-        {orgShips.length === 0 ? (
-          <p className="px-4 py-6 text-sm text-text-muted">No ships in the org fleet yet.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border/60 text-left">
-                  <th className="px-4 py-2 font-normal"><span className="mfd-label">SHIP</span></th>
-                  <th className="px-4 py-2 font-normal"><span className="mfd-label">MFR</span></th>
-                  <th className="px-4 py-2 font-normal"><span className="mfd-label">OWNER</span></th>
-                  <th className="px-4 py-2 font-normal"><span className="mfd-label">QTY</span></th>
-                  {canCommand && <th className="px-4 py-2 font-normal"></th>}
-                </tr>
-              </thead>
-              <tbody>
-                {orgShips.map((ship) => {
-                  const isOwn = ship.ownerMembershipId === viewer.id;
-                  return (
-                    <tr key={ship.id} className="border-b border-border/40 hover:bg-primary/5 transition-colors">
-                      <td className="px-4 py-2.5">
-                        <div className="flex items-center gap-3">
-                          {ship.imageUrl && ship.imageUrl.startsWith("http") && (
-                            <img
-                              src={ship.imageUrl}
-                              alt={ship.shipName}
-                              className="h-8 w-12 shrink-0 object-cover"
-                            />
-                          )}
-                          <div>
-                            <span className="font-medium text-text-primary">{ship.shipName}</span>
-                            {!ship.isPublic && isOwn && (
-                              <span className="ml-2 rounded bg-surface-elevated px-1.5 py-0.5 text-xs text-text-muted">
-                                PRIVATE
-                              </span>
-                            )}
-                            {ship.notes && (
-                              <p className="mt-0.5 text-xs text-text-muted whitespace-pre-wrap">
-                                {ship.notes}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-2.5 text-text-secondary">
-                        {ship.manufacturer ?? <span className="text-text-muted">—</span>}
-                      </td>
-                      <td className="px-4 py-2.5 text-text-secondary">{ship.ownerName}</td>
-                      <td className="px-4 py-2.5 font-mono text-amber">{ship.quantity}</td>
-                      {canCommand && (
-                        <td className="px-4 py-2.5">
-                          {!isOwn && (
-                            <ModerateDeleteButton shipId={ship.id} shipName={ship.shipName} />
-                          )}
-                        </td>
-                      )}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </MfdPanel>
+      {/* Fleet composition stats */}
+      {ships.length > 0 && (
+        <FleetStats ships={ships} />
+      )}
 
-      {/* My Fleet */}
-      <MfdPanel
-        chassis="amber"
-        title={<span>[ MY HANGAR ]</span>}
-        titleAside={<span className="mfd-label">{myShips.length} SHIPS</span>}
-        bodyPadding="md"
-      >
-        {myShips.length === 0 ? (
-          <p className="mb-4 text-sm text-text-muted">No ships registered. Add one below.</p>
-        ) : (
-          <div className="mb-6 space-y-3">
-            {myShips.map((ship) => (
-              <div
-                key={ship.id}
-                className="border border-border-light bg-surface-elevated p-4"
-              >
-                <div className="flex items-start gap-4">
-                  {ship.imageUrl && ship.imageUrl.startsWith("http") && (
-                    <img
-                      src={ship.imageUrl}
-                      alt={ship.shipName}
-                      className="h-16 w-24 shrink-0 object-cover"
-                    />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold text-text-primary">{ship.shipName}</span>
-                      {ship.manufacturer && (
-                        <span className="text-sm text-text-secondary">{ship.manufacturer}</span>
-                      )}
-                      {!ship.isPublic && (
-                        <span className="rounded bg-surface px-1.5 py-0.5 text-xs text-text-muted">
-                          PRIVATE
-                        </span>
-                      )}
-                      <span className="mfd-label">QTY: <span className="font-mono text-amber">{ship.quantity}</span></span>
-                    </div>
-                    {ship.notes && (
-                      <p className="mt-1 text-sm text-text-secondary whitespace-pre-wrap">
-                        {ship.notes}
-                      </p>
+      {/* Org fleet — search / sort / grid / list */}
+      {ships.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-text-muted">
+          <Rocket className="mb-4 h-12 w-12 opacity-20" />
+          <p className="text-lg font-medium">No ships registered yet</p>
+          <p className="mt-1 text-sm">Members can add ships via their hangar.</p>
+        </div>
+      ) : (
+        <FleetViewer
+          ships={ships}
+          viewerMembershipId={viewer.id}
+          canCommand={canCommand}
+        />
+      )}
+
+      {/* My Hangar */}
+      <div id="my-hangar">
+        <MfdPanel
+          chassis="amber"
+          title={<span>[ MY HANGAR ]</span>}
+          titleAside={<span className="mfd-label">{myShips.length} SHIPS</span>}
+          bodyPadding="md"
+        >
+          {myShips.length === 0 ? (
+            <p className="mb-4 text-sm text-text-muted">
+              No ships registered. Add one below.
+            </p>
+          ) : (
+            <div className="mb-6 space-y-3">
+              {myShips.map((ship) => (
+                <div
+                  key={ship.id}
+                  className="border border-border-light bg-surface-elevated p-4"
+                >
+                  <div className="flex items-start gap-4">
+                    {ship.imageUrl && ship.imageUrl.startsWith("http") && (
+                      <img
+                        src={ship.imageUrl}
+                        alt={ship.shipName}
+                        className="h-16 w-24 shrink-0 object-cover"
+                      />
                     )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-text-primary">
+                          {ship.shipName}
+                        </span>
+                        {ship.manufacturer && (
+                          <span className="text-sm text-text-secondary">
+                            {ship.manufacturer}
+                          </span>
+                        )}
+                        {!ship.isPublic && (
+                          <span className="rounded bg-surface px-1.5 py-0.5 text-xs text-text-muted">
+                            PRIVATE
+                          </span>
+                        )}
+                        <span className="mfd-label">
+                          QTY:{" "}
+                          <span className="font-mono text-amber">
+                            {ship.quantity}
+                          </span>
+                        </span>
+                      </div>
+                      {ship.notes && (
+                        <p className="mt-1 text-sm text-text-secondary whitespace-pre-wrap">
+                          {ship.notes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <ShipActions ship={ship} />
                   </div>
                 </div>
-                <div className="mt-3">
-                  <ShipActions ship={ship} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
 
-        <AddShipForm />
-      </MfdPanel>
+          <AddShipForm />
+        </MfdPanel>
+      </div>
     </div>
   );
 }

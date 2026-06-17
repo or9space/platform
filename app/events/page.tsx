@@ -5,37 +5,80 @@ import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { listUpcomingEvents, listPastEvents, type EventRow } from "@/lib/queries/events";
-import { formatDateTime } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { EventTypeBadge } from "@/components/events/event-type-badge";
 import { MfdPanel } from "@/components/ui/mfd";
-import { Calendar } from "lucide-react";
+import { Calendar, Clock, MapPin, Users } from "lucide-react";
 
-function EventList({ events }: { events: EventRow[] }) {
+// Group events by date label (e.g. "Jun 20 2026")
+function groupByDate(events: EventRow[]): { label: string; items: EventRow[] }[] {
+  const map = new Map<string, EventRow[]>();
+  for (const e of events) {
+    const key = formatDate(e.startsAt);
+    const bucket = map.get(key);
+    if (bucket) {
+      bucket.push(e);
+    } else {
+      map.set(key, [e]);
+    }
+  }
+  return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
+}
+
+function EventCard({ e }: { e: EventRow }) {
+  return (
+    <a
+      href={`/events/${e.id}`}
+      className="flex items-center justify-between gap-4 border border-border bg-surface px-4 py-3 transition-colors hover:border-primary mfd-cut-tl-br"
+    >
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <EventTypeBadge type={e.type} />
+          <p className="truncate font-medium text-text-primary">{e.title}</p>
+        </div>
+        <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-text-muted">
+          <span className="flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {formatDateTime(e.startsAt)}
+          </span>
+          {e.location && (
+            <span className="flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {e.location}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="flex shrink-0 items-center gap-1 text-sm text-text-muted">
+        <Users className="h-4 w-4" />
+        <span className="mfd-label">{e.goingCount}</span>
+      </div>
+    </a>
+  );
+}
+
+function GroupedEventList({ events }: { events: EventRow[] }) {
   if (events.length === 0)
     return <p className="text-sm text-text-muted">Nothing here yet.</p>;
+
+  const groups = groupByDate(events);
   return (
-    <ul className="space-y-2">
-      {events.map((e) => (
-        <li key={e.id}>
-          <a
-            href={`/events/${e.id}`}
-            className="flex items-center justify-between gap-4 border border-border bg-surface px-3 py-2.5 transition-colors hover:border-primary mfd-cut-tl-br"
-          >
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <EventTypeBadge type={e.type} />
-                <p className="truncate font-medium text-text-primary">{e.title}</p>
-              </div>
-              <p className="mt-0.5 text-sm text-text-secondary">
-                {formatDateTime(e.startsAt)}
-                {e.location ? ` · ${e.location}` : ""}
-              </p>
-            </div>
-            <span className="mfd-label shrink-0">{e.goingCount} going</span>
-          </a>
-        </li>
+    <div className="space-y-4">
+      {groups.map((g) => (
+        <div key={g.label}>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-muted">
+            {g.label}
+          </p>
+          <ul className="space-y-2">
+            {g.items.map((e) => (
+              <li key={e.id}>
+                <EventCard e={e} />
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }
 
@@ -83,7 +126,7 @@ export default async function EventsPage() {
         titleAside={<span className="mfd-readout text-sm">{upcoming.length}</span>}
         bodyPadding="sm"
       >
-        <EventList events={upcoming} />
+        <GroupedEventList events={upcoming} />
       </MfdPanel>
 
       {/* Past events panel */}
@@ -94,7 +137,7 @@ export default async function EventsPage() {
           titleAside={<span className="mfd-label">{past.length} records</span>}
           bodyPadding="sm"
         >
-          <EventList events={past} />
+          <GroupedEventList events={past} />
         </MfdPanel>
       )}
     </div>

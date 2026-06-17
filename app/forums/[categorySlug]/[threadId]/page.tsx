@@ -10,6 +10,13 @@ import { PostActions } from "./post-actions";
 import { MfdPanel } from "@/components/ui/mfd";
 import { ArrowLeft, Pin, Lock, MessageSquare, Clock } from "lucide-react";
 
+function fmtDateTime(d: Date): string {
+  const mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()];
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${mo} ${d.getDate()}, ${d.getFullYear()} at ${hh}:${mm}`;
+}
+
 export default async function ThreadPage({
   params,
 }: {
@@ -111,47 +118,64 @@ export default async function ThreadPage({
               className={i === 0 ? "border-l-2 border-primary" : ""}
             >
               <div className="px-4 py-4 space-y-3">
-                {/* Post header */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-7 w-7 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-xs font-mono font-bold text-primary">
+                {/* Post header — matches FG's Card layout: avatar initials + name/tier + timestamp */}
+                <div className="flex gap-3 sm:gap-4">
+                  {/* Author column */}
+                  <div className="hidden shrink-0 text-center sm:flex sm:flex-col sm:items-center sm:gap-1 sm:w-16">
+                    {/* Avatar initials box */}
+                    <span className="flex h-9 w-9 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-xs font-mono font-bold text-primary">
                       {(post.authorName ?? "?").slice(0, 2).toUpperCase()}
                     </span>
-                    <div>
-                      <p className="text-sm font-semibold text-text-primary leading-none">
+                    <p className="text-xs font-medium text-text-primary leading-tight">
+                      {post.authorName}
+                    </p>
+                    {i === 0 && (
+                      <span className="mfd-label text-xs text-primary">OP</span>
+                    )}
+                  </div>
+                  {/* Mobile: inline initials */}
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-xs font-mono font-bold text-primary sm:hidden">
+                    {(post.authorName ?? "?").slice(0, 2).toUpperCase()}
+                  </span>
+
+                  {/* Content column */}
+                  <div className="min-w-0 flex-1">
+                    {/* Meta row */}
+                    <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-text-muted">
+                      <span className="font-medium text-text-primary sm:hidden">
                         {post.authorName}
-                      </p>
+                      </span>
                       {i === 0 && (
-                        <span className="mfd-label text-xs text-primary">OP</span>
+                        <span className="sm:hidden mfd-label text-xs text-primary">OP</span>
+                      )}
+                      <Clock className="h-3 w-3" />
+                      <span>{fmtDateTime(post.createdAt)}</span>
+                      {post.isEdited && (
+                        <span className="mfd-label italic text-text-muted">(edited)</span>
                       )}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-text-muted shrink-0">
-                    <Clock className="h-3 w-3" />
-                    <span>{post.createdAt.toISOString().slice(0, 16).replace("T", " ")}</span>
-                    {post.isEdited && (
-                      <span className="mfd-label italic text-text-muted">(edited)</span>
+
+                    {/* Post content */}
+                    <p className="whitespace-pre-wrap text-sm text-text-secondary leading-relaxed">
+                      {post.content}
+                    </p>
+
+                    {/* Post actions */}
+                    {(myMembershipId === post.authorMembershipId || canModerate) && !thread.isLocked && (
+                      <div className="mt-2">
+                        <PostActions
+                          threadId={thread.id}
+                          posts={[post]}
+                          myMembershipId={myMembershipId}
+                          canModerate={canModerate}
+                          isPinned={thread.isPinned}
+                          isLocked={thread.isLocked}
+                          showThreadControls={false}
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
-
-                {/* Post content */}
-                <p className="whitespace-pre-wrap text-sm text-text-secondary leading-relaxed">
-                  {post.content}
-                </p>
-
-                {/* Post actions */}
-                {(myMembershipId === post.authorMembershipId || canModerate) && (
-                  <PostActions
-                    threadId={thread.id}
-                    posts={[post]}
-                    myMembershipId={myMembershipId}
-                    canModerate={canModerate}
-                    isPinned={thread.isPinned}
-                    isLocked={thread.isLocked}
-                    showThreadControls={false}
-                  />
-                )}
               </div>
             </li>
           ))}

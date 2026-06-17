@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Newspaper } from "lucide-react";
+import { ArrowLeft, Newspaper } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -32,7 +32,10 @@ export default async function EditNewsPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
-      <a href={`/news/${id}`} className="mfd-label text-xs text-text-secondary hover:text-text-primary">← Cancel</a>
+      <a href={`/news/${id}`} className="mb-2 inline-flex items-center gap-1 text-sm text-text-muted hover:text-primary transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Back to article
+      </a>
 
       <MfdPanel
         chassis="neutral"

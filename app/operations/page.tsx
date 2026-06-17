@@ -88,16 +88,36 @@ export default async function OperationsPage() {
                   <li key={o.id}>
                     <a
                       href={`/operations/${o.id}`}
-                      className="block rounded border border-border bg-surface p-3 transition-colors hover:border-primary hover:bg-surface-elevated"
+                      className="block overflow-hidden rounded border border-border bg-surface transition-colors hover:border-primary hover:bg-surface-elevated"
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="truncate font-medium text-text-primary">{o.title}</p>
+                      {/* Status pip band — mirrors FG kanban card header */}
+                      <div
+                        className={
+                          status === "ACTIVE"
+                            ? "flex items-center justify-between gap-2 bg-primary px-3 py-1.5"
+                            : status === "DEBRIEFING"
+                            ? "flex items-center justify-between gap-2 bg-amber/15 px-3 py-1.5"
+                            : status === "BRIEFING"
+                            ? "flex items-center justify-between gap-2 bg-info/15 px-3 py-1.5"
+                            : status === "COMPLETED"
+                            ? "flex items-center justify-between gap-2 bg-green-950 px-3 py-1.5"
+                            : "flex items-center justify-between gap-2 bg-surface-elevated px-3 py-1.5"
+                        }
+                      >
                         <StatusBadge status={o.status} />
+                        <span className="flex items-center gap-1 font-mono text-[11px] text-text-muted">
+                          <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                          {o.signupCount}
+                        </span>
                       </div>
-                      <p className="mt-1 font-mono text-xs text-text-muted">
-                        {o.scheduledAt ? formatDateTime(o.scheduledAt) : "Unscheduled"}
-                        {o.location ? ` · ${o.location}` : ""} · {o.signupCount} signed up
-                      </p>
+                      {/* Card body */}
+                      <div className="p-3">
+                        <p className="truncate font-medium text-text-primary">{o.title}</p>
+                        <p className="mt-1 font-mono text-xs text-text-muted">
+                          {o.scheduledAt ? formatDateTime(o.scheduledAt) : "Unscheduled"}
+                          {o.location ? ` · ${o.location}` : ""}
+                        </p>
+                      </div>
                     </a>
                   </li>
                 ))}
