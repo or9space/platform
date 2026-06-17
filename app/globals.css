@@ -18,6 +18,15 @@ body {
   font-family: var(--font-inter, system-ui, sans-serif);
 }
 
+/* Tenant app scrollbars — thin dark MFD style (ported from the FG site). Scoped
+ * to .tenant-root so the marketing pages keep the default. Applies to the
+ * sidebar nav + any scroll container inside the tenant shell. */
+.tenant-root { scrollbar-width: thin; scrollbar-color: var(--color-border) var(--color-fg-black); }
+.tenant-root ::-webkit-scrollbar { width: 8px; height: 8px; }
+.tenant-root ::-webkit-scrollbar-track { background: var(--color-fg-black); }
+.tenant-root ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+.tenant-root ::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
 .font-display {
   font-family: var(--font-oswald, system-ui, sans-serif);
   text-transform: uppercase;
