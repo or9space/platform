@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { MessagesSquare } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -20,14 +21,21 @@ export default async function AdminCategoriesPage() {
   const categories = await getCategories(ctx);
 
   return (
-    <main className="mx-auto max-w-2xl p-6">
-      <div className="mb-1">
-        <a href="/forums" className="text-sm text-text-secondary hover:text-text-primary">Forums</a>
-        <span className="mx-2 text-text-muted">/</span>
-        <span className="text-sm text-text-secondary">Manage categories</span>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <MessagesSquare className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Forum Categories</h1>
+          <p className="text-sm text-text-muted">
+            <a href="/forums" className="hover:text-text-primary">Forums</a>
+            <span className="mx-1.5 text-text-muted">/</span>
+            Manage categories
+          </p>
+        </div>
       </div>
-
-      <h1 className="mb-6 text-2xl font-bold">Forum categories</h1>
 
       <CategoryManager
         categories={categories.map((c) => ({
@@ -37,6 +45,6 @@ export default async function AdminCategoriesPage() {
           description: c.description ?? null,
         }))}
       />
-    </main>
+    </div>
   );
 }

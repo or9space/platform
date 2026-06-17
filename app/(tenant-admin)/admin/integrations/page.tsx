@@ -4,6 +4,8 @@ import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { IntegrationsForm } from "./integrations-form";
+import { Plug } from "lucide-react";
+import { MfdPanel } from "@/components/ui/mfd";
 
 export default async function IntegrationsPage() {
   const ctx = await getFullTenantContext();
@@ -29,13 +31,23 @@ export default async function IntegrationsPage() {
   const isPaid = tenant.plan === "PAID";
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Integrations</h2>
-      <IntegrationsForm
-        tenantId={tenant.id}
-        initial={{ discordGuildId, calendarId, botTokenSet }}
-        canSetToken={isPaid}
-      />
+    <div className="space-y-6 animate-page-enter">
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <Plug className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">INTEGRATIONS</h1>
+          <p className="text-sm text-text-muted">Discord and Google Calendar connections</p>
+        </div>
+      </div>
+      <MfdPanel chassis="neutral" title={<span>[ EXTERNAL SERVICES ]</span>} bodyPadding="md">
+        <IntegrationsForm
+          tenantId={tenant.id}
+          initial={{ discordGuildId, calendarId, botTokenSet }}
+          canSetToken={isPaid}
+        />
+      </MfdPanel>
     </div>
   );
 }

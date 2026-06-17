@@ -16,12 +16,14 @@ export default async function SetPasswordPage({
 
   if (!peek.ok) {
     return (
-      <main className="mx-auto mt-16 w-full max-w-sm space-y-4">
-        <h1 className="text-2xl font-bold">Set your password</h1>
-        <p className="rounded border border-danger bg-surface p-3 text-sm text-fg-red-light">{peek.error}</p>
-        <p className="text-sm text-text-secondary">
-          <a href="/login" className="underline">Back to sign in</a>
-        </p>
+      <main className="tenant-root bg-tactical-grid flex items-center justify-center p-6">
+        <div className="w-full max-w-sm border border-border bg-surface p-6 mfd-cut-tl-br space-y-4">
+          <h1 className="text-stencil text-2xl text-text-primary">Set your password</h1>
+          <p className="text-fg-red-light text-sm">{peek.error}</p>
+          <p className="text-sm">
+            <a href="/login" className="text-text-secondary hover:text-text-primary underline text-sm">Back to sign in</a>
+          </p>
+        </div>
       </main>
     );
   }

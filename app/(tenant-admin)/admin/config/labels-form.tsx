@@ -24,14 +24,17 @@ export function LabelsForm({ tenantId, initial }: { tenantId: string; initial: R
     });
   }
   return (
-    <form action={submit} className="space-y-3">
+    <form action={submit} className="space-y-4">
       {msg && <p className="text-sm text-text-secondary">{msg}</p>}
-      {FIELDS.map((f) => (
-        <label key={f.name} className="block text-sm">{f.label}
-          <input name={f.name} defaultValue={initial[f.name] ?? ""} className="mt-1 w-full rounded border border-border-light bg-surface p-2" />
-        </label>
-      ))}
-      <button type="submit" disabled={pending} className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50">{pending ? "Saving…" : "Save labels"}</button>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {FIELDS.map((f) => (
+          <div key={f.name}>
+            <label className="mfd-label block mb-1">{f.label}</label>
+            <input name={f.name} defaultValue={initial[f.name] ?? ""} className="w-full rounded border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary" />
+          </div>
+        ))}
+      </div>
+      <button type="submit" disabled={pending} className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream hover:bg-primary-hover disabled:opacity-50">{pending ? "Saving…" : "Save labels"}</button>
     </form>
   );
 }

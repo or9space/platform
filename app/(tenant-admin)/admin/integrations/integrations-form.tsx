@@ -47,62 +47,56 @@ export function IntegrationsForm({ tenantId, initial, canSetToken }: Integration
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <section className="space-y-3">
-        <h3 className="text-base font-medium">Discord</h3>
-        <div className="space-y-2">
-          <label className="block text-sm text-text-secondary" htmlFor="discordGuildId">
-            Guild ID
-          </label>
+        <p className="mfd-label text-amber">DISCORD</p>
+        <div>
+          <label className="mfd-label block mb-1" htmlFor="discordGuildId">Guild ID</label>
           <input
             id="discordGuildId"
             type="text"
             value={discordGuildId}
             onChange={(e) => setDiscordGuildId(e.target.value)}
             disabled={isPending}
-            className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full rounded border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="e.g. 123456789012345678"
           />
         </div>
-        <div className="space-y-2">
-          <label className="block text-sm text-text-secondary" htmlFor="discordBotToken">
-            Bot Token
-          </label>
+        <div>
+          <label className="mfd-label block mb-1" htmlFor="discordBotToken">Bot Token</label>
           <input
             id="discordBotToken"
             type="password"
             value={discordBotToken}
             onChange={(e) => setDiscordBotToken(e.target.value)}
             disabled={isPending || !canSetToken}
-            className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-40"
+            className="w-full rounded border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-40"
             placeholder={initial.botTokenSet ? "•••• (set)" : ""}
           />
           {!canSetToken && (
-            <p className="text-xs text-text-muted">
+            <p className="mt-1 text-xs text-text-muted">
               Upgrade to a paid plan to set a bot token.
             </p>
           )}
         </div>
       </section>
 
-      <section className="space-y-3">
-        <h3 className="text-base font-medium">Google Calendar</h3>
-        <div className="space-y-2">
-          <label className="block text-sm text-text-secondary" htmlFor="calendarId">
-            Calendar ID
-          </label>
+      <section className="space-y-3 border-t border-border/40 pt-4">
+        <p className="mfd-label text-amber">GOOGLE CALENDAR</p>
+        <div>
+          <label className="mfd-label block mb-1" htmlFor="calendarId">Calendar ID</label>
           <input
             id="calendarId"
             type="text"
             value={calendarId}
             onChange={(e) => setCalendarId(e.target.value)}
             disabled={isPending}
-            className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full rounded border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
             placeholder="e.g. your-org@group.calendar.google.com"
           />
         </div>
       </section>
 
       {error && (
-        <p className="rounded border border-danger bg-surface px-3 py-2 text-sm text-fg-red-light">
+        <p className="rounded border border-fg-red-light/30 bg-surface px-3 py-2 text-sm text-fg-red-light">
           {error}
         </p>
       )}
@@ -110,7 +104,7 @@ export function IntegrationsForm({ tenantId, initial, canSetToken }: Integration
       <button
         type="submit"
         disabled={isPending}
-        className="rounded bg-primary px-4 py-2 text-sm font-medium text-fg-cream hover:bg-white disabled:opacity-50"
+        className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream hover:bg-primary-hover disabled:opacity-50"
       >
         {isPending ? "Saving…" : "Save integrations"}
       </button>

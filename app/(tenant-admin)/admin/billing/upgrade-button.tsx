@@ -29,7 +29,7 @@ export function UpgradeButton({ tenantId, priceId }: UpgradeButtonProps) {
       <button
         onClick={handleClick}
         disabled={isPending}
-        className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
+        className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream hover:bg-primary-hover disabled:opacity-60"
       >
         {isPending ? "Redirecting…" : "Upgrade to Paid"}
       </button>

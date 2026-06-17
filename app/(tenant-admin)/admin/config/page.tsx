@@ -9,6 +9,8 @@ import { BrandingForm } from "./branding-form";
 import { LabelsForm } from "./labels-form";
 import { FeatureToggles } from "./feature-toggles";
 import { CustomFieldsEditor } from "./custom-fields-editor";
+import { Settings } from "lucide-react";
+import { MfdPanel } from "@/components/ui/mfd";
 
 export default async function ConfigPage() {
   const ctx = await getFullTenantContext();
@@ -22,31 +24,40 @@ export default async function ConfigPage() {
   if (!m || !hasTier(m.tier, "COMMAND")) return null;
 
   return (
-    <div className="space-y-10">
-      <section>
-        <h2 className="mb-3 text-xl font-semibold">Branding</h2>
+    <div className="space-y-6 animate-page-enter">
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <Settings className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">CONFIGURATION</h1>
+          <p className="text-sm text-text-muted">Org branding, labels, features, and custom fields</p>
+        </div>
+      </div>
+
+      <MfdPanel chassis="neutral" title={<span>[ BRANDING ]</span>} bodyPadding="md">
         <BrandingForm tenantId={tenant.id} initial={{ name: config.branding.name, tagline: config.branding.tagline, preset: config.branding.preset }} />
-      </section>
-      <section>
-        <h2 className="mb-3 text-xl font-semibold">Labels</h2>
+      </MfdPanel>
+
+      <MfdPanel chassis="neutral" title={<span>[ LABELS ]</span>} bodyPadding="md">
         <LabelsForm tenantId={tenant.id} initial={config.labels} />
-      </section>
-      <section>
-        <h2 className="mb-3 text-xl font-semibold">Features</h2>
+      </MfdPanel>
+
+      <MfdPanel chassis="neutral" title={<span>[ FEATURES ]</span>} bodyPadding="md">
         <FeatureToggles
           tenantId={tenant.id}
           plan={tenant.plan}
           flags={FEATURE_FLAGS.map((f) => ({ key: f.key, label: f.label, enabled: features[f.key], tenantEditable: f.tenantEditable, paidOnly: f.paidOnly }))}
         />
-      </section>
-      <section>
-        <h2 className="mb-3 text-xl font-semibold">Custom fields</h2>
+      </MfdPanel>
+
+      <MfdPanel chassis="neutral" title={<span>[ CUSTOM FIELDS ]</span>} bodyPadding="md">
         <CustomFieldsEditor
           tenantId={tenant.id}
           eligibleTypes={[...CUSTOM_FIELD_ELIGIBLE_TYPES]}
           defs={(config.customFields ?? {}) as Record<string, Array<{ key: string; label: string; kind: string }>>}
         />
-      </section>
+      </MfdPanel>
     </div>
   );
 }

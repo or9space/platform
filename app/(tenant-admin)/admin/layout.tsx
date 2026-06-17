@@ -12,25 +12,30 @@ export default async function TenantAdminLayout({ children }: { children: ReactN
   const m = await getViewerMembership(tenant.id, accountId);
   if (!m || !hasTier(m.tier, "COMMAND")) {
     return (
-      <main className="mx-auto max-w-md p-8 text-center">
-        <h1 className="text-2xl font-bold">{tenant.name} — admin</h1>
-        <p className="mt-3 text-text-secondary">You need COMMAND rank in this org. <a className="underline" href="/login">Sign in</a>.</p>
-      </main>
+      <div className="p-3 sm:p-6 animate-page-enter">
+        <div className="mx-auto max-w-md text-center py-16">
+          <h1 className="text-2xl font-bold text-text-primary">{tenant.name} — COMMAND ACCESS REQUIRED</h1>
+          <p className="mt-3 text-text-secondary">You need COMMAND rank in this org. <a className="underline hover:text-text-primary" href="/login">Sign in</a>.</p>
+        </div>
+      </div>
     );
   }
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-border p-4">
-        <nav className="flex gap-6 text-sm">
-          <a href="/admin" className="font-bold">{tenant.name} admin</a>
-          <a href="/admin/config" className="text-text-secondary hover:text-text-primary">Configuration</a>
-          <a href="/admin/directory" className="text-text-secondary hover:text-text-primary">Directory</a>
-          <a href="/admin/integrations" className="text-text-secondary hover:text-text-primary">Integrations</a>
-          <a href="/admin/billing" className="text-text-secondary hover:text-text-primary">Billing</a>
-          <a href="/" className="text-text-secondary hover:text-text-primary">View site</a>
+    <div className="min-h-screen bg-surface">
+      <header className="border-b border-border bg-surface-elevated px-4 py-3">
+        <nav className="flex flex-wrap gap-1 text-xs">
+          <a href="/admin" className="mfd-label px-2 py-1 font-bold text-primary hover:text-text-primary">{tenant.name} <span className="text-text-muted">COMMAND</span></a>
+          <span className="mfd-label px-1 text-border">|</span>
+          <a href="/admin/config" className="mfd-label px-2 py-1 text-text-secondary hover:text-text-primary">[ CONFIG ]</a>
+          <a href="/admin/directory" className="mfd-label px-2 py-1 text-text-secondary hover:text-text-primary">[ DIRECTORY ]</a>
+          <a href="/admin/integrations" className="mfd-label px-2 py-1 text-text-secondary hover:text-text-primary">[ INTEGRATIONS ]</a>
+          <a href="/admin/members" className="mfd-label px-2 py-1 text-text-secondary hover:text-text-primary">[ MEMBERS ]</a>
+          <a href="/admin/billing" className="mfd-label px-2 py-1 text-text-secondary hover:text-text-primary">[ BILLING ]</a>
+          <span className="mfd-label px-1 text-border">|</span>
+          <a href="/" className="mfd-label px-2 py-1 text-text-muted hover:text-text-secondary">← SITE</a>
         </nav>
       </header>
-      <main className="mx-auto max-w-2xl p-6">{children}</main>
+      <div className="p-3 sm:p-6">{children}</div>
     </div>
   );
 }

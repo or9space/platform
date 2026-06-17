@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createCategoryAction, deleteCategoryAction } from "@/lib/actions/forums";
+import { MfdPanel } from "@/components/ui/mfd";
 
 interface CategoryItem {
   id: string;
@@ -36,11 +37,15 @@ export function CategoryManager({ categories }: { categories: CategoryItem[] }) 
   }
 
   return (
-    <div className="space-y-8">
-      <section>
-        <h2 className="mb-3 font-semibold">Existing categories</h2>
+    <div className="space-y-6">
+      <MfdPanel
+        chassis="neutral"
+        title="[ CATEGORIES ]"
+        titleAside={<span className="mfd-readout">{categories.length} defined</span>}
+        bodyPadding="sm"
+      >
         {categories.length === 0 ? (
-          <p className="text-sm text-text-secondary">No categories yet.</p>
+          <p className="text-sm text-text-secondary py-1">No categories yet.</p>
         ) : (
           <ul className="space-y-2">
             {categories.map((cat) => (
@@ -48,25 +53,24 @@ export function CategoryManager({ categories }: { categories: CategoryItem[] }) 
             ))}
           </ul>
         )}
-      </section>
+      </MfdPanel>
 
-      <section>
-        <h2 className="mb-3 font-semibold">Create category</h2>
+      <MfdPanel chassis="primary" title="[ CREATE CATEGORY ]" bodyPadding="md">
         <form action={handleCreate} className="space-y-3">
           {createError && <p className="text-sm text-fg-red-light">{createError}</p>}
           <label className="block text-sm">
-            Name
+            <span className="mfd-label">Name</span>
             <input
               name="name"
               required
               maxLength={100}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full rounded border border-border-light bg-surface p-2"
+              className="mt-1 w-full border border-border-light bg-surface-elevated px-3 py-2 text-text-primary"
             />
           </label>
           <label className="block text-sm">
-            Slug (URL-safe, e.g. general-chat)
+            <span className="mfd-label">Slug (URL-safe, e.g. general-chat)</span>
             <input
               name="slug"
               required
@@ -74,28 +78,28 @@ export function CategoryManager({ categories }: { categories: CategoryItem[] }) 
               pattern="[a-z0-9-]+"
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
-              className="mt-1 w-full rounded border border-border-light bg-surface p-2"
+              className="mt-1 w-full border border-border-light bg-surface-elevated px-3 py-2 text-text-primary"
             />
           </label>
           <label className="block text-sm">
-            Description (optional)
+            <span className="mfd-label">Description (optional)</span>
             <input
               name="description"
               maxLength={300}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="mt-1 w-full rounded border border-border-light bg-surface p-2"
+              className="mt-1 w-full border border-border-light bg-surface-elevated px-3 py-2 text-text-primary"
             />
           </label>
           <button
             type="submit"
             disabled={createPending}
-            className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
+            className="bg-primary px-4 py-2 text-sm font-semibold text-fg-cream hover:bg-primary-hover disabled:opacity-50"
           >
             {createPending ? "Creating…" : "Create category"}
           </button>
         </form>
-      </section>
+      </MfdPanel>
     </div>
   );
 }
@@ -121,10 +125,10 @@ function CategoryRow({
   }
 
   return (
-    <li className="flex items-center justify-between rounded border border-border p-3">
+    <li className="flex items-center justify-between border border-border bg-surface-elevated px-3 py-2">
       <div>
-        <p className="font-medium">{category.name}</p>
-        <p className="text-xs text-text-muted">/forums/{category.slug}</p>
+        <p className="font-medium text-text-primary">{category.name}</p>
+        <p className="mfd-label">/forums/{category.slug}</p>
         {category.description && (
           <p className="text-xs text-text-secondary">{category.description}</p>
         )}
@@ -134,7 +138,7 @@ function CategoryRow({
         type="button"
         disabled={pending}
         onClick={handleDelete}
-        className="rounded border border-border-light px-3 py-1 text-sm disabled:opacity-50 hover:border-primary"
+        className="border border-border-light px-3 py-1 text-sm text-text-secondary disabled:opacity-50 hover:border-primary hover:text-text-primary"
       >
         {pending ? "Deleting…" : "Delete"}
       </button>

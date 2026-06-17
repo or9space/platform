@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { CalendarDays } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -10,6 +11,7 @@ import {
   listLootMembersWithBalances,
 } from "@/lib/queries/loot";
 import { ATTENDANCE_STATUSES } from "@/lib/loot";
+import { MfdPanel } from "@/components/ui/mfd";
 import { CreateSessionForm } from "./create-session-form";
 import { AttendanceCell } from "./attendance-cell";
 
@@ -49,83 +51,101 @@ export default async function LootSessionsPage({
   }
 
   return (
-    <main className="mx-auto max-w-4xl p-6">
-      <div className="mb-4 text-sm">
-        <a href="/loot" className="text-text-secondary hover:text-text-primary">
-          Leaderboard
-        </a>
-        <span className="mx-2 text-text-muted">/</span>
-        <span className="text-text-secondary">Sessions</span>
-      </div>
-
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Sessions</h1>
-      </div>
-
-      <div className="mb-6">
-        <CreateSessionForm />
-      </div>
-
-      {sessions.length === 0 ? (
-        <p className="text-text-secondary">No sessions yet.</p>
-      ) : (
-        <div className="mb-8 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-text-muted">
-                <th className="pb-2 pr-4 font-normal">Date</th>
-                <th className="pb-2 pr-4 font-normal">Label</th>
-                <th className="pb-2 font-normal">Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sessions.map((s) => (
-                <tr
-                  key={s.id}
-                  className={`border-b border-border hover:bg-surface-hover/40 ${
-                    selectedSessionId === s.id ? "bg-surface/60" : ""
-                  }`}
-                >
-                  <td className="py-2 pr-4 text-text-secondary">
-                    {s.sessionDate.toISOString().slice(0, 10)}
-                  </td>
-                  <td className="py-2 pr-4">
-                    <a
-                      href={`/loot/sessions?session=${s.id}`}
-                      className="hover:text-text-secondary text-text-primary"
-                    >
-                      {s.label}
-                    </a>
-                  </td>
-                  <td className="py-2 text-text-secondary max-w-xs truncate">
-                    {s.notes ?? <span className="text-text-muted">—</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {grid && (
-        <section>
-          <h2 className="mb-1 font-semibold text-lg">{grid.label}</h2>
-          <p className="mb-4 text-sm text-text-muted">
-            {grid.sessionDate.toISOString().slice(0, 10)}
-            {grid.notes && (
-              <span className="ml-3 text-text-secondary">{grid.notes}</span>
-            )}
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <CalendarDays className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Sessions</h1>
+          <p className="text-sm text-text-muted">
+            <a href="/loot" className="hover:text-text-primary">Leaderboard</a>
+            <span className="mx-1.5 text-text-muted">/</span>
+            Loot sessions
           </p>
+        </div>
+      </div>
 
+      {/* Create session form */}
+      <MfdPanel chassis="primary" title="[ NEW SESSION ]" bodyPadding="md">
+        <CreateSessionForm />
+      </MfdPanel>
+
+      {/* Sessions list */}
+      <MfdPanel
+        chassis="neutral"
+        title="[ SESSIONS ]"
+        titleAside={<span className="mfd-readout">{sessions.length} total</span>}
+        bodyPadding="none"
+      >
+        {sessions.length === 0 ? (
+          <p className="px-4 py-3 text-text-secondary text-sm">No sessions yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-left">
+                  <th className="px-4 pb-2 pt-3 font-normal mfd-label">Date</th>
+                  <th className="pb-2 pt-3 pr-4 font-normal mfd-label">Label</th>
+                  <th className="pb-2 pt-3 pr-4 font-normal mfd-label">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sessions.map((s) => (
+                  <tr
+                    key={s.id}
+                    className={`border-b border-border hover:bg-surface-hover/40 ${
+                      selectedSessionId === s.id ? "bg-primary/10" : ""
+                    }`}
+                  >
+                    <td className="py-2 pl-4 pr-4 text-text-secondary">
+                      <span className="mfd-readout">{s.sessionDate.toISOString().slice(0, 10)}</span>
+                    </td>
+                    <td className="py-2 pr-4">
+                      <a
+                        href={`/loot/sessions?session=${s.id}`}
+                        className={`font-medium hover:text-primary ${selectedSessionId === s.id ? "text-primary" : "text-text-primary"}`}
+                      >
+                        {s.label}
+                      </a>
+                    </td>
+                    <td className="py-2 pr-4 text-text-secondary max-w-xs truncate">
+                      {s.notes ?? <span className="text-text-muted">—</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </MfdPanel>
+
+      {/* Attendance grid for selected session */}
+      {grid && (
+        <MfdPanel
+          chassis="amber"
+          title="[ ATTENDANCE ]"
+          titleAside={
+            <span className="mfd-readout">
+              {grid.sessionDate.toISOString().slice(0, 10)}
+              {grid.notes && <span className="ml-2 text-text-secondary">{grid.notes}</span>}
+            </span>
+          }
+          bodyPadding="none"
+        >
+          <div className="px-4 py-2">
+            <p className="mfd-label mb-2">{grid.label}</p>
+          </div>
           {members.length === 0 ? (
-            <p className="text-text-muted text-sm">No loot participants.</p>
+            <p className="px-4 py-3 text-text-muted text-sm">No loot participants.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border text-left text-text-muted">
-                    <th className="pb-2 pr-4 font-normal">Member</th>
-                    <th className="pb-2 font-normal">Attendance</th>
+                  <tr className="border-b border-border text-left">
+                    <th className="px-4 pb-2 pt-1 font-normal mfd-label">Member</th>
+                    <th className="pb-2 pt-1 pr-4 font-normal mfd-label">Attendance</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -141,10 +161,10 @@ export default async function LootSessionsPage({
                         key={m.id}
                         className="border-b border-border hover:bg-surface-hover/40"
                       >
-                        <td className="py-2 pr-4 text-text-primary">
+                        <td className="py-2 pl-4 pr-4 text-text-primary font-medium">
                           {m.displayName}
                         </td>
-                        <td className="py-2">
+                        <td className="py-2 pr-4">
                           <AttendanceCell
                             sessionId={grid.id}
                             memberId={m.id}
@@ -158,8 +178,8 @@ export default async function LootSessionsPage({
               </table>
             </div>
           )}
-        </section>
+        </MfdPanel>
       )}
-    </main>
+    </div>
   );
 }

@@ -37,23 +37,19 @@ export function DirectoryForm({ tenantId, initial }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <label className="flex items-center gap-3">
+      <label className="flex items-center gap-3 cursor-pointer">
         <input
           type="checkbox"
           checked={isListed}
           onChange={(e) => setIsListed(e.target.checked)}
-          className="h-4 w-4 rounded border-border-light bg-surface-elevated accent-red-500"
+          className="h-4 w-4 rounded border-border bg-surface-elevated accent-primary"
         />
-        <span className="text-sm font-medium text-text-primary">
-          List this org publicly
-        </span>
+        <span className="mfd-label text-text-primary">LIST THIS ORG PUBLICLY</span>
       </label>
 
       <div>
-        <label className="block text-sm font-medium text-text-secondary" htmlFor="tagline">
-          Tagline
-        </label>
-        <p className="mb-1 text-xs text-text-muted">
+        <label className="mfd-label block mb-1" htmlFor="tagline">Tagline</label>
+        <p className="mb-2 text-xs text-text-muted">
           A short description shown on the directory (max 200 characters).
         </p>
         <input
@@ -63,7 +59,7 @@ export function DirectoryForm({ tenantId, initial }: Props) {
           onChange={(e) => setTagline(e.target.value)}
           maxLength={200}
           placeholder="We are a competitive esports org..."
-          className="mt-1 w-full rounded border border-border-light bg-surface px-3 py-2 text-sm text-white placeholder-text-muted focus:border-border-light focus:outline-none"
+          className="w-full rounded border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
@@ -72,12 +68,12 @@ export function DirectoryForm({ tenantId, initial }: Props) {
       </p>
 
       {error && <p className="text-sm text-fg-red-light">{error}</p>}
-      {saved && <p className="text-sm text-green-400">Saved.</p>}
+      {saved && <p className="text-sm text-success">Saved.</p>}
 
       <button
         type="submit"
         disabled={isPending}
-        className="rounded bg-danger px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-danger disabled:opacity-50"
+        className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream hover:bg-primary-hover disabled:opacity-50"
       >
         {isPending ? "Saving…" : "Save"}
       </button>
