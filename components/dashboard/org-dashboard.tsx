@@ -3,12 +3,14 @@ import {
   Newspaper, TrendingUp, ArrowRight,
 } from "lucide-react";
 import { getDashboardData } from "@/lib/queries/dashboard";
+import { getActivityFeed } from "@/lib/queries/activity";
 import { type FeatureMap } from "@/lib/features";
 import { makeTenantContext } from "@/lib/tenant";
 import type { ViewerMembership } from "@/lib/authz";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { EventTypeBadge } from "@/components/events/event-type-badge";
 import { CategoryBadge } from "@/components/news/category-badge";
+import { ActivityItem } from "@/components/activity/activity-item";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTime, formatDate } from "@/lib/format";
 import { MfdPanel } from "@/components/ui/mfd";
@@ -35,6 +37,7 @@ export async function OrgDashboard({
   const data = await getDashboardData(ctx, {
     features, viewerTier: viewer.tier, viewerMembershipId: viewer.id,
   });
+  const activity = await getActivityFeed(ctx, features, 8);
 
   type Stat = { label: string; value: string; icon: typeof Users; color: string };
   const stats: Stat[] = [
@@ -130,29 +133,20 @@ export async function OrgDashboard({
               </>
             }
             titleAside={
-              <a href="/forums" className="flex items-center gap-1 mfd-label hover:text-primary">
+              <a href="/activity" className="flex items-center gap-1 mfd-label hover:text-primary">
                 View All
                 <ArrowRight className="h-3 w-3" />
               </a>
             }
           >
-            {!data.forums || data.forums.recent.length === 0 ? (
+            {activity.length === 0 ? (
               <p className="px-1 py-2 text-sm text-text-muted">No recent activity yet.</p>
             ) : (
-              <div className="space-y-0.5">
-                {data.forums.recent.map((t) => (
-                  <a
-                    key={t.id}
-                    href={`/forums/${t.categorySlug}/${t.id}`}
-                    className="block border-b border-border/40 px-1 py-2 transition-colors hover:bg-surface-hover"
-                  >
-                    <p className="truncate text-sm font-medium text-text-primary">{t.title}</p>
-                    <p className="text-xs text-text-muted">
-                      {t.categoryName} · {t.authorName} · {t.postCount} posts · {timeAgo(t.lastPostAt)}
-                    </p>
-                  </a>
+              <ul className="space-y-0">
+                {activity.map((e, i) => (
+                  <ActivityItem key={`${e.href}-${i}`} entry={e} timeAgo={(d) => timeAgo(d)} />
                 ))}
-              </div>
+              </ul>
             )}
           </MfdPanel>
         </div>

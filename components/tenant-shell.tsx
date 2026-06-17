@@ -4,6 +4,8 @@ import { isFeatureEnabled } from "@/lib/features";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
+import { makeTenantContext } from "@/lib/tenant";
+import { countUnreadMessages } from "@/lib/queries/messages";
 import { TenantShellChrome, type NavSection, type NavEntry } from "./tenant-shell-chrome";
 
 /**
@@ -70,6 +72,12 @@ export async function TenantShell({ children }: { children: ReactNode }) {
   const userName = viewer?.displayName ?? viewer?.username ?? "Member";
   const profileHref = viewer?.username ? `/members/${viewer.username}` : "/members";
 
+  // Notifications bell → unread DM count (when messages enabled + a member).
+  const unread = viewer && isFeatureEnabled(f, "messages")
+    ? await countUnreadMessages(makeTenantContext(ctx.tenant.id), viewer.id)
+    : 0;
+  const messagesEnabled = isFeatureEnabled(f, "messages");
+
   return (
     <TenantShellChrome
       brandName={brandName}
@@ -78,6 +86,8 @@ export async function TenantShell({ children }: { children: ReactNode }) {
       sections={sections}
       logoUrl={ctx.config.branding.logoUrl}
       palette={ctx.config.branding.palette}
+      unread={unread}
+      messagesEnabled={messagesEnabled}
     >
       {children}
     </TenantShellChrome>
