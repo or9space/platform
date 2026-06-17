@@ -1,11 +1,13 @@
 import { getCommodities, getTradeRoutes } from "@/lib/uex/queries";
 import { UexNotice, aUEC, safeUex } from "@/components/sc-tools/ui";
 import { Picker } from "../prices/page";
+import { TrendingUp } from "lucide-react";
+import { MfdPanel } from "@/components/ui/mfd";
 
 export default async function TradePage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const { id } = await searchParams;
   const commodities = await safeUex(getCommodities);
-  if (!commodities.ok) return <Main><UexNotice>Couldn&apos;t reach UEX right now.</UexNotice></Main>;
+  if (!commodities.ok) return <div className="p-3 sm:p-6"><UexNotice>Couldn&apos;t reach UEX right now.</UexNotice></div>;
 
   const list = commodities.data.filter((c) => c.is_sellable).sort((a, b) => a.name.localeCompare(b.name));
   const selectedId = id ? Number(id) : list[0]?.id;
@@ -15,7 +17,16 @@ export default async function TradePage({ searchParams }: { searchParams: Promis
   const rows = routes.ok ? [...routes.data].sort((a, b) => b.profit - a.profit).slice(0, 50) : [];
 
   return (
-    <Main>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <TrendingUp className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">TRADE ROUTES</h1>
+          <p className="text-sm text-text-muted">Most profitable hauls right now, ranked by profit and ROI.</p>
+        </div>
+      </div>
       <Picker list={list} selectedId={selectedId} />
       {selected && <h2 className="text-lg font-semibold">Best routes — {selected.name}</h2>}
       {!routes.ok ? (
@@ -23,27 +34,31 @@ export default async function TradePage({ searchParams }: { searchParams: Promis
       ) : rows.length === 0 ? (
         <p className="text-sm text-text-muted">No profitable routes reported.</p>
       ) : (
-        <table className="w-full text-sm">
-          <thead className="text-left text-xs text-text-muted">
-            <tr><th className="py-1">Buy at</th><th>Sell at</th><th className="text-right">Profit/SCU</th><th className="text-right">ROI</th><th className="text-right">Jump</th></tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.id} className="border-t border-border">
-                <td className="py-1 pr-2">{r.origin_terminal_code} <span className="text-text-muted">@ {aUEC(r.price_origin)}</span></td>
-                <td className="pr-2">{r.destination_terminal_code} <span className="text-text-muted">@ {aUEC(r.price_destination)}</span></td>
-                <td className="text-right font-mono text-success">{aUEC(r.profit)}</td>
-                <td className="text-right font-mono">{r.price_roi ? `${r.price_roi.toFixed(1)}%` : "—"}</td>
-                <td className="text-right text-text-secondary">{r.distance}</td>
+        <MfdPanel title={<span>[ TRADE ROUTES ]</span>} chassis="amber" bodyPadding="none">
+          <table className="w-full text-sm">
+            <thead className="text-left">
+              <tr>
+                <th className="mfd-label py-2 pl-4 pr-2">Buy at</th>
+                <th className="mfd-label py-2 pr-2">Sell at</th>
+                <th className="mfd-label py-2 pr-4 text-right">Profit/SCU</th>
+                <th className="mfd-label py-2 pr-4 text-right">ROI</th>
+                <th className="mfd-label py-2 pr-4 text-right">Jump</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id} className="border-t border-border">
+                  <td className="py-1.5 pl-4 pr-2">{r.origin_terminal_code} <span className="text-text-muted">@ {aUEC(r.price_origin)}</span></td>
+                  <td className="pr-2">{r.destination_terminal_code} <span className="text-text-muted">@ {aUEC(r.price_destination)}</span></td>
+                  <td className="pr-4 text-right font-mono text-success mfd-readout">{aUEC(r.profit)}</td>
+                  <td className="pr-4 text-right font-mono">{r.price_roi ? `${r.price_roi.toFixed(1)}%` : "—"}</td>
+                  <td className="pr-4 text-right text-text-secondary">{r.distance}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </MfdPanel>
       )}
-    </Main>
+    </div>
   );
-}
-
-function Main({ children }: { children: React.ReactNode }) {
-  return <main className="mx-auto max-w-4xl space-y-4 p-6"><h1 className="text-2xl font-bold">Trade Routes</h1>{children}</main>;
 }
