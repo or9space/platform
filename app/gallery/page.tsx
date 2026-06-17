@@ -40,9 +40,15 @@ export default async function GalleryPage() {
             {items.map((g) => (
               <figure key={g.id} className="relative overflow-hidden border border-border bg-surface-elevated">
                 {(isOfficer || g.authorId === viewer.id) && <DeleteGalleryButton id={g.id} />}
-                <img src={g.imageUrl} alt={g.title ?? g.caption ?? "Gallery image"} className="aspect-video w-full object-cover" />
+                <a href={`/gallery/${g.id}`} className="block">
+                  <img src={g.imageUrl} alt={g.title ?? g.caption ?? "Gallery image"} className="aspect-video w-full object-cover hover:opacity-90 transition-opacity" />
+                </a>
                 <figcaption className="p-2">
-                  {g.title && <p className="text-sm font-medium text-text-primary">{g.title}</p>}
+                  {g.title && (
+                    <a href={`/gallery/${g.id}`} className="hover:text-primary transition-colors">
+                      <p className="text-sm font-medium text-text-primary">{g.title}</p>
+                    </a>
+                  )}
                   {g.caption && <p className="text-xs text-text-secondary">{g.caption}</p>}
                   <p className="mt-1 mfd-label">{g.authorName}</p>
                 </figcaption>

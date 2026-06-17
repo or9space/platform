@@ -102,6 +102,22 @@ export async function getEvent(ctx: TenantContext, eventId: string): Promise<Eve
   };
 }
 
+/** All events within a calendar month window (first day 00:00 to last day 23:59:59). */
+export async function listEventsByMonth(
+  ctx: TenantContext,
+  year: number,
+  month: number, // 0-indexed
+): Promise<EventRow[]> {
+  const start = new Date(year, month, 1, 0, 0, 0, 0);
+  const end = new Date(year, month + 1, 0, 23, 59, 59, 999);
+  const rows = await db(ctx).event.findMany({
+    where: { startsAt: { gte: start, lte: end } },
+    orderBy: { startsAt: "asc" },
+    select: ROW_SELECT,
+  });
+  return rows.map(toRow);
+}
+
 export async function getMyRsvp(
   ctx: TenantContext, eventId: string, membershipId: string,
 ): Promise<string | null> {

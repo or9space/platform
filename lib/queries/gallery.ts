@@ -11,6 +11,35 @@ export interface GalleryRow {
   authorUsername: string;
 }
 
+export interface GalleryItemDetail extends GalleryRow {
+  createdAt: Date;
+}
+
+export async function getGalleryItem(
+  ctx: TenantContext,
+  id: string,
+): Promise<GalleryItemDetail | null> {
+  const g = await db(ctx).galleryItem.findFirst({
+    where: { id, tenantId: ctx.tenantId },
+    select: {
+      id: true, title: true, imageUrl: true, caption: true,
+      createdById: true, createdAt: true,
+      createdBy: { select: { displayName: true, username: true } },
+    },
+  });
+  if (!g) return null;
+  return {
+    id: g.id,
+    title: g.title,
+    imageUrl: g.imageUrl,
+    caption: g.caption,
+    authorId: g.createdById,
+    authorName: g.createdBy?.displayName ?? g.createdBy?.username ?? "Unknown",
+    authorUsername: g.createdBy?.username ?? "",
+    createdAt: g.createdAt,
+  };
+}
+
 export async function listGallery(ctx: TenantContext): Promise<GalleryRow[]> {
   const rows = await db(ctx).galleryItem.findMany({
     orderBy: { createdAt: "desc" },
