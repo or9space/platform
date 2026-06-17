@@ -11,7 +11,7 @@
   --alert:      oklch(58% 0.190 25);
 }
 
-html, body { height: 100%; }
+html, body { min-height: 100%; }
 body {
   background: var(--ink);
   color: var(--cream);
