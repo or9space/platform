@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { FileText } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -27,16 +28,7 @@ export default async function ContractsPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <FileText className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">Contracts</h1>
-          <p className="text-sm text-text-muted">Available missions and posted jobs</p>
-        </div>
-      </div>
+      <PageHeader icon={FileText} title="Contracts" subtitle="Available missions and posted jobs" />
 
       {/* Create form */}
       {canManage && (

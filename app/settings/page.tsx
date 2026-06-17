@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { makeTenantContext } from "@/lib/tenant";
 import { ProfileForm } from "@/components/settings/profile-form";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { Settings } from "lucide-react";
 
 export default async function SettingsPage() {
@@ -21,21 +22,12 @@ export default async function SettingsPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Settings className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">SETTINGS</h1>
-          <p className="text-sm text-text-muted">
-            Your profile in {ctx.config.branding.name}
-            {me?.username && (
-              <span className="ml-1 mfd-readout text-xs">@{me.username}</span>
-            )}
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        icon={Settings}
+        title="Settings"
+        subtitle={`Your profile in ${ctx.config.branding.name}`}
+        readout={me?.username ? <>@{me.username}</> : undefined}
+      />
 
       {/* Profile panel */}
       <MfdPanel chassis="neutral" title={<span>[ PROFILE ]</span>} bodyPadding="md">

@@ -9,6 +9,7 @@ import { UpsertSectionForm } from "./upsert-section-form";
 import { DeleteSectionButton } from "./delete-section-button";
 import { StatusControls } from "./status-controls";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { BookMarked, Eye } from "lucide-react";
 
 export default async function HandbookEditPage({
@@ -34,21 +35,12 @@ export default async function HandbookEditPage({
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <BookMarked className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">{hb.title}</h1>
-            <p className="text-sm text-text-muted">
-              EDIT HANDBOOK
-            </p>
-          </div>
-        </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <span className="mfd-label text-xs text-text-muted">v{hb.version} — {hb.status}</span>
+      <PageHeader
+        icon={BookMarked}
+        title={hb.title}
+        subtitle="EDIT HANDBOOK"
+        readout={<>v{hb.version} — {hb.status}</>}
+        actions={
           <a
             href={`/handbook/${slug}`}
             className="flex items-center gap-1.5 rounded border border-border-light px-3 py-1.5 text-sm text-text-secondary hover:border-primary hover:text-text-primary transition-colors"
@@ -56,8 +48,8 @@ export default async function HandbookEditPage({
             <Eye className="h-3.5 w-3.5" />
             View
           </a>
-        </div>
-      </div>
+        }
+      />
 
       {/* Status controls */}
       {isCommand && (

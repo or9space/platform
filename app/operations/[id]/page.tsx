@@ -11,6 +11,7 @@ import { StatusBadge } from "@/components/operations/status-badge";
 import { SignupControl } from "@/components/operations/signup-control";
 import { StatusControl } from "@/components/operations/status-control";
 import { MfdPanel, MfdReadout } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function OperationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await getFullTenantContext();
@@ -35,19 +36,12 @@ export default async function OperationDetailPage({ params }: { params: Promise<
         ← Operations
       </a>
 
-      {/* Page header — icon + title + StatusBadge, matching FG detail header */}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Swords className="h-5 w-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-bold text-text-primary">{op.title}</h1>
-            <StatusBadge status={op.status} />
-          </div>
-          <p className="text-sm text-text-muted">Operation briefing and crew roster</p>
-        </div>
-      </div>
+      <PageHeader
+        icon={Swords}
+        title={op.title}
+        subtitle="Operation briefing and crew roster"
+        actions={<StatusBadge status={op.status} />}
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main column (2/3) — mirrors FG's lg:col-span-2 */}

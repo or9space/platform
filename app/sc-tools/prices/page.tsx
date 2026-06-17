@@ -2,6 +2,7 @@ import { getCommodities, getCommodityPrices } from "@/lib/uex/queries";
 import { UexNotice, aUEC, safeUex } from "@/components/sc-tools/ui";
 import { DollarSign } from "lucide-react";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function PricesPage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const { id } = await searchParams;
@@ -17,15 +18,7 @@ export default async function PricesPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <DollarSign className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">COMMODITY PRICES</h1>
-          <p className="text-sm text-text-muted">Live buy/sell prices across every terminal.</p>
-        </div>
-      </div>
+      <PageHeader icon={DollarSign} title="Commodity Prices" subtitle="Live buy/sell prices across every terminal." />
       <Picker list={list} selectedId={selectedId} />
       {selected && <h2 className="text-lg font-semibold">{selected.name}</h2>}
       {!prices.ok ? (

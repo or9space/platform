@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { BookOpen, Link2, FileText } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -19,18 +20,7 @@ export default async function ResourcesPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <BookOpen className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">Resources</h1>
-            <p className="text-sm text-text-muted">Guides, builds, and reference links.</p>
-          </div>
-        </div>
-      </div>
+      <PageHeader icon={BookOpen} title="Resources" subtitle="Guides, builds, and reference links." />
 
       {canManage && <ResourceCreateForm />}
 

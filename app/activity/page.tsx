@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Activity } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -27,16 +28,7 @@ export default async function ActivityPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Activity className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">Activity</h1>
-          <p className="text-sm text-text-muted">Recent org activity tape</p>
-        </div>
-      </div>
+      <PageHeader icon={Activity} title="Activity" subtitle="Recent org activity tape" />
 
       {/* Feed chassis */}
       <MfdPanel

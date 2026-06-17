@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Coins, Grid3x3 } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -45,36 +46,31 @@ export default async function LootPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header — mirrors FG layout exactly */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Coins className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">Loot Points</h1>
-            <p className="text-sm text-text-muted">Earn at events, spend at the Sunday loot pile.</p>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 sm:pt-1">
-          <a
-            href="/loot/sessions"
-            className="inline-flex items-center gap-1.5 border border-border px-3 py-1.5 text-xs text-text-secondary hover:bg-surface-hover hover:text-text-primary"
-          >
-            <Grid3x3 className="h-3.5 w-3.5" />
-            Sessions
-          </a>
-          {isOfficer && (
+      <PageHeader
+        icon={Coins}
+        title="Loot Points"
+        subtitle="Earn at events, spend at the Sunday loot pile."
+        actions={
+          <>
             <a
-              href="/loot/sessions/new"
-              className="inline-flex items-center gap-1.5 bg-primary px-3 py-1.5 text-xs text-fg-cream hover:bg-primary/80"
+              href="/loot/sessions"
+              className="inline-flex items-center gap-1.5 border border-border px-3 py-1.5 text-xs text-text-secondary hover:bg-surface-hover hover:text-text-primary"
             >
-              <Coins className="h-3.5 w-3.5" />
-              Run loot session
+              <Grid3x3 className="h-3.5 w-3.5" />
+              Sessions
             </a>
-          )}
-        </div>
-      </div>
+            {isOfficer && (
+              <a
+                href="/loot/sessions/new"
+                className="inline-flex items-center gap-1.5 bg-primary px-3 py-1.5 text-xs text-fg-cream hover:bg-primary/80"
+              >
+                <Coins className="h-3.5 w-3.5" />
+                Run loot session
+              </a>
+            )}
+          </>
+        }
+      />
 
       {/* Standing band — hero section for viewer */}
       {me ? (

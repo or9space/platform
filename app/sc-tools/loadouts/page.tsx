@@ -2,6 +2,7 @@ import { getVehicles, getVehiclePrices } from "@/lib/uex/queries";
 import { UexNotice, aUEC, safeUex } from "@/components/sc-tools/ui";
 import { Wrench } from "lucide-react";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function LoadoutsPage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const { id } = await searchParams;
@@ -14,15 +15,7 @@ export default async function LoadoutsPage({ searchParams }: { searchParams: Pro
   if (!ship) {
     return (
       <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Wrench className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">SHIP PRICES</h1>
-            <p className="text-sm text-text-muted">Where to buy or rent a ship, and for how much.</p>
-          </div>
-        </div>
+        <PageHeader icon={Wrench} title="Ship Prices" subtitle="Where to buy or rent a ship, and for how much." />
         <p className="text-sm text-text-secondary">
           Pick a ship from the <a href="/sc-tools/hangar" className="underline hover:text-text-primary">Hangar</a> to see its specs and where to buy or rent it.
         </p>
@@ -35,15 +28,7 @@ export default async function LoadoutsPage({ searchParams }: { searchParams: Pro
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Wrench className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">SHIP PRICES</h1>
-          <p className="text-sm text-text-muted">Where to buy or rent a ship, and for how much.</p>
-        </div>
-      </div>
+      <PageHeader icon={Wrench} title="Ship Prices" subtitle="Where to buy or rent a ship, and for how much." />
 
       <MfdPanel title={<span>[ SHIP ]</span>} chassis="neutral">
         <h2 className="text-lg font-semibold">{ship.name_full ?? ship.name}</h2>

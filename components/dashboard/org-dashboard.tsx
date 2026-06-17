@@ -106,6 +106,9 @@ export async function OrgDashboard({
                       </span>
                     </div>
                     <h4 className="font-semibold text-text-primary">{p.title}</h4>
+                    {p.body && (
+                      <p className="mt-1 line-clamp-2 text-sm text-text-secondary">{p.body}</p>
+                    )}
                   </div>
                 </a>
               ))}

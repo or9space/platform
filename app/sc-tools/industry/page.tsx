@@ -2,6 +2,7 @@ import { getCommodities } from "@/lib/uex/queries";
 import { UexNotice, aUEC, safeUex } from "@/components/sc-tools/ui";
 import { Pickaxe } from "lucide-react";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function IndustryPage({ searchParams }: { searchParams: Promise<{ kind?: string }> }) {
   const { kind } = await searchParams;
@@ -18,15 +19,7 @@ export default async function IndustryPage({ searchParams }: { searchParams: Pro
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Pickaxe className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">INDUSTRY</h1>
-          <p className="text-sm text-text-muted">Mining &amp; refining — minerals, raw ores and refined goods.</p>
-        </div>
-      </div>
+      <PageHeader icon={Pickaxe} title="Industry" subtitle="Mining & refining — minerals, raw ores and refined goods." />
       <nav className="flex gap-3 text-sm">
         {[["mineral", "Minerals"], ["raw", "Raw ores"], ["refined", "Refined"], ["harvest", "Harvestable"]].map(([key, label]) => (
           <a key={key} href={`/sc-tools/industry?kind=${key}`} className={k === key ? "font-bold text-text-primary" : "text-text-secondary hover:text-text-primary"}>{label}</a>

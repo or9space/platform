@@ -3,6 +3,7 @@ import { UexNotice, aUEC, safeUex } from "@/components/sc-tools/ui";
 import { Picker } from "../prices/page";
 import { TrendingUp } from "lucide-react";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function TradePage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const { id } = await searchParams;
@@ -18,15 +19,7 @@ export default async function TradePage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <TrendingUp className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">TRADE ROUTES</h1>
-          <p className="text-sm text-text-muted">Most profitable hauls right now, ranked by profit and ROI.</p>
-        </div>
-      </div>
+      <PageHeader icon={TrendingUp} title="Trade Routes" subtitle="Most profitable hauls right now, ranked by profit and ROI." />
       <Picker list={list} selectedId={selectedId} />
       {selected && <h2 className="text-lg font-semibold">Best routes — {selected.name}</h2>}
       {!routes.ok ? (

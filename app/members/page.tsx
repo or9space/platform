@@ -8,8 +8,8 @@ import { listMembers } from "@/lib/queries/members";
 import type { MemberRow } from "@/lib/queries/members";
 import type { RankTier } from "@/lib/permissions";
 import { Rank } from "@/components/rank";
-import { L } from "@/components/l";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { Users, Shield } from "lucide-react";
 
 const tierChassis: Record<RankTier, "primary" | "amber" | "neutral"> = {
@@ -71,40 +71,29 @@ export default async function MembersPage({
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Users className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">
-              <L k="memberPlural" fallback="Members" />
-            </h1>
-            <p className="text-sm text-text-muted">
-              <span className="mfd-readout">{filtered.length}</span>
-              <span className="ml-1.5">personnel on record</span>
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* View toggle */}
-          <a
-            href={`/members?${new URLSearchParams({ ...(q ? { q } : {}), ...(tier ? { tier } : {}), view: isGridView ? "list" : "grid" }).toString()}`}
-            className="mfd-label border border-border-light bg-surface-elevated px-3 py-1.5 text-xs hover:border-primary hover:text-primary transition-colors"
-          >
-            [ {isGridView ? "LIST" : "GRID"} ]
-          </a>
-          {canManageRanks && (
+      <PageHeader
+        icon={Users}
+        title="Members"
+        readout={<>{filtered.length} personnel on record</>}
+        actions={
+          <>
             <a
-              href="/admin/members"
+              href={`/members?${new URLSearchParams({ ...(q ? { q } : {}), ...(tier ? { tier } : {}), view: isGridView ? "list" : "grid" }).toString()}`}
               className="mfd-label border border-border-light bg-surface-elevated px-3 py-1.5 text-xs hover:border-primary hover:text-primary transition-colors"
             >
-              [ MANAGE RANKS ]
+              [ {isGridView ? "LIST" : "GRID"} ]
             </a>
-          )}
-        </div>
-      </div>
+            {canManageRanks && (
+              <a
+                href="/admin/members"
+                className="mfd-label border border-border-light bg-surface-elevated px-3 py-1.5 text-xs hover:border-primary hover:text-primary transition-colors"
+              >
+                [ MANAGE RANKS ]
+              </a>
+            )}
+          </>
+        }
+      />
 
       {/* Search + filter panel */}
       <MfdPanel chassis="neutral" title={<span>[ SEARCH / FILTER ]</span>} bodyPadding="sm">

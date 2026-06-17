@@ -7,6 +7,7 @@ import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { listTournaments } from "@/lib/queries/tournaments";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { CreateTournamentForm } from "./create-tournament-form";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -39,16 +40,7 @@ export default async function TournamentsPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Trophy className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">Tournaments</h1>
-          <p className="text-sm text-text-muted">Competitive events and bracket play.</p>
-        </div>
-      </div>
+      <PageHeader icon={Trophy} title="Tournaments" subtitle="Competitive events and bracket play." />
 
       <MfdPanel
         chassis="neutral"

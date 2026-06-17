@@ -10,6 +10,7 @@ import { EventTypeBadge } from "@/components/events/event-type-badge";
 import { RsvpButtons } from "@/components/events/rsvp-buttons";
 import { DeleteEventButton } from "@/components/events/delete-event-button";
 import { MfdPanel, MfdReadout } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { Calendar } from "lucide-react";
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -32,36 +33,27 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Calendar className="h-5 w-5" />
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <EventTypeBadge type={event.type} />
-              <h1 className="text-2xl font-bold text-text-primary">{event.title}</h1>
-            </div>
-            <p className="text-sm text-text-muted">
-              <a href="/events" className="hover:text-text-secondary">EVENTS</a>
-              <span className="mx-1 opacity-40">/</span>
-              DETAIL
-            </p>
-          </div>
-        </div>
-        {canManage && (
-          <div className="flex shrink-0 items-center gap-2">
-            <a
-              href={`/events/${event.id}/edit`}
-              className="rounded border border-border px-3 py-1.5 text-sm text-text-secondary hover:border-primary hover:text-text-primary transition-colors"
-            >
-              Edit
-            </a>
-            <DeleteEventButton eventId={event.id} />
-          </div>
-        )}
-      </div>
+      <PageHeader
+        icon={Calendar}
+        title={event.title}
+        subtitle="EVENTS / DETAIL"
+        actions={
+          <>
+            <EventTypeBadge type={event.type} />
+            {canManage && (
+              <>
+                <a
+                  href={`/events/${event.id}/edit`}
+                  className="rounded border border-border px-3 py-1.5 text-sm text-text-secondary hover:border-primary hover:text-text-primary transition-colors"
+                >
+                  Edit
+                </a>
+                <DeleteEventButton eventId={event.id} />
+              </>
+            )}
+          </>
+        }
+      />
 
       {/* Mission clock / stats strip */}
       <div className="flex flex-wrap items-stretch gap-x-6 gap-y-3 border border-border bg-surface-elevated px-4 py-2.5 mfd-cut-tl-br">

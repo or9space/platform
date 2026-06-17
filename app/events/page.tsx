@@ -8,6 +8,7 @@ import { listUpcomingEvents, listPastEvents, type EventRow } from "@/lib/queries
 import { formatDate, formatDateTime } from "@/lib/format";
 import { EventTypeBadge } from "@/components/events/event-type-badge";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 
 // Group events by date label (e.g. "Jun 20 2026")
@@ -98,26 +99,19 @@ export default async function EventsPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Calendar className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">Events</h1>
-            <p className="text-sm text-text-muted">MISSION CALENDAR</p>
-          </div>
-        </div>
-        {canManage && (
+      <PageHeader
+        icon={Calendar}
+        title="Events"
+        subtitle="MISSION CALENDAR"
+        actions={canManage ? (
           <a
             href="/events/new"
             className="rounded border border-primary bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/20"
           >
             + New Event
           </a>
-        )}
-      </div>
+        ) : undefined}
+      />
 
       {/* Upcoming events panel */}
       <MfdPanel

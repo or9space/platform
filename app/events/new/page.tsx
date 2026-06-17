@@ -5,6 +5,7 @@ import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { EventForm } from "@/components/events/event-form";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { Calendar } from "lucide-react";
 
 export default async function NewEventPage() {
@@ -15,20 +16,7 @@ export default async function NewEventPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Calendar className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">New Event</h1>
-          <p className="text-sm text-text-muted">
-            <a href="/events" className="hover:text-text-secondary">EVENTS</a>
-            <span className="mx-1 opacity-40">/</span>
-            CREATE
-          </p>
-        </div>
-      </div>
+      <PageHeader icon={Calendar} title="New Event" subtitle="EVENTS / CREATE" />
 
       <MfdPanel
         chassis="primary"

@@ -2,6 +2,7 @@ import { getStarSystems, getPlanets, type Planet } from "@/lib/uex/queries";
 import { UexNotice, safeUex } from "@/components/sc-tools/ui";
 import { Globe } from "lucide-react";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function StarMapPage() {
   const [systems, planets] = await Promise.all([safeUex(getStarSystems), safeUex(getPlanets)]);
@@ -20,15 +21,7 @@ export default async function StarMapPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Globe className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">STAR MAP</h1>
-          <p className="text-sm text-text-muted">Systems, planets and moons of the &apos;verse.</p>
-        </div>
-      </div>
+      <PageHeader icon={Globe} title="Star Map" subtitle="Systems, planets and moons of the 'verse." />
       <MfdPanel title={<span>[ STAR MAP ]</span>} chassis="neutral" bodyPadding="sm">
         <div className="grid gap-3 sm:grid-cols-2">
           {list.map((s) => {

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Swords } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -15,24 +16,19 @@ export default async function NewOperationPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Swords className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">New Operation</h1>
-            <p className="text-sm text-text-muted">Define mission parameters and objectives</p>
-          </div>
-        </div>
-        <a
-          href="/operations"
-          className="font-mono text-xs text-text-muted hover:text-primary transition-colors uppercase tracking-widest"
-        >
-          ← Operations
-        </a>
-      </div>
+      <PageHeader
+        icon={Swords}
+        title="New Operation"
+        subtitle="Define mission parameters and objectives"
+        actions={
+          <a
+            href="/operations"
+            className="font-mono text-xs text-text-muted hover:text-primary transition-colors uppercase tracking-widest"
+          >
+            ← Operations
+          </a>
+        }
+      />
 
       <div className="mx-auto max-w-lg">
         <MfdPanel chassis="primary" title={<span>[ NEW MISSION ]</span>} bodyPadding="md">

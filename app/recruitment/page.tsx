@@ -4,6 +4,7 @@ import { makeTenantContext } from "@/lib/tenant";
 import { listApplications } from "@/lib/queries/recruitment";
 import { ReviewList } from "@/components/recruitment/recruitment-client";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { Megaphone } from "lucide-react";
 
 export default async function RecruitmentPage() {
@@ -12,24 +13,15 @@ export default async function RecruitmentPage() {
 
   const apps = await listApplications(makeTenantContext(ctx.tenant.id));
   const pending = apps.filter((a) => a.status === "PENDING").length;
-  const applyUrl = `/apply`;
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Megaphone className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">RECRUITMENT</h1>
-          <p className="text-sm text-text-muted">
-            <span className="mfd-readout">{pending}</span>
-            <span className="ml-1.5">pending · public apply form at</span>{" "}
-            <a href={applyUrl} className="underline hover:text-text-primary transition-colors">/apply</a>
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        icon={Megaphone}
+        title="Recruitment"
+        subtitle="Manage applications and review candidates"
+        readout={<>{pending} pending</>}
+      />
 
       {/* Stats row */}
       <MfdPanel chassis="amber" title={<span>[ STATUS ]</span>} bodyPadding="md">

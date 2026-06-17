@@ -9,6 +9,7 @@ import { listOperations, OPERATION_STATUSES, type OperationRow } from "@/lib/que
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge, STATUS_LABELS } from "@/components/operations/status-badge";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function OperationsPage() {
   const ctx = await getFullTenantContext();
@@ -25,26 +26,19 @@ export default async function OperationsPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Swords className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">Operations</h1>
-            <p className="text-sm text-text-muted">Mission planning and crew signups</p>
-          </div>
-        </div>
-        {canManage && (
+      <PageHeader
+        icon={Swords}
+        title="Operations"
+        subtitle="Mission planning and crew signups"
+        actions={canManage ? (
           <a
             href="/operations/new"
             className="inline-flex items-center gap-1.5 rounded border border-primary bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary hover:bg-primary/20 transition-colors mfd-cut-tl-br"
           >
             + New Operation
           </a>
-        )}
-      </div>
+        ) : undefined}
+      />
 
       {/* Stat bar */}
       <MfdPanel chassis="neutral" bodyPadding="sm">

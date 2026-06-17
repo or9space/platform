@@ -4,27 +4,26 @@ import type { TenantContext } from "../tenant";
 export interface NewsRow {
   id: string;
   title: string;
+  body: string;
   category: string;
   isPinned: boolean;
   authorName: string;
   createdAt: Date;
 }
 
-export interface NewsDetail extends NewsRow {
-  body: string;
-}
+export type NewsDetail = NewsRow;
 
 const LIST_SELECT = {
-  id: true, title: true, category: true, isPinned: true, createdAt: true,
+  id: true, title: true, body: true, category: true, isPinned: true, createdAt: true,
   author: { select: { displayName: true, username: true } },
 };
 
 function toRow(p: {
-  id: string; title: string; category: string; isPinned: boolean; createdAt: Date;
+  id: string; title: string; body: string; category: string; isPinned: boolean; createdAt: Date;
   author: { displayName: string | null; username: string } | null;
 }): NewsRow {
   return {
-    id: p.id, title: p.title, category: p.category, isPinned: p.isPinned, createdAt: p.createdAt,
+    id: p.id, title: p.title, body: p.body, category: p.category, isPinned: p.isPinned, createdAt: p.createdAt,
     authorName: p.author?.displayName ?? p.author?.username ?? "Unknown",
   };
 }
@@ -52,8 +51,8 @@ export async function latestNews(ctx: TenantContext, limit = 3): Promise<NewsRow
 export async function getNews(ctx: TenantContext, id: string): Promise<NewsDetail | null> {
   const p = await db(ctx).newsPost.findFirst({
     where: { id },
-    select: { ...LIST_SELECT, body: true },
+    select: LIST_SELECT,
   });
   if (!p) return null;
-  return { ...toRow(p), body: p.body };
+  return toRow(p);
 }

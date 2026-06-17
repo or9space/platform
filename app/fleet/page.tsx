@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Rocket } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -33,16 +34,7 @@ export default async function FleetPage() {
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Rocket className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">Fleet</h1>
-          <p className="text-sm text-text-muted">Org ship registry</p>
-        </div>
-      </div>
+      <PageHeader icon={Rocket} title="Fleet" subtitle="Org ship registry" />
 
       {/* Count line + My Hangar shortcut */}
       <div className="flex items-center justify-between">

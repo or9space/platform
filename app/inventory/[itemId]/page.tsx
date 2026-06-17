@@ -9,6 +9,7 @@ import { getItem, listHoldingsByItem } from "@/lib/queries/inventory";
 import { CATEGORY_LABELS } from "@/lib/inventory";
 import type { HoldingState } from "@/lib/inventory";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { CreateHoldingForm } from "./create-holding-form";
 import { HoldingActions } from "./holding-actions";
 import { DeleteItemButton } from "./delete-item-button";
@@ -65,22 +66,12 @@ export default async function ItemDetailPage({
         &larr; INVENTORY
       </a>
 
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Package className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">{item.name}</h1>
-            <p className="text-sm text-text-muted">
-              {CATEGORY_LABELS[item.category]}&nbsp;&middot;&nbsp;
-              {item.kind === "UNIQUE" ? "Unique" : "Fungible"}
-            </p>
-          </div>
-        </div>
-        {canDelete && <DeleteItemButton itemId={item.id} />}
-      </div>
+      <PageHeader
+        icon={Package}
+        title={item.name}
+        subtitle={`${CATEGORY_LABELS[item.category]} · ${item.kind === "UNIQUE" ? "Unique" : "Fungible"}`}
+        actions={canDelete ? <DeleteItemButton itemId={item.id} /> : undefined}
+      />
 
       {/* Item meta */}
       {item.description && (

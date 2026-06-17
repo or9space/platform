@@ -8,6 +8,7 @@ import { makeTenantContext } from "@/lib/tenant";
 import { listItems, listHoldings } from "@/lib/queries/inventory";
 import { CATEGORY_LABELS } from "@/lib/inventory";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { CreateItemForm } from "./create-item-form";
 
 export default async function InventoryPage({
@@ -41,23 +42,12 @@ export default async function InventoryPage({
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Package className="h-5 w-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">Inventory</h1>
-            <p className="text-sm text-text-muted">Org-wide gear, ships, and consumables</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 sm:pt-1">
-          <span className="mfd-label text-text-muted font-mono text-xs">
-            {items.length} <span className="text-primary">ITEMS</span>
-          </span>
-        </div>
-      </div>
+      <PageHeader
+        icon={Package}
+        title="Inventory"
+        subtitle="Org-wide gear, ships, and consumables"
+        readout={<>{items.length} ITEMS</>}
+      />
 
       {/* Search */}
       <MfdPanel

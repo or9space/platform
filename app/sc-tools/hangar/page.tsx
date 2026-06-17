@@ -2,6 +2,7 @@ import { getVehicles } from "@/lib/uex/queries";
 import { UexNotice, safeUex } from "@/components/sc-tools/ui";
 import { Rocket } from "lucide-react";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function HangarPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q } = await searchParams;
@@ -17,15 +18,7 @@ export default async function HangarPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <Rocket className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">HANGAR</h1>
-          <p className="text-sm text-text-muted">Browse the full ship catalog with cargo, crew and specs.</p>
-        </div>
-      </div>
+      <PageHeader icon={Rocket} title="Hangar" subtitle="Browse the full ship catalog with cargo, crew and specs." />
       <form method="get" className="flex items-center gap-2">
         <input name="q" defaultValue={q} placeholder="Search ships…" className="w-full rounded border border-border-light bg-surface p-2 text-sm" />
         <button type="submit" className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream">Search</button>

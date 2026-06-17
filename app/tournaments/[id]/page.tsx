@@ -7,6 +7,7 @@ import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { getTournamentWithEntries } from "@/lib/queries/tournaments";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 import { RegisterButton } from "./register-button";
 import { ManageTournament } from "./manage-tournament";
 import { DeleteTournamentButton } from "./delete-tournament-button";
@@ -62,38 +63,17 @@ export default async function TournamentDetailPage({
         &larr; Tournaments
       </a>
 
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-            <Trophy className="h-5 w-5" />
-          </span>
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl font-bold text-text-primary">{tournament.name}</h1>
-              <span className={statusClass}>{statusLabel}</span>
-            </div>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              {tournament.format && <span className="text-text-secondary">{tournament.format}</span>}
-              {tournament.startsAt && (
-                <span className="text-text-secondary">
-                  {new Date(tournament.startsAt).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
-              )}
-            </div>
-            {tournament.description && (
-              <p className="mt-2 max-w-prose text-sm text-text-secondary whitespace-pre-wrap">
-                {tournament.description}
-              </p>
-            )}
-          </div>
-        </div>
-        {isCommand && <DeleteTournamentButton tournamentId={tournament.id} />}
-      </div>
+      <PageHeader
+        icon={Trophy}
+        title={tournament.name}
+        subtitle={tournament.description ?? tournament.format ?? "Tournament details"}
+        actions={
+          <>
+            <span className={statusClass}>{statusLabel}</span>
+            {isCommand && <DeleteTournamentButton tournamentId={tournament.id} />}
+          </>
+        }
+      />
 
       {canRegister && (
         <div>

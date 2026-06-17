@@ -3,6 +3,7 @@ import { UexNotice, aUEC, safeUex } from "@/components/sc-tools/ui";
 import { Picker } from "../prices/page";
 import { ArrowRightLeft } from "lucide-react";
 import { MfdPanel } from "@/components/ui/mfd";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function ComparePage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const { id } = await searchParams;
@@ -24,15 +25,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <ArrowRightLeft className="h-5 w-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary">PRICE COMPARE</h1>
-          <p className="text-sm text-text-muted">Best place to buy vs. best place to sell — the spread at a glance.</p>
-        </div>
-      </div>
+      <PageHeader icon={ArrowRightLeft} title="Price Compare" subtitle="Best place to buy vs. best place to sell — the spread at a glance." />
       <Picker list={list} selectedId={selectedId} />
       {selected && <h2 className="text-lg font-semibold">{selected.name}</h2>}
       {!prices.ok ? (
