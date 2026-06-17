@@ -101,6 +101,44 @@ body {
   --font-tactical: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
   --font-stencil:  var(--font-blackops), ui-sans-serif, system-ui, sans-serif;
   --font-readout:  var(--font-jetbrains), ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  /* Explicit fallbacks for every MFD token so raw var() in .tenant-root /
+   * .mfd-frame / .card-tactical / .bg-tactical-grid always resolves, even if
+   * Tailwind v4 prunes an unused @theme var from its emitted :root block. */
+  --color-fg-black: oklch(15% 0.008 25);
+  --color-fg-gold: oklch(72% 0.16 75);
+  --color-fg-gold-light: oklch(80% 0.18 75);
+  --color-fg-cream: oklch(95% 0.008 60);
+  --color-fg-white: oklch(99% 0.005 60);
+  --color-fg-red: oklch(45% 0.16 25);
+  --color-fg-red-light: oklch(65% 0.20 25);
+  --color-fg-blue: oklch(40% 0.10 245);
+  --color-fg-blue-light: oklch(75% 0.13 245);
+  --color-tier-enlisted: oklch(60% 0.09 110);
+  --color-tier-enlisted-soft: oklch(28% 0.05 110);
+  --color-tier-nco: oklch(62% 0.13 245);
+  --color-tier-nco-soft: oklch(28% 0.07 245);
+  --color-tier-officer: oklch(85% 0.005 60);
+  --color-tier-officer-soft: oklch(35% 0.005 60);
+  --color-tier-command: oklch(55% 0.18 25);
+  --color-tier-command-soft: oklch(28% 0.10 25);
+  --color-primary: oklch(55% 0.18 25);
+  --color-primary-hover: oklch(65% 0.20 25);
+  --color-surface: oklch(18% 0.008 25);
+  --color-surface-elevated: oklch(22% 0.008 25);
+  --color-surface-hover: oklch(26% 0.008 25);
+  --color-border: oklch(32% 0.008 25);
+  --color-border-light: oklch(38% 0.008 25);
+  --color-text-primary: oklch(95% 0.008 60);
+  --color-text-secondary: oklch(70% 0.008 60);
+  --color-text-muted: oklch(48% 0.008 60);
+  --color-danger: oklch(50% 0.22 18);
+  --color-success: oklch(62% 0.16 145);
+  --color-warning: oklch(72% 0.16 75);
+  --color-info: oklch(70% 0.13 245);
+  --color-amber: oklch(72% 0.16 75);
+  --color-amber-soft: oklch(28% 0.10 75);
+  --color-amber-glow: oklch(80% 0.18 75);
 }
 
 /* Tenant app root — sets the tactical surface + Plex body font for the whole
