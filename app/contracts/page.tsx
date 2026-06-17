@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { FileText } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -6,10 +7,11 @@ import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { listContracts } from "@/lib/queries/contracts";
 import { ContractCreateForm, ContractActions } from "@/components/contracts/contracts-client";
+import { MfdPanel, MfdReadout } from "@/components/ui/mfd";
 
 const STATUS_CLS: Record<string, string> = {
   OPEN: "border-green-800 bg-green-950 text-green-300",
-  CLAIMED: "border-sky-800 bg-sky-950 text-info",
+  CLAIMED: "border-info bg-surface-elevated text-info",
   COMPLETED: "border-border-light bg-surface text-text-secondary",
   CANCELLED: "border-border bg-surface text-text-muted",
 };
@@ -24,44 +26,78 @@ export default async function ContractsPage() {
   const contracts = await listContracts(makeTenantContext(ctx.tenant.id));
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
-      <h1 className="text-2xl font-bold">Contracts</h1>
-      {canManage && <ContractCreateForm />}
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <FileText className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Contracts</h1>
+          <p className="text-sm text-text-muted">Available missions and posted jobs</p>
+        </div>
+      </div>
 
-      {contracts.length === 0 ? (
-        <p className="text-sm text-text-muted">No contracts yet.</p>
-      ) : (
-        <ul className="space-y-3">
-          {contracts.map((c) => (
-            <li key={c.id} className="rounded border border-border p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className={`rounded border px-2 py-0.5 text-xs font-medium uppercase ${STATUS_CLS[c.status] ?? STATUS_CLS.OPEN}`}>{c.status}</span>
-                    <p className="font-medium text-text-primary">{c.title}</p>
-                  </div>
-                  {c.reward && <p className="mt-1 text-sm text-amber">Reward: {c.reward}</p>}
-                  {c.description && <p className="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{c.description}</p>}
-                  {c.claimedByName && (
-                    <p className="mt-1 text-xs text-text-muted">
-                      Claimed by <a href={`/members/${c.claimedByUsername}`} className="hover:underline">{c.claimedByName}</a>
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="mt-3">
-                <ContractActions
-                  id={c.id}
-                  status={c.status}
-                  canManage={canManage}
-                  isClaimant={c.claimedById === viewer.id}
-                  canClaim={true}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+      {/* Create form */}
+      {canManage && (
+        <MfdPanel chassis="primary" title={<span>[ NEW CONTRACT ]</span>} bodyPadding="md">
+          <ContractCreateForm />
+        </MfdPanel>
       )}
-    </main>
+
+      {/* Contract list */}
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ CONTRACTS ]</span>}
+        titleAside={<span>{contracts.length} total</span>}
+        bodyPadding="sm"
+      >
+        {contracts.length === 0 ? (
+          <p className="py-6 text-center text-sm text-text-muted">No contracts posted yet.</p>
+        ) : (
+          <ul className="space-y-3 py-1">
+            {contracts.map((c) => (
+              <li key={c.id} className="rounded border border-border bg-surface-elevated p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`rounded border px-2 py-0.5 text-xs font-medium uppercase ${STATUS_CLS[c.status] ?? STATUS_CLS.OPEN}`}>
+                        {c.status}
+                      </span>
+                      <p className="font-medium text-text-primary">{c.title}</p>
+                    </div>
+                    {c.reward && (
+                      <div className="mt-2">
+                        <MfdReadout label="REWARD" value={c.reward} tone="amber" size="sm" />
+                      </div>
+                    )}
+                    {c.description && (
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-text-secondary">{c.description}</p>
+                    )}
+                    {c.claimedByName && (
+                      <p className="mt-1 text-xs text-text-muted">
+                        <span className="mfd-label">CLAIMED BY</span>{" "}
+                        <a href={`/members/${c.claimedByUsername}`} className="text-text-secondary hover:text-text-primary hover:underline">
+                          {c.claimedByName}
+                        </a>
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="mt-3 border-t border-border/40 pt-3">
+                  <ContractActions
+                    id={c.id}
+                    status={c.status}
+                    canManage={canManage}
+                    isClaimant={c.claimedById === viewer.id}
+                    canClaim={true}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </MfdPanel>
+    </div>
   );
 }

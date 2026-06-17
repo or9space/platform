@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { createLfgAction, closeLfgAction, deleteLfgAction } from "@/lib/actions/lfg";
+import { MfdPanel } from "@/components/ui/mfd";
 
-const field = "w-full rounded border border-border-light bg-surface p-2 text-sm";
+const field = "w-full border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none";
 
 export function LfgCreateForm() {
   const [error, setError] = useState<string | null>(null);
@@ -22,31 +23,68 @@ export function LfgCreateForm() {
   }
 
   if (!open) {
-    return <button onClick={() => setOpen(true)} className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream">Post LFG</button>;
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="border border-primary bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary mfd-cut-tl-br hover:bg-primary/20 transition-colors"
+      >
+        + POST LFG
+      </button>
+    );
   }
   return (
-    <form action={submit} className="space-y-2 rounded border border-border p-4">
-      {error && <p className="text-sm text-fg-red-light">{error}</p>}
-      <input name="title" required placeholder="What are you looking for?" maxLength={160} className={field} />
-      <textarea name="body" rows={3} placeholder="Details (optional)" maxLength={5000} className={field} />
-      <div className="flex gap-2">
-        <button type="submit" disabled={pending} className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream disabled:opacity-50">{pending ? "Posting…" : "Post"}</button>
-        <button type="button" onClick={() => setOpen(false)} className="text-sm text-text-secondary hover:text-text-primary">Cancel</button>
-      </div>
-    </form>
+    <MfdPanel title={<span>[ NEW POST ]</span>} chassis="primary" bodyPadding="md">
+      <form action={submit} className="space-y-3">
+        {error && <p className="mfd-label text-sm text-amber">{error}</p>}
+        <div className="space-y-1">
+          <label className="mfd-label block">TITLE</label>
+          <input name="title" required placeholder="What are you looking for?" maxLength={160} className={field} />
+        </div>
+        <div className="space-y-1">
+          <label className="mfd-label block">DETAILS</label>
+          <textarea name="body" rows={3} placeholder="Optional" maxLength={5000} className={field} />
+        </div>
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            disabled={pending}
+            className="border border-primary bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary mfd-cut-tl-br hover:bg-primary/20 transition-colors disabled:opacity-50"
+          >
+            {pending ? "POSTING…" : "POST"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="mfd-label text-sm hover:text-text-primary transition-colors"
+          >
+            CANCEL
+          </button>
+        </div>
+      </form>
+    </MfdPanel>
   );
 }
 
 export function LfgRowActions({ id, status }: { id: string; status: string }) {
   const [pending, start] = useTransition();
   return (
-    <span className="flex items-center gap-3">
+    <span className="flex items-center gap-3 shrink-0">
       {status === "OPEN" && (
-        <button onClick={() => start(async () => { const r = await closeLfgAction(id); if (r.ok) window.location.reload(); })}
-          disabled={pending} className="text-xs text-text-secondary hover:text-text-primary disabled:opacity-50">Close</button>
+        <button
+          onClick={() => start(async () => { const r = await closeLfgAction(id); if (r.ok) window.location.reload(); })}
+          disabled={pending}
+          className="mfd-label text-xs hover:text-text-primary disabled:opacity-50 transition-colors"
+        >
+          CLOSE
+        </button>
       )}
-      <button onClick={() => start(async () => { const r = await deleteLfgAction(id); if (r.ok) window.location.reload(); })}
-        disabled={pending} className="text-xs text-fg-red-light hover:text-fg-red-light disabled:opacity-50">Delete</button>
+      <button
+        onClick={() => start(async () => { const r = await deleteLfgAction(id); if (r.ok) window.location.reload(); })}
+        disabled={pending}
+        className="mfd-label text-xs text-amber hover:text-text-primary disabled:opacity-50 transition-colors"
+      >
+        DELETE
+      </button>
     </span>
   );
 }

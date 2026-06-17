@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Newspaper } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -6,6 +7,7 @@ import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { getNews } from "@/lib/queries/news";
 import { NewsForm } from "@/components/news/news-form";
+import { MfdPanel } from "@/components/ui/mfd";
 
 export default async function EditNewsPage({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await getFullTenantContext();
@@ -18,12 +20,27 @@ export default async function EditNewsPage({ params }: { params: Promise<{ id: s
   if (!post) notFound();
 
   return (
-    <main className="mx-auto max-w-2xl space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Edit post</h1>
-        <a href={`/news/${id}`} className="text-sm text-text-secondary underline hover:text-text-primary">← Cancel</a>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* MFD page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <Newspaper className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Edit post</h1>
+          <p className="text-sm text-text-muted">Modify dispatch content</p>
+        </div>
       </div>
-      <NewsForm postId={id} initial={{ title: post.title, body: post.body, category: post.category, isPinned: post.isPinned }} />
-    </main>
+
+      <a href={`/news/${id}`} className="mfd-label text-xs text-text-secondary hover:text-text-primary">← Cancel</a>
+
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ NEWS ] EDIT</span>}
+        bodyPadding="lg"
+      >
+        <NewsForm postId={id} initial={{ title: post.title, body: post.body, category: post.category, isPinned: post.isPinned }} />
+      </MfdPanel>
+    </div>
   );
 }

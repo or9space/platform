@@ -4,6 +4,8 @@ import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { EventForm } from "@/components/events/event-form";
+import { MfdPanel } from "@/components/ui/mfd";
+import { Calendar } from "lucide-react";
 
 export default async function NewEventPage() {
   const ctx = await getFullTenantContext();
@@ -12,12 +14,29 @@ export default async function NewEventPage() {
   if (!viewer || !hasTier(viewer.tier, "OFFICER")) notFound();
 
   return (
-    <main className="mx-auto max-w-lg space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">New event</h1>
-        <a href="/events" className="text-sm text-text-secondary underline hover:text-text-primary">← Events</a>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <Calendar className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">New Event</h1>
+          <p className="text-sm text-text-muted">
+            <a href="/events" className="hover:text-text-secondary">EVENTS</a>
+            <span className="mx-1 opacity-40">/</span>
+            CREATE
+          </p>
+        </div>
       </div>
-      <EventForm />
-    </main>
+
+      <MfdPanel
+        chassis="primary"
+        title={<span>[ EVENT DETAILS ]</span>}
+        bodyPadding="md"
+      >
+        <EventForm />
+      </MfdPanel>
+    </div>
   );
 }

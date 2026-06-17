@@ -5,6 +5,8 @@ import { getViewerMembership } from "@/lib/authz";
 import { makeTenantContext } from "@/lib/tenant";
 import { getThreadsByCategory } from "@/lib/queries/forums";
 import { NewThreadForm } from "./new-thread-form";
+import { MfdPanel, MfdReadout } from "@/components/ui/mfd";
+import { ArrowLeft, Pin, Lock, MessageSquare } from "lucide-react";
 
 export default async function CategoryPage({
   params,
@@ -27,66 +29,117 @@ export default async function CategoryPage({
   const { category, threads } = data;
   const isLoggedIn = viewer !== null;
 
+  const pinnedCount = threads.filter((t) => t.isPinned).length;
+  const lockedCount = threads.filter((t) => t.isLocked).length;
+
   return (
-    <main className="mx-auto max-w-3xl p-6">
-      <div className="mb-1">
-        <a href="/forums" className="text-sm text-text-secondary hover:text-text-primary">Forums</a>
-        <span className="mx-2 text-text-muted">/</span>
-        <span className="text-sm text-text-secondary">{category.name}</span>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Back nav */}
+      <div className="flex items-center gap-2 text-xs text-text-muted">
+        <a href="/forums" className="flex items-center gap-1 hover:text-primary transition-colors">
+          <ArrowLeft className="h-3 w-3" />
+          <span className="mfd-label">FORUMS</span>
+        </a>
+        <span>/</span>
+        <span className="mfd-label text-text-secondary">{category.name.toUpperCase()}</span>
       </div>
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">{category.name}</h1>
-        {category.description && (
-          <p className="mt-1 text-text-secondary">{category.description}</p>
+      {/* Page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <MessageSquare className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">{category.name}</h1>
+          {category.description && (
+            <p className="text-sm text-text-muted">{category.description}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div className="flex flex-wrap gap-6">
+        <MfdReadout label="THREADS" value={threads.length} tone="primary" size="sm" />
+        {pinnedCount > 0 && (
+          <MfdReadout label="PINNED" value={pinnedCount} tone="amber" size="sm" />
+        )}
+        {lockedCount > 0 && (
+          <MfdReadout label="LOCKED" value={lockedCount} tone="muted" size="sm" />
         )}
       </div>
 
-      {threads.length === 0 ? (
-        <p className="mb-6 text-text-secondary">No threads yet. Be the first to post.</p>
-      ) : (
-        <ul className="mb-8 space-y-2">
-          {threads.map((t) => (
-            <li key={t.id} className="rounded border border-border p-4 hover:border-primary">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {t.isPinned && (
-                      <span className="rounded bg-surface-elevated px-1.5 py-0.5 text-xs">Pinned</span>
-                    )}
-                    {t.isLocked && (
-                      <span className="rounded bg-surface-elevated px-1.5 py-0.5 text-xs">Locked</span>
-                    )}
-                    <a
-                      href={`/forums/${categorySlug}/${t.id}`}
-                      className="font-semibold hover:underline"
-                    >
-                      {t.title}
-                    </a>
+      {/* Thread list */}
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ THREADS ]</span>}
+        titleAside={
+          <span className="mfd-label text-xs">{threads.length} total</span>
+        }
+        bodyPadding="none"
+      >
+        {threads.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
+            <MessageSquare className="h-8 w-8 text-text-muted opacity-40" />
+            <p className="mfd-label">NO THREADS YET</p>
+            <p className="text-xs text-text-muted">Be the first to post. Set the tone.</p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-border/40">
+            {threads.map((t) => (
+              <li key={t.id}>
+                <a
+                  href={`/forums/${categorySlug}/${t.id}`}
+                  className="group flex items-center gap-3 px-4 py-3 hover:bg-surface-elevated transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                      {t.isPinned && (
+                        <Pin className="h-3 w-3 shrink-0 text-primary" />
+                      )}
+                      {t.isLocked && (
+                        <Lock className="h-3 w-3 shrink-0 text-text-muted" />
+                      )}
+                      <span className="truncate font-medium text-text-primary group-hover:text-primary transition-colors">
+                        {t.title}
+                      </span>
+                    </div>
+                    <p className="text-xs text-text-muted">
+                      <span className="mfd-label">BY</span>{" "}
+                      {t.authorName}
+                      {t.lastPostAt && (
+                        <>
+                          {" "}
+                          <span className="mfd-label">LAST</span>{" "}
+                          {t.lastPostAt.toISOString().slice(0, 16).replace("T", " ")}
+                        </>
+                      )}
+                    </p>
                   </div>
-                  <p className="mt-1 text-xs text-text-muted">
-                    by {t.authorName} · {t.postCount} {t.postCount === 1 ? "reply" : "replies"}
-                    {t.lastPostAt && (
-                      <> · last post {t.lastPostAt.toISOString().slice(0, 16).replace("T", " ")}</>
-                    )}
-                  </p>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+                  <div className="shrink-0 flex items-center gap-1 text-xs text-text-muted">
+                    <MessageSquare className="h-3 w-3" />
+                    <span className="font-mono tabular-nums">{t.postCount}</span>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </MfdPanel>
 
-      {isLoggedIn ? (
-        <div className="rounded border border-border p-4">
-          <h2 className="mb-3 font-semibold">New thread</h2>
+      {/* New thread panel */}
+      <MfdPanel
+        chassis="primary"
+        title={<span>[ NEW THREAD ]</span>}
+        bodyPadding="md"
+      >
+        {isLoggedIn ? (
           <NewThreadForm categoryId={category.id} />
-        </div>
-      ) : (
-        <p className="text-sm text-text-muted">
-          <a href="/login" className="underline">Sign in</a> to start a thread.
-        </p>
-      )}
-    </main>
+        ) : (
+          <p className="text-sm text-text-muted">
+            <a href="/login" className="text-primary underline">Sign in</a> to start a thread.
+          </p>
+        )}
+      </MfdPanel>
+    </div>
   );
 }

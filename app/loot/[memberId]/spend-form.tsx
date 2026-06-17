@@ -77,7 +77,7 @@ export function SpendForm({ memberId }: { memberId: string }) {
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-red-700 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-50"
+          className="rounded bg-danger px-4 py-2 text-sm font-semibold text-white hover:bg-danger disabled:opacity-50"
         >
           {pending ? "Spending…" : "Spend"}
         </button>

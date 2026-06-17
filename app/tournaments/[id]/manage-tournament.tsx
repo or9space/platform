@@ -220,7 +220,7 @@ export function ManageTournament({ tournamentId, currentStatus, entries }: Props
                   type="button"
                   onClick={() => handleRemove(entry.id)}
                   disabled={removePending}
-                  className="rounded border border-danger px-2 py-1 text-xs text-fg-red-light hover:bg-red-900/30 disabled:opacity-50"
+                  className="rounded border border-danger px-2 py-1 text-xs text-fg-red-light hover:bg-danger/30 disabled:opacity-50"
                 >
                   Remove
                 </button>

@@ -17,7 +17,7 @@ export function SquadCreateForm() {
   }
   if (!open) return <button onClick={() => setOpen(true)} className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream">New squad</button>;
   return (
-    <form action={submit} className="space-y-2 rounded border border-border p-4">
+    <form action={submit} className="space-y-2">
       {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <input name="name" required placeholder="Squad name" maxLength={120} className={field} />
       <textarea name="description" rows={2} placeholder="Description (optional)" maxLength={2000} className={field} />

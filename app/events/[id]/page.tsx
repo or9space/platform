@@ -9,6 +9,8 @@ import { formatDateTime } from "@/lib/format";
 import { EventTypeBadge } from "@/components/events/event-type-badge";
 import { RsvpButtons } from "@/components/events/rsvp-buttons";
 import { DeleteEventButton } from "@/components/events/delete-event-button";
+import { MfdPanel, MfdReadout } from "@/components/ui/mfd";
+import { Calendar } from "lucide-react";
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await getFullTenantContext();
@@ -29,71 +31,121 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   const maybe = event.rsvps.filter((r) => r.status === "MAYBE");
 
   return (
-    <main className="mx-auto max-w-2xl space-y-8 p-6">
-      <div>
-        <a href="/events" className="text-sm text-text-secondary underline hover:text-text-primary">← Events</a>
-        <div className="mt-3 flex items-start justify-between gap-4">
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+            <Calendar className="h-5 w-5" />
+          </span>
           <div>
             <div className="flex items-center gap-2">
               <EventTypeBadge type={event.type} />
-              <h1 className="text-2xl font-bold">{event.title}</h1>
+              <h1 className="text-2xl font-bold text-text-primary">{event.title}</h1>
             </div>
-            <p className="mt-2 text-text-secondary">{formatDateTime(event.startsAt)}{event.endsAt ? ` – ${formatDateTime(event.endsAt)}` : ""}</p>
-            {event.location && <p className="text-sm text-text-secondary">{event.location}</p>}
-            <p className="mt-1 text-xs text-text-muted">Created by {event.createdByName}</p>
+            <p className="text-sm text-text-muted">
+              <a href="/events" className="hover:text-text-secondary">EVENTS</a>
+              <span className="mx-1 opacity-40">/</span>
+              DETAIL
+            </p>
           </div>
-          {canManage && (
-            <div className="flex shrink-0 items-center gap-2">
-              <a href={`/events/${event.id}/edit`} className="rounded border border-border-light px-3 py-1.5 text-sm hover:border-primary">Edit</a>
-              <DeleteEventButton eventId={event.id} />
-            </div>
-          )}
+        </div>
+        {canManage && (
+          <div className="flex shrink-0 items-center gap-2">
+            <a
+              href={`/events/${event.id}/edit`}
+              className="rounded border border-border px-3 py-1.5 text-sm text-text-secondary hover:border-primary hover:text-text-primary transition-colors"
+            >
+              Edit
+            </a>
+            <DeleteEventButton eventId={event.id} />
+          </div>
+        )}
+      </div>
+
+      {/* Mission clock / stats strip */}
+      <div className="flex flex-wrap items-stretch gap-x-6 gap-y-3 border border-border bg-surface-elevated px-4 py-2.5 mfd-cut-tl-br">
+        <MfdReadout
+          label="STARTS"
+          value={formatDateTime(event.startsAt)}
+          tone="amber"
+          size="sm"
+        />
+        {event.endsAt && (
+          <MfdReadout
+            label="ENDS"
+            value={formatDateTime(event.endsAt)}
+            tone="amber"
+            size="sm"
+          />
+        )}
+        {event.location && (
+          <MfdReadout label="LOCATION" value={event.location} tone="primary" size="sm" />
+        )}
+        <MfdReadout label="GOING" value={event.counts.GOING} tone="primary" size="sm" />
+        <MfdReadout label="MAYBE" value={event.counts.MAYBE} tone="muted" size="sm" />
+        <div className="ml-auto flex flex-col gap-0.5 justify-center">
+          <span className="mfd-label">POSTED BY</span>
+          <span className="text-xs text-text-muted">{event.createdByName}</span>
         </div>
       </div>
 
+      {/* Description */}
       {event.description && (
-        <p className="whitespace-pre-wrap text-text-primary">{event.description}</p>
+        <MfdPanel chassis="neutral" title={<span>[ BRIEFING ]</span>} bodyPadding="md">
+          <p className="whitespace-pre-wrap text-sm text-text-primary">{event.description}</p>
+        </MfdPanel>
       )}
 
-      <section className="space-y-3">
-        <h2 className="font-mono text-xs uppercase tracking-widest text-text-muted">[ Your RSVP ]</h2>
+      {/* RSVP */}
+      <MfdPanel chassis="primary" title={<span>[ YOUR RSVP ]</span>} bodyPadding="md">
         <RsvpButtons eventId={event.id} current={myRsvp} />
-      </section>
+      </MfdPanel>
 
-      <section className="grid gap-6 sm:grid-cols-2">
-        <div>
-          <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-text-muted">
-            [ Going · {event.counts.GOING} ]
-          </h2>
+      {/* Roster */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <MfdPanel
+          chassis="neutral"
+          title={<span>[ GOING ]</span>}
+          titleAside={<span className="mfd-readout text-sm">{event.counts.GOING}</span>}
+          bodyPadding="sm"
+        >
           {going.length === 0 ? (
             <p className="text-sm text-text-muted">No one yet.</p>
           ) : (
             <ul className="space-y-1 text-sm">
               {going.map((r) => (
                 <li key={r.membershipId}>
-                  <a href={`/members/${r.username}`} className="text-text-primary hover:underline">{r.name}</a>
+                  <a href={`/members/${r.username}`} className="text-text-primary hover:underline hover:text-primary">
+                    {r.name}
+                  </a>
                 </li>
               ))}
             </ul>
           )}
-        </div>
-        <div>
-          <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-text-muted">
-            [ Maybe · {event.counts.MAYBE} ]
-          </h2>
+        </MfdPanel>
+
+        <MfdPanel
+          chassis="neutral"
+          title={<span>[ MAYBE ]</span>}
+          titleAside={<span className="mfd-readout text-sm">{event.counts.MAYBE}</span>}
+          bodyPadding="sm"
+        >
           {maybe.length === 0 ? (
             <p className="text-sm text-text-muted">No one yet.</p>
           ) : (
             <ul className="space-y-1 text-sm">
               {maybe.map((r) => (
                 <li key={r.membershipId}>
-                  <a href={`/members/${r.username}`} className="text-text-primary hover:underline">{r.name}</a>
+                  <a href={`/members/${r.username}`} className="text-text-primary hover:underline hover:text-primary">
+                    {r.name}
+                  </a>
                 </li>
               ))}
             </ul>
           )}
-        </div>
-      </section>
-    </main>
+        </MfdPanel>
+      </div>
+    </div>
   );
 }

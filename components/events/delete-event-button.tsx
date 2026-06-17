@@ -35,7 +35,7 @@ export function DeleteEventButton({ eventId }: { eventId: string }) {
       <button
         onClick={remove}
         disabled={pending}
-        className="rounded border border-danger bg-surface px-3 py-1.5 text-sm text-red-200 disabled:opacity-50"
+        className="rounded border border-danger bg-surface px-3 py-1.5 text-sm text-fg-red-light disabled:opacity-50"
       >
         {pending ? "Deleting…" : "Confirm delete"}
       </button>

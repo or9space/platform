@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -8,6 +9,7 @@ import { getTreasurySummary, listTreasuryEntries } from "@/lib/queries/treasury"
 import { TREASURY_TYPES, TREASURY_CATEGORIES, CATEGORY_LABELS } from "@/lib/treasury";
 import type { TreasuryType, TreasuryCategory } from "@/lib/treasury";
 import { L } from "@/components/l";
+import { MfdPanel } from "@/components/ui/mfd";
 import { AddEntryForm } from "./add-entry-form";
 import { EntryActions } from "./entry-actions";
 
@@ -49,157 +51,221 @@ export default async function TreasuryPage({
   );
 
   return (
-    <main className="mx-auto max-w-4xl p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Treasury</h1>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <Wallet className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Treasury</h1>
+          <p className="text-sm text-text-muted">Org finance log</p>
+        </div>
       </div>
 
-      {/* Balance summary */}
-      <div className="mb-6 rounded border border-border p-5">
-        <div className="mb-4 flex flex-col gap-1">
-          <span className="text-sm text-text-secondary">Balance</span>
-          <span className="text-3xl font-bold">
-            {summary.balance.toLocaleString()}{" "}
-            <span className="text-lg font-normal text-text-secondary">
-              <L k="currencyCode" fallback="aUEC" />
+      {/* Balance + stats */}
+      <MfdPanel
+        chassis="amber"
+        title={<span>[ TREASURY ]</span>}
+        titleAside={
+          <span className="mfd-label">
+            <L k="currencyCode" fallback="aUEC" />
+          </span>
+        }
+        bodyPadding="md"
+      >
+        <div className="flex flex-col gap-4">
+          {/* Running balance */}
+          <div className="flex flex-col gap-0.5">
+            <span className="mfd-label">BALANCE</span>
+            <span
+              className={`mfd-readout text-3xl font-mono font-semibold tabular-nums tracking-wide ${
+                summary.balance >= 0 ? "text-success" : "text-fg-red-light"
+              }`}
+            >
+              {summary.balance.toLocaleString()}{" "}
+              <span className="text-lg font-normal text-text-muted">
+                <L k="currencyCode" fallback="aUEC" />
+              </span>
             </span>
-          </span>
-        </div>
-        <div className="mb-4 flex gap-6 text-sm">
-          <span className="text-green-400">
-            Income: {summary.totalIncome.toLocaleString()}
-          </span>
-          <span className="text-fg-red-light">
-            Expenses: {summary.totalExpense.toLocaleString()}
-          </span>
-        </div>
-        {nonzeroCategories.length > 0 && (
-          <div className="border-t border-border pt-3">
-            <p className="mb-2 text-xs text-text-muted">By category (net)</p>
-            <div className="flex flex-wrap gap-3">
-              {nonzeroCategories.map(([cat, net]) => (
-                <span key={cat} className="text-sm">
-                  <span className="text-text-secondary">
-                    {CATEGORY_LABELS[cat as TreasuryCategory] ?? cat}:
-                  </span>{" "}
-                  <span className={net >= 0 ? "text-green-400" : "text-fg-red-light"}>
-                    {net.toLocaleString()}
-                  </span>
+          </div>
+
+          {/* Income / Expense row */}
+          <div className="flex flex-wrap gap-6">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-success" />
+              <div className="flex flex-col gap-0.5">
+                <span className="mfd-label">INCOME</span>
+                <span className="mfd-readout text-success">
+                  {summary.totalIncome.toLocaleString()}
                 </span>
-              ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <TrendingDown className="h-4 w-4 text-fg-red-light" />
+              <div className="flex flex-col gap-0.5">
+                <span className="mfd-label">EXPENSES</span>
+                <span className="mfd-readout text-fg-red-light">
+                  {summary.totalExpense.toLocaleString()}
+                </span>
+              </div>
             </div>
           </div>
-        )}
-      </div>
+
+          {/* By-category breakdown */}
+          {nonzeroCategories.length > 0 && (
+            <div className="border-t border-border/60 pt-3">
+              <p className="mfd-label mb-2">BY CATEGORY (NET)</p>
+              <div className="flex flex-wrap gap-4">
+                {nonzeroCategories.map(([cat, net]) => (
+                  <div key={cat} className="flex flex-col gap-0.5">
+                    <span className="mfd-label">
+                      {CATEGORY_LABELS[cat as TreasuryCategory] ?? cat}
+                    </span>
+                    <span
+                      className={`mfd-readout ${net >= 0 ? "text-success" : "text-fg-red-light"}`}
+                    >
+                      {net >= 0 ? "+" : ""}
+                      {net.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </MfdPanel>
 
       {/* Add entry form */}
-      <div className="mb-6">
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ ADD ENTRY ]</span>}
+        bodyPadding="md"
+      >
         <AddEntryForm />
-      </div>
-
-      {/* Filter form */}
-      <form method="GET" className="mb-4 flex flex-wrap gap-3">
-        <select
-          name="type"
-          defaultValue={filterType ?? ""}
-          className="rounded border border-border-light bg-surface px-3 py-2 text-sm"
-        >
-          <option value="">All types</option>
-          {TREASURY_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t === "INCOME" ? "Income" : "Expense"}
-            </option>
-          ))}
-        </select>
-        <select
-          name="category"
-          defaultValue={filterCategory ?? ""}
-          className="rounded border border-border-light bg-surface px-3 py-2 text-sm"
-        >
-          <option value="">All categories</option>
-          {TREASURY_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {CATEGORY_LABELS[c]}
-            </option>
-          ))}
-        </select>
-        <button
-          type="submit"
-          className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
-        >
-          Filter
-        </button>
-        {(filterType || filterCategory) && (
-          <a
-            href="/treasury"
-            className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
-          >
-            Clear
-          </a>
-        )}
-      </form>
+      </MfdPanel>
 
       {/* Ledger */}
-      {entries.length === 0 ? (
-        <p className="text-text-secondary">No entries found.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-text-muted">
-                <th className="pb-2 pr-4 font-normal">Date</th>
-                <th className="pb-2 pr-4 font-normal">Type</th>
-                <th className="pb-2 pr-4 font-normal">Category</th>
-                <th className="pb-2 pr-4 font-normal">Amount</th>
-                <th className="pb-2 pr-4 font-normal">Description</th>
-                <th className="pb-2 pr-4 font-normal">Author</th>
-                {canDelete && <th className="pb-2 font-normal"></th>}
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((e) => (
-                <tr key={e.id} className="border-b border-border hover:bg-surface-hover/40">
-                  <td className="py-2 pr-4 text-text-secondary">
-                    {e.createdAt.toISOString().slice(0, 10)}
-                  </td>
-                  <td className="py-2 pr-4">
-                    <span
-                      className={
-                        e.type === "INCOME"
-                          ? "rounded px-1.5 py-0.5 text-xs font-semibold bg-green-900/50 text-green-300"
-                          : "rounded px-1.5 py-0.5 text-xs font-semibold bg-red-900/50 text-fg-red-light"
-                      }
-                    >
-                      {e.type === "INCOME" ? "Income" : "Expense"}
-                    </span>
-                  </td>
-                  <td className="py-2 pr-4 text-text-secondary">
-                    {CATEGORY_LABELS[e.category]}
-                  </td>
-                  <td className="py-2 pr-4 font-mono">
-                    <span className={e.type === "INCOME" ? "text-green-400" : "text-fg-red-light"}>
-                      {e.type === "EXPENSE" ? "-" : ""}
-                      {e.amount.toLocaleString()}
-                    </span>{" "}
-                    <span className="text-text-muted text-xs">
-                      <L k="currencyCode" fallback="aUEC" />
-                    </span>
-                  </td>
-                  <td className="py-2 pr-4 text-text-secondary max-w-xs truncate">
-                    {e.description}
-                  </td>
-                  <td className="py-2 pr-4 text-text-secondary">{e.authorName}</td>
-                  {canDelete && (
-                    <td className="py-2">
-                      <EntryActions entryId={e.id} />
-                    </td>
-                  )}
-                </tr>
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ LEDGER ]</span>}
+        titleAside={
+          <span className="mfd-label">{entries.length} RECORDS</span>
+        }
+        bodyPadding="none"
+      >
+        {/* Filter form */}
+        <div className="flex flex-wrap gap-3 border-b border-border/60 px-4 py-3">
+          <form method="GET" className="flex flex-wrap gap-3">
+            <select
+              name="type"
+              defaultValue={filterType ?? ""}
+              className="rounded border border-border bg-surface px-3 py-1.5 text-sm text-text-primary"
+            >
+              <option value="">All types</option>
+              {TREASURY_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t === "INCOME" ? "Income" : "Expense"}
+                </option>
               ))}
-            </tbody>
-          </table>
+            </select>
+            <select
+              name="category"
+              defaultValue={filterCategory ?? ""}
+              className="rounded border border-border bg-surface px-3 py-1.5 text-sm text-text-primary"
+            >
+              <option value="">All categories</option>
+              {TREASURY_CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {CATEGORY_LABELS[c]}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              className="rounded border border-border px-4 py-1.5 text-sm text-text-primary hover:border-primary hover:text-primary"
+            >
+              Filter
+            </button>
+            {(filterType || filterCategory) && (
+              <a
+                href="/treasury"
+                className="rounded border border-border px-4 py-1.5 text-sm text-text-muted hover:border-primary hover:text-primary"
+              >
+                Clear
+              </a>
+            )}
+          </form>
         </div>
-      )}
-    </main>
+
+        {entries.length === 0 ? (
+          <p className="px-4 py-6 text-sm text-text-muted">No entries found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/60 text-left">
+                  <th className="mfd-label px-4 py-2 font-normal">DATE</th>
+                  <th className="mfd-label px-4 py-2 font-normal">TYPE</th>
+                  <th className="mfd-label px-4 py-2 font-normal">CATEGORY</th>
+                  <th className="mfd-label px-4 py-2 font-normal">AMOUNT</th>
+                  <th className="mfd-label px-4 py-2 font-normal">DESCRIPTION</th>
+                  <th className="mfd-label px-4 py-2 font-normal">AUTHOR</th>
+                  {canDelete && <th className="mfd-label px-4 py-2 font-normal"></th>}
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((e) => (
+                  <tr
+                    key={e.id}
+                    className="border-b border-border/40 hover:bg-surface-elevated/60"
+                  >
+                    <td className="px-4 py-2 text-text-muted">
+                      {e.createdAt.toISOString().slice(0, 10)}
+                    </td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={
+                          e.type === "INCOME"
+                            ? "rounded px-1.5 py-0.5 text-xs font-semibold bg-success/10 text-success"
+                            : "rounded px-1.5 py-0.5 text-xs font-semibold bg-fg-red-light/10 text-fg-red-light"
+                        }
+                      >
+                        {e.type === "INCOME" ? "Income" : "Expense"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-text-secondary">
+                      {CATEGORY_LABELS[e.category]}
+                    </td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={`mfd-readout ${
+                          e.type === "INCOME" ? "text-success" : "text-fg-red-light"
+                        }`}
+                      >
+                        {e.type === "EXPENSE" ? "-" : ""}
+                        {e.amount.toLocaleString()}
+                      </span>{" "}
+                      <span className="mfd-label text-xs">
+                        <L k="currencyCode" fallback="aUEC" />
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-text-secondary max-w-xs truncate">
+                      {e.description}
+                    </td>
+                    <td className="px-4 py-2 text-text-secondary">{e.authorName}</td>
+                    {canDelete && (
+                      <td className="px-4 py-2">
+                        <EntryActions entryId={e.id} />
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </MfdPanel>
+    </div>
   );
 }

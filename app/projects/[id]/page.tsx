@@ -6,8 +6,10 @@ import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { getProject, TICKET_STATUSES, type TicketRow } from "@/lib/queries/projects";
 import { TicketCreateForm, TicketCard, DeleteProjectButton } from "@/components/projects/projects-client";
+import { MfdPanel } from "@/components/ui/mfd";
+import { ClipboardList } from "lucide-react";
 
-const COLUMN_LABEL: Record<string, string> = { TODO: "To do", IN_PROGRESS: "In progress", DONE: "Done" };
+const COLUMN_LABEL: Record<string, string> = { TODO: "TO DO", IN_PROGRESS: "IN PROGRESS", DONE: "DONE" };
 
 export default async function ProjectBoardPage({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await getFullTenantContext();
@@ -25,48 +27,61 @@ export default async function ProjectBoardPage({ params }: { params: Promise<{ i
   for (const t of project.tickets) byStatus.get(t.status)?.push(t);
 
   return (
-    <main className="mx-auto max-w-5xl space-y-6 p-6">
-      <div>
-        <a href="/projects" className="text-sm text-text-secondary underline hover:text-text-primary">← Projects</a>
-        <div className="mt-2 flex items-start justify-between gap-4">
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+            <ClipboardList className="h-5 w-5" />
+          </span>
           <div>
-            <h1 className="text-2xl font-bold">{project.name}</h1>
-            {project.description && <p className="text-sm text-text-secondary">{project.description}</p>}
+            <a href="/projects" className="mfd-label text-xs hover:text-primary transition-colors">← PROJECTS</a>
+            <h1 className="text-2xl font-bold text-text-primary">{project.name}</h1>
+            {project.description && (
+              <p className="text-sm text-text-muted">{project.description}</p>
+            )}
           </div>
-          <div className="flex shrink-0 items-center gap-3">
-            <TicketCreateForm projectId={project.id} />
-            {canManage && <DeleteProjectButton id={project.id} />}
-          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-3 pt-4">
+          <TicketCreateForm projectId={project.id} />
+          {canManage && <DeleteProjectButton id={project.id} />}
         </div>
       </div>
 
+      {/* Kanban board */}
       <div className="grid gap-4 md:grid-cols-3">
-        {TICKET_STATUSES.map((status) => (
-          <section key={status}>
-            <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-text-muted">
-              {COLUMN_LABEL[status]} · {byStatus.get(status)!.length}
-            </h2>
-            <div className="space-y-2">
-              {byStatus.get(status)!.length === 0 ? (
-                <p className="text-xs text-text-muted">—</p>
-              ) : (
-                byStatus.get(status)!.map((t) => (
-                  <TicketCard
-                    key={t.id}
-                    projectId={project.id}
-                    id={t.id}
-                    title={t.title}
-                    description={t.description}
-                    status={t.status}
-                    assigneeName={t.assigneeUsername}
-                    canDelete={canManage}
-                  />
-                ))
-              )}
-            </div>
-          </section>
-        ))}
+        {TICKET_STATUSES.map((status) => {
+          const tickets = byStatus.get(status)!;
+          return (
+            <MfdPanel
+              key={status}
+              chassis={status === "DONE" ? "primary" : status === "IN_PROGRESS" ? "amber" : "neutral"}
+              title={<span>[ {COLUMN_LABEL[status]} ]</span>}
+              titleAside={<span className="mfd-readout text-xs">{tickets.length}</span>}
+              bodyPadding="sm"
+            >
+              <div className="space-y-2">
+                {tickets.length === 0 ? (
+                  <p className="mfd-label py-4 text-center">—</p>
+                ) : (
+                  tickets.map((t) => (
+                    <TicketCard
+                      key={t.id}
+                      projectId={project.id}
+                      id={t.id}
+                      title={t.title}
+                      description={t.description}
+                      status={t.status}
+                      assigneeName={t.assigneeUsername}
+                      canDelete={canManage}
+                    />
+                  ))
+                )}
+              </div>
+            </MfdPanel>
+          );
+        })}
       </div>
-    </main>
+    </div>
   );
 }

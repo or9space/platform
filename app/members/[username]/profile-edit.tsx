@@ -47,52 +47,49 @@ export function ProfileEdit({ initial }: ProfileEditProps) {
   }
 
   return (
-    <div className="mt-6 rounded border border-border p-4">
-      <h2 className="mb-4 font-semibold">Edit profile</h2>
-      <form action={handleSubmit} className="space-y-4">
-        {error && <p className="text-sm text-fg-red-light">{error}</p>}
-        {saved && <p className="text-sm text-green-400">Profile updated.</p>}
-        <label className="block text-sm">
-          Display name
-          <input
-            name="displayName"
-            maxLength={80}
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            className="mt-1 w-full rounded border border-border-light bg-surface p-2"
-          />
-        </label>
-        <label className="block text-sm">
-          Bio
-          <textarea
-            name="bio"
-            maxLength={500}
-            rows={4}
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            className="mt-1 w-full rounded border border-border-light bg-surface p-2"
-          />
-        </label>
-        <label className="block text-sm">
-          Avatar URL
-          <input
-            name="avatarUrl"
-            type="url"
-            maxLength={500}
-            value={avatarUrl}
-            onChange={(e) => setAvatarUrl(e.target.value)}
-            placeholder="https://…"
-            className="mt-1 w-full rounded border border-border-light bg-surface p-2"
-          />
-        </label>
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
-        >
-          {pending ? "Saving…" : "Save"}
-        </button>
-      </form>
-    </div>
+    <form action={handleSubmit} className="space-y-4">
+      {error && <p className="text-sm text-fg-red-light">{error}</p>}
+      {saved && <p className="mfd-label text-primary">PROFILE UPDATED</p>}
+      <label className="block">
+        <span className="mfd-label block mb-1">DISPLAY NAME</span>
+        <input
+          name="displayName"
+          maxLength={80}
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          className="w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none"
+        />
+      </label>
+      <label className="block">
+        <span className="mfd-label block mb-1">BIO</span>
+        <textarea
+          name="bio"
+          maxLength={500}
+          rows={4}
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          className="w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none"
+        />
+      </label>
+      <label className="block">
+        <span className="mfd-label block mb-1">AVATAR URL</span>
+        <input
+          name="avatarUrl"
+          type="url"
+          maxLength={500}
+          value={avatarUrl}
+          onChange={(e) => setAvatarUrl(e.target.value)}
+          placeholder="https://…"
+          className="w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none"
+        />
+      </label>
+      <button
+        type="submit"
+        disabled={pending}
+        className="border border-primary bg-primary/10 px-5 py-2 text-sm font-semibold text-primary hover:bg-primary/20 disabled:opacity-50 transition-colors"
+      >
+        {pending ? "SAVING…" : "[ SAVE ]"}
+      </button>
+    </form>
   );
 }

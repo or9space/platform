@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { UserPlus2 } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -7,6 +8,7 @@ import { makeTenantContext } from "@/lib/tenant";
 import { listLfg } from "@/lib/queries/lfg";
 import { formatDate } from "@/lib/format";
 import { LfgCreateForm, LfgRowActions } from "@/components/lfg/lfg-client";
+import { MfdPanel } from "@/components/ui/mfd";
 
 export default async function LfgPage() {
   const ctx = await getFullTenantContext();
@@ -18,36 +20,61 @@ export default async function LfgPage() {
   const posts = await listLfg(makeTenantContext(ctx.tenant.id));
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
-      <h1 className="text-2xl font-bold">Looking for group</h1>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <UserPlus2 className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">LFG</h1>
+          <p className="text-sm text-text-muted">Find crew and wing partners</p>
+        </div>
+      </div>
+
+      {/* Create form */}
       <LfgCreateForm />
 
+      {/* Posts */}
       {posts.length === 0 ? (
-        <p className="text-sm text-text-muted">No posts yet.</p>
+        <MfdPanel title={<span>[ LFG ]</span>} bodyPadding="md">
+          <p className="mfd-label py-4 text-center">No posts yet.</p>
+        </MfdPanel>
       ) : (
-        <ul className="space-y-3">
+        <div className="space-y-3">
           {posts.map((p) => {
             const canManage = isOfficer || p.authorId === viewer.id;
             return (
-              <li key={p.id} className={`rounded border p-4 ${p.status === "CLOSED" ? "border-border opacity-60" : "border-border"}`}>
+              <MfdPanel
+                key={p.id}
+                chassis={p.status === "CLOSED" ? "neutral" : "primary"}
+                bodyPadding="md"
+                className={p.status === "CLOSED" ? "opacity-60" : undefined}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      {p.status === "CLOSED" && <span className="text-xs uppercase text-text-muted">Closed</span>}
+                      {p.status === "CLOSED" && (
+                        <span className="mfd-label text-xs uppercase">Closed</span>
+                      )}
                       <p className="font-medium text-text-primary">{p.title}</p>
                     </div>
-                    {p.body && <p className="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{p.body}</p>}
+                    {p.body && (
+                      <p className="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{p.body}</p>
+                    )}
                     <p className="mt-1 text-xs text-text-muted">
-                      <a href={`/members/${p.authorUsername}`} className="hover:underline">{p.authorName}</a> · {formatDate(p.createdAt)}
+                      <a href={`/members/${p.authorUsername}`} className="hover:underline text-primary">{p.authorName}</a>
+                      {" · "}
+                      <span className="mfd-readout text-xs">{formatDate(p.createdAt)}</span>
                     </p>
                   </div>
                   {canManage && <LfgRowActions id={p.id} status={p.status} />}
                 </div>
-              </li>
+              </MfdPanel>
             );
           })}
-        </ul>
+        </div>
       )}
-    </main>
+    </div>
   );
 }

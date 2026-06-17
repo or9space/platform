@@ -47,9 +47,7 @@ export function CreateTournamentForm() {
   }
 
   return (
-    <div className="rounded border border-border p-4">
-      <h2 className="mb-4 font-semibold">Create tournament</h2>
-      <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
+    <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
         {error && <p className="w-full text-sm text-fg-red-light">{error}</p>}
 
         <label className="flex flex-col gap-1 text-sm flex-1 min-w-48">
@@ -114,6 +112,5 @@ export function CreateTournamentForm() {
           {pending ? "Creating…" : "Create"}
         </button>
       </form>
-    </div>
   );
 }

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Package } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -7,6 +8,7 @@ import { makeTenantContext } from "@/lib/tenant";
 import { getItem, listHoldingsByItem } from "@/lib/queries/inventory";
 import { CATEGORY_LABELS } from "@/lib/inventory";
 import type { HoldingState } from "@/lib/inventory";
+import { MfdPanel } from "@/components/ui/mfd";
 import { CreateHoldingForm } from "./create-holding-form";
 import { HoldingActions } from "./holding-actions";
 import { DeleteItemButton } from "./delete-item-button";
@@ -19,10 +21,10 @@ const STATE_LABELS: Record<HoldingState, string> = {
 };
 
 const STATE_CLASSES: Record<HoldingState, string> = {
-  ACTIVE: "rounded px-1.5 py-0.5 text-xs font-semibold bg-green-900/50 text-green-300",
-  LOST: "rounded px-1.5 py-0.5 text-xs font-semibold bg-yellow-900/50 text-yellow-300",
-  DESTROYED: "rounded px-1.5 py-0.5 text-xs font-semibold bg-red-900/50 text-fg-red-light",
-  RETIRED: "rounded px-1.5 py-0.5 text-xs font-semibold bg-surface-elevated text-text-secondary",
+  ACTIVE: "px-1.5 py-0.5 text-xs font-mono font-semibold bg-green-900/30 text-green-300 border border-green-700/40",
+  LOST: "px-1.5 py-0.5 text-xs font-mono font-semibold bg-yellow-900/30 text-yellow-300 border border-yellow-700/40",
+  DESTROYED: "px-1.5 py-0.5 text-xs font-mono font-semibold bg-danger/30 text-fg-red-light border border-danger/40",
+  RETIRED: "px-1.5 py-0.5 text-xs font-mono font-semibold bg-surface-elevated text-text-secondary border border-border",
 };
 
 export default async function ItemDetailPage({
@@ -51,88 +53,130 @@ export default async function ItemDetailPage({
   const canManage = hasTier(viewer.tier, "OFFICER");
   const canDelete = hasTier(viewer.tier, "COMMAND");
 
+  const totalQty = holdings.reduce((acc, h) => acc + h.quantity, 0);
+
   return (
-    <main className="mx-auto max-w-4xl p-6">
-      <div className="mb-6">
-        <a
-          href="/inventory"
-          className="text-sm text-text-secondary hover:text-text-primary"
-        >
-          &larr; Inventory
-        </a>
-      </div>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Back nav */}
+      <a
+        href="/inventory"
+        className="mfd-label inline-flex items-center gap-1 text-xs text-text-muted hover:text-primary"
+      >
+        &larr; INVENTORY
+      </a>
 
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">{item.name}</h1>
-          <p className="mt-1 text-sm text-text-secondary">
-            {CATEGORY_LABELS[item.category]} &middot;{" "}
-            {item.kind === "UNIQUE" ? "Unique" : "Fungible"}
-          </p>
-          {item.description && (
-            <p className="mt-3 max-w-prose text-sm text-text-secondary whitespace-pre-wrap">
-              {item.description}
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+            <Package className="h-5 w-5" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">{item.name}</h1>
+            <p className="text-sm text-text-muted">
+              {CATEGORY_LABELS[item.category]}&nbsp;&middot;&nbsp;
+              {item.kind === "UNIQUE" ? "Unique" : "Fungible"}
             </p>
-          )}
+          </div>
         </div>
-        {canDelete && (
-          <DeleteItemButton itemId={item.id} />
-        )}
+        {canDelete && <DeleteItemButton itemId={item.id} />}
       </div>
 
+      {/* Item meta */}
+      {item.description && (
+        <MfdPanel chassis="neutral" title={<span>[ DESCRIPTION ]</span>} bodyPadding="md">
+          <p className="max-w-prose text-sm text-text-secondary whitespace-pre-wrap">
+            {item.description}
+          </p>
+        </MfdPanel>
+      )}
+
+      {/* Stat strip */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <MfdPanel chassis="amber" bodyPadding="sm">
+          <p className="mfd-label text-text-muted">Total qty</p>
+          <p className="mt-0.5 font-mono tabular-nums text-2xl font-bold text-amber">{totalQty}</p>
+        </MfdPanel>
+        <MfdPanel chassis="neutral" bodyPadding="sm">
+          <p className="mfd-label text-text-muted">Holdings</p>
+          <p className="mt-0.5 font-mono tabular-nums text-2xl font-bold text-text-primary">{holdings.length}</p>
+        </MfdPanel>
+        <MfdPanel chassis="neutral" bodyPadding="sm" className="col-span-2 sm:col-span-1">
+          <p className="mfd-label text-text-muted">Kind</p>
+          <p className="mt-0.5 font-mono text-sm font-semibold text-text-primary">
+            {item.kind === "UNIQUE" ? "UNIQUE" : "FUNGIBLE"}
+          </p>
+        </MfdPanel>
+      </div>
+
+      {/* Add holding (officers only) */}
       {canManage && (
-        <div className="mb-6">
+        <MfdPanel
+          chassis="primary"
+          title={<span>[ ADD HOLDING ]</span>}
+          bodyPadding="md"
+        >
           <CreateHoldingForm itemId={item.id} />
-        </div>
+        </MfdPanel>
       )}
 
-      <h2 className="mb-3 font-semibold">Holdings</h2>
-
-      {holdings.length === 0 ? (
-        <p className="text-text-secondary text-sm">No holdings recorded.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-text-muted">
-                <th className="pb-2 pr-4 font-normal">Qty</th>
-                <th className="pb-2 pr-4 font-normal">State</th>
-                <th className="pb-2 pr-4 font-normal">Custodian</th>
-                <th className="pb-2 pr-4 font-normal">Notes</th>
-                {canManage && <th className="pb-2 font-normal"></th>}
-              </tr>
-            </thead>
-            <tbody>
-              {holdings.map((h) => (
-                <tr key={h.id} className="border-b border-border hover:bg-surface-hover/40">
-                  <td className="py-2 pr-4 font-mono">{h.quantity}</td>
-                  <td className="py-2 pr-4">
-                    <span className={STATE_CLASSES[h.state]}>
-                      {STATE_LABELS[h.state]}
-                    </span>
-                  </td>
-                  <td className="py-2 pr-4 text-text-secondary">
-                    {h.custodianName ?? <span className="text-text-muted">&mdash;</span>}
-                  </td>
-                  <td className="py-2 pr-4 max-w-xs text-text-secondary whitespace-pre-wrap">
-                    {h.notes ?? <span className="text-text-muted">&mdash;</span>}
-                  </td>
-                  {canManage && (
-                    <td className="py-2">
-                      <HoldingActions
-                        holdingId={h.id}
-                        quantity={h.quantity}
-                        state={h.state}
-                        notes={h.notes}
-                      />
-                    </td>
-                  )}
+      {/* Holdings table */}
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ HOLDINGS ]</span>}
+        titleAside={
+          <span className="font-mono text-xs tabular-nums text-text-muted">
+            {holdings.length} records
+          </span>
+        }
+        bodyPadding="none"
+      >
+        {holdings.length === 0 ? (
+          <p className="px-4 py-6 text-sm text-text-muted">No holdings recorded.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/60 text-left">
+                  <th className="mfd-label px-4 py-2 pr-4 font-normal text-text-muted">Qty</th>
+                  <th className="mfd-label px-4 py-2 pr-4 font-normal text-text-muted">State</th>
+                  <th className="mfd-label px-4 py-2 pr-4 font-normal text-text-muted">Custodian</th>
+                  <th className="mfd-label px-4 py-2 pr-4 font-normal text-text-muted">Notes</th>
+                  {canManage && <th className="mfd-label px-4 py-2 font-normal text-text-muted"></th>}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </main>
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                {holdings.map((h) => (
+                  <tr key={h.id} className="hover:bg-surface-hover/40">
+                    <td className="px-4 py-2.5 pr-4 font-mono tabular-nums text-amber">{h.quantity}</td>
+                    <td className="px-4 py-2.5 pr-4">
+                      <span className={STATE_CLASSES[h.state]}>
+                        {STATE_LABELS[h.state].toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5 pr-4 font-mono text-text-secondary">
+                      {h.custodianName ?? <span className="text-text-muted">&mdash;</span>}
+                    </td>
+                    <td className="px-4 py-2.5 pr-4 max-w-xs text-text-secondary whitespace-pre-wrap">
+                      {h.notes ?? <span className="text-text-muted">&mdash;</span>}
+                    </td>
+                    {canManage && (
+                      <td className="px-4 py-2.5">
+                        <HoldingActions
+                          holdingId={h.id}
+                          quantity={h.quantity}
+                          state={h.state}
+                          notes={h.notes}
+                        />
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </MfdPanel>
+    </div>
   );
 }

@@ -6,7 +6,7 @@ import {
   claimContractAction, unclaimContractAction,
 } from "@/lib/actions/contracts";
 
-const field = "w-full rounded border border-border-light bg-surface p-2 text-sm";
+const field = "w-full rounded border border-border bg-surface p-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none";
 
 export function ContractCreateForm() {
   const [error, setError] = useState<string | null>(null);
@@ -18,16 +18,40 @@ export function ContractCreateForm() {
     const input = { title: String(fd.get("title") ?? ""), reward: String(fd.get("reward") ?? "") || null, description: String(fd.get("description") ?? "") || null };
     start(async () => { const r = await createContractAction(input); if (!r.ok) { setError(r.error); return; } window.location.reload(); });
   }
-  if (!open) return <button onClick={() => setOpen(true)} className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream">New contract</button>;
+  if (!open) return (
+    <button
+      onClick={() => setOpen(true)}
+      className="rounded border border-primary bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary hover:bg-primary/20 mfd-cut-tl-br"
+    >
+      + New Contract
+    </button>
+  );
   return (
-    <form action={submit} className="space-y-2 rounded border border-border p-4">
+    <form action={submit} className="space-y-3">
       {error && <p className="text-sm text-fg-red-light">{error}</p>}
-      <input name="title" required placeholder="Title" maxLength={160} className={field} />
-      <input name="reward" placeholder="Reward (optional, e.g. 50k aUEC)" maxLength={160} className={field} />
-      <textarea name="description" rows={3} placeholder="Details (optional)" maxLength={5000} className={field} />
-      <div className="flex gap-2">
-        <button type="submit" disabled={pending} className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream disabled:opacity-50">{pending ? "Saving…" : "Save"}</button>
-        <button type="button" onClick={() => setOpen(false)} className="text-sm text-text-secondary hover:text-text-primary">Cancel</button>
+      <div>
+        <label className="mfd-label mb-1 block">TITLE</label>
+        <input name="title" required placeholder="Contract title" maxLength={160} className={field} />
+      </div>
+      <div>
+        <label className="mfd-label mb-1 block">REWARD</label>
+        <input name="reward" placeholder="e.g. 50k aUEC (optional)" maxLength={160} className={field} />
+      </div>
+      <div>
+        <label className="mfd-label mb-1 block">DETAILS</label>
+        <textarea name="description" rows={3} placeholder="Mission details (optional)" maxLength={5000} className={field} />
+      </div>
+      <div className="flex items-center gap-3 pt-1">
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded border border-primary bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary hover:bg-primary/20 disabled:opacity-50 mfd-cut-tl-br"
+        >
+          {pending ? "Saving…" : "Save Contract"}
+        </button>
+        <button type="button" onClick={() => setOpen(false)} className="text-sm text-text-muted hover:text-text-secondary">
+          Cancel
+        </button>
       </div>
     </form>
   );
@@ -41,7 +65,7 @@ export function ContractActions({
   id, status, canManage, isClaimant, canClaim,
 }: { id: string; status: string; canManage: boolean; isClaimant: boolean; canClaim: boolean }) {
   const [pending, start] = useTransition();
-  const btn = "rounded border border-border-light px-2 py-1 text-xs hover:border-primary disabled:opacity-50";
+  const btn = "rounded border border-border bg-surface px-2 py-1 text-xs text-text-secondary hover:border-primary hover:text-primary disabled:opacity-50 mfd-cut-tl-br";
   return (
     <span className="flex flex-wrap items-center gap-2">
       {status === "OPEN" && canClaim && (
@@ -57,7 +81,9 @@ export function ContractActions({
         <button onClick={() => act(() => setContractStatusAction(id, "CANCELLED"), start)} disabled={pending} className={btn}>Cancel</button>
       )}
       {canManage && (
-        <button onClick={() => act(() => deleteContractAction(id), start)} disabled={pending} className="text-xs text-fg-red-light hover:text-fg-red-light disabled:opacity-50">Delete</button>
+        <button onClick={() => act(() => deleteContractAction(id), start)} disabled={pending} className="text-xs text-fg-red-light hover:opacity-80 disabled:opacity-50">
+          Delete
+        </button>
       )}
     </span>
   );

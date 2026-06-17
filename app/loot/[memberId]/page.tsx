@@ -20,7 +20,7 @@ const TXN_LABELS: Record<LootTxnType, string> = {
 };
 
 const TXN_COLORS: Record<LootTxnType, string> = {
-  SPEND: "bg-red-900/50 text-fg-red-light",
+  SPEND: "bg-danger/50 text-fg-red-light",
   TRANSFER_IN: "bg-green-900/50 text-green-300",
   TRANSFER_OUT: "bg-yellow-900/50 text-yellow-300",
   ADJUST: "bg-surface-elevated text-text-secondary",

@@ -50,60 +50,57 @@ export function CreateHoldingForm({ itemId }: CreateHoldingFormProps) {
   }
 
   return (
-    <div className="rounded border border-border p-4">
-      <h2 className="mb-4 font-semibold">Add holding</h2>
-      <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
-        {error && <p className="w-full text-sm text-fg-red-light">{error}</p>}
-        <label className="flex flex-col gap-1 text-sm">
-          Quantity
-          <input
-            name="quantity"
-            type="number"
-            min="1"
-            step="1"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            disabled={pending}
-            className="w-24 rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          State
-          <select
-            name="state"
-            value={state}
-            onChange={(e) => setState(e.target.value as HoldingState)}
-            disabled={pending}
-            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
-          >
-            {HOLDING_STATES.map((s) => (
-              <option key={s} value={s}>
-                {s.charAt(0) + s.slice(1).toLowerCase()}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-sm flex-1 min-w-48">
-          Notes
-          <input
-            name="notes"
-            type="text"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            disabled={pending}
-            placeholder="Optional notes…"
-            maxLength={500}
-            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
-          />
-        </label>
-        <button
-          type="submit"
+    <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
+      {error && <p className="w-full text-xs text-fg-red-light mfd-label">{error}</p>}
+      <label className="flex flex-col gap-1">
+        <span className="mfd-label text-text-muted">Quantity</span>
+        <input
+          name="quantity"
+          type="number"
+          min="1"
+          step="1"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
           disabled={pending}
-          className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
+          className="w-24 border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none disabled:opacity-50"
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="mfd-label text-text-muted">State</span>
+        <select
+          name="state"
+          value={state}
+          onChange={(e) => setState(e.target.value as HoldingState)}
+          disabled={pending}
+          className="border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none disabled:opacity-50"
         >
-          {pending ? "Adding…" : "Add"}
-        </button>
-      </form>
-    </div>
+          {HOLDING_STATES.map((s) => (
+            <option key={s} value={s}>
+              {s.charAt(0) + s.slice(1).toLowerCase()}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col gap-1 flex-1 min-w-48">
+        <span className="mfd-label text-text-muted">Notes</span>
+        <input
+          name="notes"
+          type="text"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          disabled={pending}
+          placeholder="Optional notes…"
+          maxLength={500}
+          className="border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none disabled:opacity-50"
+        />
+      </label>
+      <button
+        type="submit"
+        disabled={pending}
+        className="border border-primary bg-primary/10 px-4 py-2 text-xs mfd-label text-primary hover:bg-primary/20 disabled:opacity-50"
+      >
+        {pending ? "ADDING…" : "ADD HOLDING"}
+      </button>
+    </form>
   );
 }

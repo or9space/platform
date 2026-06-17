@@ -1,6 +1,6 @@
 const STYLES: Record<string, { label: string; cls: string }> = {
   OP: { label: "Op", cls: "border-danger bg-surface text-fg-red-light" },
-  MEETING: { label: "Meeting", cls: "border-sky-800 bg-sky-950 text-info" },
+  MEETING: { label: "Meeting", cls: "border-info bg-surface-elevated text-info" },
   TRAINING: { label: "Training", cls: "border-green-800 bg-green-950 text-green-300" },
   SOCIAL: { label: "Social", cls: "border-border-light bg-surface text-text-secondary" },
   TOURNAMENT: { label: "Tournament", cls: "border-amber bg-amber-soft text-amber" },

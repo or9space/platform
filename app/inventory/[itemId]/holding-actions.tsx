@@ -74,10 +74,10 @@ export function HoldingActions({ holdingId, quantity, state, notes }: HoldingAct
   if (editing) {
     return (
       <span className="inline-flex flex-col gap-2 min-w-56">
-        {error && <span className="text-xs text-fg-red-light">{error}</span>}
+        {error && <span className="mfd-label text-xs text-fg-red-light">{error}</span>}
         <span className="flex flex-wrap gap-2 items-end">
-          <label className="flex flex-col gap-1 text-xs">
-            Qty
+          <label className="flex flex-col gap-1">
+            <span className="mfd-label text-text-muted">Qty</span>
             <input
               type="number"
               min="1"
@@ -85,16 +85,16 @@ export function HoldingActions({ holdingId, quantity, state, notes }: HoldingAct
               value={editQty}
               onChange={(e) => setEditQty(e.target.value)}
               disabled={pending}
-              className="w-20 rounded border border-border-light bg-surface px-2 py-1 text-sm disabled:opacity-50"
+              className="w-20 border border-border bg-surface px-2 py-1 text-sm text-text-primary focus:border-primary focus:outline-none disabled:opacity-50"
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs">
-            State
+          <label className="flex flex-col gap-1">
+            <span className="mfd-label text-text-muted">State</span>
             <select
               value={editState}
               onChange={(e) => setEditState(e.target.value as HoldingState)}
               disabled={pending}
-              className="rounded border border-border-light bg-surface px-2 py-1 text-sm disabled:opacity-50"
+              className="border border-border bg-surface px-2 py-1 text-sm text-text-primary focus:border-primary focus:outline-none disabled:opacity-50"
             >
               {HOLDING_STATES.map((s) => (
                 <option key={s} value={s}>
@@ -103,15 +103,15 @@ export function HoldingActions({ holdingId, quantity, state, notes }: HoldingAct
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-1 text-xs flex-1 min-w-32">
-            Notes
+          <label className="flex flex-col gap-1 flex-1 min-w-32">
+            <span className="mfd-label text-text-muted">Notes</span>
             <input
               type="text"
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
               disabled={pending}
               maxLength={500}
-              className="rounded border border-border-light bg-surface px-2 py-1 text-sm disabled:opacity-50"
+              className="border border-border bg-surface px-2 py-1 text-sm text-text-primary focus:border-primary focus:outline-none disabled:opacity-50"
             />
           </label>
         </span>
@@ -119,16 +119,16 @@ export function HoldingActions({ holdingId, quantity, state, notes }: HoldingAct
           <button
             onClick={handleSave}
             disabled={pending}
-            className="rounded border border-border-light px-2 py-1 text-xs hover:border-primary disabled:opacity-50"
+            className="border border-primary bg-primary/10 px-2 py-1 text-xs mfd-label text-primary hover:bg-primary/20 disabled:opacity-50"
           >
-            {pending ? "Saving…" : "Save"}
+            {pending ? "SAVING…" : "SAVE"}
           </button>
           <button
             onClick={() => { setEditing(false); setError(null); }}
             disabled={pending}
-            className="rounded border border-border-light px-2 py-1 text-xs text-text-secondary hover:border-primary disabled:opacity-50"
+            className="border border-border px-2 py-1 text-xs mfd-label text-text-secondary hover:border-primary disabled:opacity-50"
           >
-            Cancel
+            CANCEL
           </button>
         </span>
       </span>
@@ -141,19 +141,19 @@ export function HoldingActions({ holdingId, quantity, state, notes }: HoldingAct
         <button
           onClick={openEdit}
           disabled={pending}
-          className="rounded border border-border-light px-2 py-1 text-xs hover:border-primary disabled:opacity-50"
+          className="border border-border px-2 py-1 text-xs mfd-label text-text-secondary hover:border-primary hover:text-primary disabled:opacity-50"
         >
-          Edit
+          EDIT
         </button>
         <button
           onClick={handleDelete}
           disabled={pending}
-          className="rounded border border-border-light px-2 py-1 text-xs text-fg-red-light hover:border-danger hover:text-fg-red-light disabled:opacity-50"
+          className="border border-border px-2 py-1 text-xs mfd-label text-fg-red-light hover:border-danger hover:bg-danger/20 disabled:opacity-50"
         >
-          {pending ? "Deleting…" : "Delete"}
+          {pending ? "DELETING…" : "DELETE"}
         </button>
       </span>
-      {error && <span className="text-xs text-fg-red-light">{error}</span>}
+      {error && <span className="mfd-label text-xs text-fg-red-light">{error}</span>}
     </span>
   );
 }

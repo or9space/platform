@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
+import { BookOpen, Link2, FileText } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { listResources } from "@/lib/queries/resources";
+import { MfdPanel } from "@/components/ui/mfd";
 import { ResourceCreateForm, DeleteResourceButton } from "@/components/resources/resources-client";
 
 export default async function ResourcesPage() {
@@ -16,35 +18,75 @@ export default async function ResourcesPage() {
   const resources = await listResources(makeTenantContext(ctx.tenant.id));
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Resources</h1>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+            <BookOpen className="h-5 w-5" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">Resources</h1>
+            <p className="text-sm text-text-muted">Guides, builds, and reference links.</p>
+          </div>
+        </div>
       </div>
+
       {canManage && <ResourceCreateForm />}
 
-      {resources.length === 0 ? (
-        <p className="text-sm text-text-muted">No resources yet.</p>
-      ) : (
-        <ul className="space-y-3">
-          {resources.map((r) => (
-            <li key={r.id} className="rounded border border-border p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  {r.category && <span className="mr-2 rounded border border-border-light px-2 py-0.5 text-xs uppercase text-text-secondary">{r.category}</span>}
-                  {r.url ? (
-                    <a href={r.url} target="_blank" rel="noopener noreferrer" className="font-medium text-text-primary underline hover:text-white">{r.title}</a>
-                  ) : (
-                    <span className="font-medium text-text-primary">{r.title}</span>
+      <MfdPanel
+        chassis="neutral"
+        bodyPadding="none"
+        title={<><BookOpen className="h-3 w-3 text-primary" /><span>[ RESOURCES ]</span></>}
+        titleAside={<span className="mfd-readout text-[10px]">{resources.length}</span>}
+      >
+        {resources.length === 0 ? (
+          <p className="px-4 py-3 text-sm text-text-muted">No resources yet.</p>
+        ) : (
+          <ul className="divide-y divide-border/50">
+            {resources.map((r) => (
+              <li key={r.id} className="flex items-start justify-between gap-3 px-4 py-3 hover:bg-surface-hover/40 transition-colors">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {r.category && (
+                      <span className="inline-flex items-center rounded border border-border px-1.5 py-0.5 mfd-label text-[10px] uppercase text-text-secondary">
+                        {r.category}
+                      </span>
+                    )}
+                    {r.url ? (
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 font-medium text-text-primary hover:text-primary underline underline-offset-2"
+                      >
+                        <Link2 className="h-3 w-3 shrink-0 text-primary" />
+                        {r.title}
+                      </a>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 font-medium text-text-primary">
+                        <FileText className="h-3 w-3 shrink-0 text-text-muted" />
+                        {r.title}
+                      </span>
+                    )}
+                  </div>
+                  {r.body && (
+                    <p className="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{r.body}</p>
                   )}
-                  {r.body && <p className="mt-1 whitespace-pre-wrap text-sm text-text-secondary">{r.body}</p>}
-                  <p className="mt-1 text-xs text-text-muted">Added by {r.authorName}</p>
+                  <p className="mt-1 mfd-label text-[10px]">
+                    Added by <span className="text-text-secondary">{r.authorName}</span>
+                  </p>
                 </div>
-                {canManage && <DeleteResourceButton id={r.id} />}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+                {canManage && (
+                  <div className="shrink-0 pt-0.5">
+                    <DeleteResourceButton id={r.id} />
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </MfdPanel>
+    </div>
   );
 }

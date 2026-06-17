@@ -17,7 +17,7 @@ export function GalleryUploadForm() {
   }
   if (!open) return <button onClick={() => setOpen(true)} className="rounded bg-primary px-3 py-1.5 text-sm font-semibold text-fg-cream">Add image</button>;
   return (
-    <form action={submit} className="space-y-2 rounded border border-border p-4">
+    <form action={submit} className="space-y-2">
       {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <input name="imageUrl" required placeholder="Image URL (https://…)" maxLength={1000} className={field} />
       <input name="title" placeholder="Title (optional)" maxLength={160} className={field} />
@@ -34,7 +34,7 @@ export function DeleteGalleryButton({ id }: { id: string }) {
   const [pending, start] = useTransition();
   return (
     <button onClick={() => start(async () => { const r = await deleteGalleryAction(id); if (r.ok) window.location.reload(); })}
-      disabled={pending} className="absolute right-2 top-2 rounded bg-black/60 px-2 py-1 text-xs text-fg-red-light hover:text-red-200 disabled:opacity-50">
+      disabled={pending} className="absolute right-2 top-2 rounded bg-black/60 px-2 py-1 text-xs text-fg-red-light hover:text-fg-red-light disabled:opacity-50">
       {pending ? "…" : "Delete"}
     </button>
   );

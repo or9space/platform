@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Package } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -6,6 +7,7 @@ import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { listItems, listHoldings } from "@/lib/queries/inventory";
 import { CATEGORY_LABELS } from "@/lib/inventory";
+import { MfdPanel } from "@/components/ui/mfd";
 import { CreateItemForm } from "./create-item-form";
 
 export default async function InventoryPage({
@@ -38,82 +40,120 @@ export default async function InventoryPage({
   const canManage = hasTier(viewer.tier, "OFFICER");
 
   return (
-    <main className="mx-auto max-w-4xl p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Inventory</h1>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+            <Package className="h-5 w-5" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">Inventory</h1>
+            <p className="text-sm text-text-muted">Org-wide gear, ships, and consumables</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 sm:pt-1">
+          <span className="mfd-label text-text-muted font-mono text-xs">
+            {items.length} <span className="text-primary">ITEMS</span>
+          </span>
+        </div>
       </div>
 
-      <form method="GET" className="mb-6">
-        <div className="flex gap-2">
-          <input
-            type="search"
-            name="q"
-            defaultValue={q ?? ""}
-            placeholder="Search items…"
-            className="flex-1 rounded border border-border-light bg-surface px-3 py-2 text-sm"
-          />
-          <button
-            type="submit"
-            className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
-          >
-            Search
-          </button>
-          {q && (
-            <a
-              href="/inventory"
-              className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
+      {/* Search */}
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ SEARCH ]</span>}
+        bodyPadding="md"
+      >
+        <form method="GET">
+          <div className="flex gap-2">
+            <input
+              type="search"
+              name="q"
+              defaultValue={q ?? ""}
+              placeholder="Search items…"
+              className="flex-1 border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="border border-border px-4 py-2 text-xs mfd-label hover:border-primary hover:text-primary"
             >
-              Clear
-            </a>
-          )}
-        </div>
-      </form>
+              SEARCH
+            </button>
+            {q && (
+              <a
+                href="/inventory"
+                className="border border-border px-4 py-2 text-xs mfd-label hover:border-primary hover:text-primary"
+              >
+                CLEAR
+              </a>
+            )}
+          </div>
+        </form>
+      </MfdPanel>
 
+      {/* Add item (officers only) */}
       {canManage && (
-        <div className="mb-6">
+        <MfdPanel
+          chassis="primary"
+          title={<span>[ ADD ITEM ]</span>}
+          bodyPadding="md"
+        >
           <CreateItemForm />
-        </div>
+        </MfdPanel>
       )}
 
-      {items.length === 0 ? (
-        <p className="text-text-secondary">No items found.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-text-muted">
-                <th className="pb-2 pr-4 font-normal">Name</th>
-                <th className="pb-2 pr-4 font-normal">Category</th>
-                <th className="pb-2 pr-4 font-normal">Kind</th>
-                <th className="pb-2 font-normal">Qty held</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.id} className="border-b border-border hover:bg-surface-hover/40">
-                  <td className="py-2 pr-4">
-                    <a
-                      href={`/inventory/${item.id}`}
-                      className="font-medium hover:text-text-primary hover:underline"
-                    >
-                      {item.name}
-                    </a>
-                  </td>
-                  <td className="py-2 pr-4 text-text-secondary">
-                    {CATEGORY_LABELS[item.category]}
-                  </td>
-                  <td className="py-2 pr-4 text-text-secondary">
-                    {item.kind === "UNIQUE" ? "Unique" : "Fungible"}
-                  </td>
-                  <td className="py-2 font-mono text-text-secondary">
-                    {quantityByItem.get(item.id) ?? 0}
-                  </td>
+      {/* Items table */}
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ INVENTORY ]</span>}
+        titleAside={
+          <span className="mfd-readout font-mono text-xs text-text-muted tabular-nums">
+            {items.length} records
+          </span>
+        }
+        bodyPadding="none"
+      >
+        {items.length === 0 ? (
+          <p className="px-4 py-6 text-sm text-text-muted">No items found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/60 text-left">
+                  <th className="mfd-label px-4 py-2 pr-4 font-normal text-text-muted">Name</th>
+                  <th className="mfd-label px-4 py-2 pr-4 font-normal text-text-muted">Category</th>
+                  <th className="mfd-label px-4 py-2 pr-4 font-normal text-text-muted">Kind</th>
+                  <th className="mfd-label px-4 py-2 font-normal text-text-muted">Qty held</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </main>
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                {items.map((item) => (
+                  <tr key={item.id} className="hover:bg-surface-hover/40">
+                    <td className="px-4 py-2.5 pr-4">
+                      <a
+                        href={`/inventory/${item.id}`}
+                        className="font-medium text-text-primary hover:text-primary"
+                      >
+                        {item.name}
+                      </a>
+                    </td>
+                    <td className="px-4 py-2.5 pr-4 text-text-secondary">
+                      {CATEGORY_LABELS[item.category]}
+                    </td>
+                    <td className="px-4 py-2.5 pr-4 text-text-secondary">
+                      {item.kind === "UNIQUE" ? "Unique" : "Fungible"}
+                    </td>
+                    <td className="px-4 py-2.5 font-mono tabular-nums text-amber">
+                      {quantityByItem.get(item.id) ?? 0}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </MfdPanel>
+    </div>
   );
 }

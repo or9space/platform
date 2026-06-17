@@ -34,11 +34,11 @@ export function DeleteItemButton({ itemId }: DeleteItemButtonProps) {
       <button
         onClick={handleDelete}
         disabled={pending}
-        className="rounded border border-border-light px-3 py-1.5 text-sm text-fg-red-light hover:border-danger hover:text-fg-red-light disabled:opacity-50"
+        className="border border-border px-3 py-1.5 text-xs mfd-label text-fg-red-light hover:border-danger hover:bg-danger/20 disabled:opacity-50"
       >
-        {pending ? "Deleting…" : "Delete item"}
+        {pending ? "DELETING…" : "DELETE ITEM"}
       </button>
-      {error && <span className="text-xs text-fg-red-light">{error}</span>}
+      {error && <span className="mfd-label text-xs text-fg-red-light">{error}</span>}
     </span>
   );
 }

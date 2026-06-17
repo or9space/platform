@@ -30,27 +30,38 @@ export function ProfileForm({ initial }: { initial: ProfileInitial }) {
     });
   }
 
-  const field = "mt-1 w-full rounded border border-border-light bg-surface p-2 text-sm";
+  const field = "mt-1 w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none";
 
   return (
     <form action={submit} className="max-w-lg space-y-4">
-      {msg && <p className="rounded border border-green-800 bg-green-950 p-2 text-sm text-green-300">{msg}</p>}
-      {error && <p className="rounded border border-danger bg-surface p-2 text-sm text-fg-red-light">{error}</p>}
+      {msg && (
+        <div className="border border-primary/40 bg-primary/10 px-3 py-2 text-sm text-primary">
+          <span className="mfd-label">{msg}</span>
+        </div>
+      )}
+      {error && (
+        <div className="border border-danger bg-surface px-3 py-2 text-sm text-fg-red-light">
+          <span className="mfd-label">{error}</span>
+        </div>
+      )}
       <label className="block text-sm">
-        Display name
+        <span className="mfd-label">DISPLAY NAME</span>
         <input name="displayName" defaultValue={initial.displayName} maxLength={120} className={field} />
       </label>
       <label className="block text-sm">
-        Avatar URL
+        <span className="mfd-label">AVATAR URL</span>
         <input name="avatarUrl" defaultValue={initial.avatarUrl} maxLength={500} placeholder="https://…" className={field} />
       </label>
       <label className="block text-sm">
-        Bio
+        <span className="mfd-label">BIO</span>
         <textarea name="bio" rows={4} defaultValue={initial.bio} maxLength={500} className={field} />
       </label>
-      <button type="submit" disabled={pending}
-        className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50">
-        {pending ? "Saving…" : "Save profile"}
+      <button
+        type="submit"
+        disabled={pending}
+        className="border border-primary bg-primary/10 px-4 py-2 text-sm font-semibold text-primary disabled:opacity-50 hover:bg-primary/20 transition-colors"
+      >
+        {pending ? "SAVING…" : "SAVE PROFILE"}
       </button>
     </form>
   );

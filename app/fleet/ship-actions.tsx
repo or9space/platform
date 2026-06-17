@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateShipAction, deleteShipAction } from "@/lib/actions/fleet";
 import type { FleetShipRow } from "@/lib/queries/fleet";
+import { MfdPanel } from "@/components/ui/mfd";
 
 interface ShipActionsProps {
   ship: FleetShipRow;
@@ -86,13 +87,17 @@ export function ShipActions({ ship }: ShipActionsProps) {
 
   if (editing) {
     return (
-      <div className="rounded border border-border-light p-4 mt-2">
-        <h3 className="mb-3 text-sm font-semibold">Edit ship</h3>
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ EDIT SHIP ]</span>}
+        bodyPadding="md"
+        className="mt-2"
+      >
         <form action={handleSave} className="flex flex-wrap gap-3 items-end">
           {error && <p className="w-full text-sm text-fg-red-light">{error}</p>}
 
           <label className="flex flex-col gap-1 text-sm flex-1 min-w-40">
-            Ship name
+            <span className="mfd-label">SHIP NAME</span>
             <input
               name="shipName"
               type="text"
@@ -100,12 +105,12 @@ export function ShipActions({ ship }: ShipActionsProps) {
               onChange={(e) => setShipName(e.target.value)}
               disabled={pending}
               maxLength={200}
-              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
+              className="border border-border-light bg-surface px-3 py-2 text-sm text-text-primary disabled:opacity-50"
             />
           </label>
 
           <label className="flex flex-col gap-1 text-sm flex-1 min-w-36">
-            Manufacturer
+            <span className="mfd-label">MANUFACTURER</span>
             <input
               name="manufacturer"
               type="text"
@@ -113,12 +118,12 @@ export function ShipActions({ ship }: ShipActionsProps) {
               onChange={(e) => setManufacturer(e.target.value)}
               disabled={pending}
               maxLength={200}
-              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
+              className="border border-border-light bg-surface px-3 py-2 text-sm text-text-primary disabled:opacity-50"
             />
           </label>
 
           <label className="flex flex-col gap-1 text-sm w-20">
-            Qty
+            <span className="mfd-label">QTY</span>
             <input
               name="quantity"
               type="number"
@@ -126,12 +131,12 @@ export function ShipActions({ ship }: ShipActionsProps) {
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
               disabled={pending}
-              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
+              className="border border-border-light bg-surface px-3 py-2 text-sm font-mono text-amber disabled:opacity-50"
             />
           </label>
 
           <label className="flex flex-col gap-1 text-sm flex-1 min-w-48">
-            Image URL
+            <span className="mfd-label">IMAGE URL</span>
             <input
               name="imageUrl"
               type="url"
@@ -139,12 +144,12 @@ export function ShipActions({ ship }: ShipActionsProps) {
               onChange={(e) => setImageUrl(e.target.value)}
               disabled={pending}
               maxLength={500}
-              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
+              className="border border-border-light bg-surface px-3 py-2 text-sm text-text-primary disabled:opacity-50"
             />
           </label>
 
           <label className="flex flex-col gap-1 text-sm flex-1 min-w-48">
-            Notes
+            <span className="mfd-label">NOTES</span>
             <input
               name="notes"
               type="text"
@@ -152,7 +157,7 @@ export function ShipActions({ ship }: ShipActionsProps) {
               onChange={(e) => setNotes(e.target.value)}
               disabled={pending}
               maxLength={1000}
-              className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
+              className="border border-border-light bg-surface px-3 py-2 text-sm text-text-primary disabled:opacity-50"
             />
           </label>
 
@@ -165,28 +170,28 @@ export function ShipActions({ ship }: ShipActionsProps) {
               disabled={pending}
               className="disabled:opacity-50"
             />
-            Public
+            <span className="mfd-label">PUBLIC</span>
           </label>
 
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={pending}
-              className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
+              className="bg-primary px-4 py-2 text-sm font-semibold text-fg-cream hover:bg-primary/90 disabled:opacity-50 transition-colors"
             >
-              {pending ? "Saving…" : "Save"}
+              {pending ? "SAVING…" : "SAVE"}
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
               disabled={pending}
-              className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary disabled:opacity-50"
+              className="border border-border-light px-4 py-2 text-sm text-text-secondary hover:border-primary hover:text-primary disabled:opacity-50 transition-colors"
             >
-              Cancel
+              CANCEL
             </button>
           </div>
         </form>
-      </div>
+      </MfdPanel>
     );
   }
 
@@ -197,17 +202,17 @@ export function ShipActions({ ship }: ShipActionsProps) {
         type="button"
         onClick={openEdit}
         disabled={pending}
-        className="rounded border border-border-light px-3 py-1 text-sm hover:border-primary disabled:opacity-50"
+        className="border border-border-light px-3 py-1 text-xs text-text-secondary hover:border-primary hover:text-primary disabled:opacity-50 transition-colors"
       >
-        Edit
+        <span className="mfd-label">EDIT</span>
       </button>
       <button
         type="button"
         onClick={handleDelete}
         disabled={pending}
-        className="rounded border border-danger px-3 py-1 text-sm text-fg-red-light hover:border-danger disabled:opacity-50"
+        className="border border-danger px-3 py-1 text-xs text-fg-red-light hover:bg-danger/10 disabled:opacity-50 transition-colors"
       >
-        {pending ? "Deleting…" : "Delete"}
+        <span className="mfd-label">{pending ? "DELETING…" : "DELETE"}</span>
       </button>
     </div>
   );

@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
+import { Swords } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { OperationForm } from "@/components/operations/operation-form";
+import { MfdPanel } from "@/components/ui/mfd";
 
 export default async function NewOperationPage() {
   const ctx = await getFullTenantContext();
@@ -12,12 +14,31 @@ export default async function NewOperationPage() {
   if (!viewer || !hasTier(viewer.tier, "OFFICER")) notFound();
 
   return (
-    <main className="mx-auto max-w-lg space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">New operation</h1>
-        <a href="/operations" className="text-sm text-text-secondary underline hover:text-text-primary">← Operations</a>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+            <Swords className="h-5 w-5" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">New Operation</h1>
+            <p className="text-sm text-text-muted">Define mission parameters and objectives</p>
+          </div>
+        </div>
+        <a
+          href="/operations"
+          className="font-mono text-xs text-text-muted hover:text-primary transition-colors uppercase tracking-widest"
+        >
+          ← Operations
+        </a>
       </div>
-      <OperationForm />
-    </main>
+
+      <div className="mx-auto max-w-lg">
+        <MfdPanel chassis="primary" title={<span>[ NEW MISSION ]</span>} bodyPadding="md">
+          <OperationForm />
+        </MfdPanel>
+      </div>
+    </div>
   );
 }

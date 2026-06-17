@@ -47,14 +47,14 @@ export function UpsertSectionForm({ handbookId, sectionId }: Props) {
         name="title"
         required
         placeholder="Section title"
-        className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
+        className="w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none mfd-cut-tl-br"
       />
       <textarea
         name="body"
         required
         rows={6}
         placeholder="Section body…"
-        className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
+        className="w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none mfd-cut-tl-br"
       />
       <input
         name="orderIndex"
@@ -62,14 +62,14 @@ export function UpsertSectionForm({ handbookId, sectionId }: Props) {
         required
         defaultValue={0}
         placeholder="Order index"
-        className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
+        className="w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none mfd-cut-tl-br"
       />
       <button
         type="submit"
         disabled={isPending}
-        className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary disabled:opacity-50"
+        className="mfd-label rounded border border-primary bg-primary/10 px-4 py-2 text-sm text-primary hover:bg-primary/20 disabled:opacity-50 transition-colors"
       >
-        {isPending ? "Saving…" : sectionId ? "Update Section" : "Add Section"}
+        {isPending ? "SAVING…" : sectionId ? "UPDATE SECTION" : "ADD SECTION"}
       </button>
     </form>
   );

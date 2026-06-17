@@ -30,7 +30,7 @@ export function DeleteNewsButton({ postId }: { postId: string }) {
   return (
     <span className="inline-flex items-center gap-2">
       <button onClick={remove} disabled={pending}
-        className="rounded border border-danger bg-surface px-3 py-1.5 text-sm text-red-200 disabled:opacity-50">
+        className="rounded border border-danger bg-surface px-3 py-1.5 text-sm text-fg-red-light disabled:opacity-50">
         {pending ? "Deleting…" : "Confirm delete"}
       </button>
       <button onClick={() => setConfirming(false)} className="text-sm text-text-secondary hover:text-text-primary">Cancel</button>

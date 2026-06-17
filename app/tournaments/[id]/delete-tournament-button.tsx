@@ -27,7 +27,7 @@ export function DeleteTournamentButton({ tournamentId }: { tournamentId: string 
       <button
         onClick={handleClick}
         disabled={pending}
-        className="rounded border border-danger px-3 py-1.5 text-sm text-fg-red-light hover:bg-red-900/30 disabled:opacity-50"
+        className="rounded border border-danger px-3 py-1.5 text-sm text-fg-red-light hover:bg-danger/30 disabled:opacity-50"
       >
         {pending ? "Deleting…" : "Delete tournament"}
       </button>

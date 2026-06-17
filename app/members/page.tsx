@@ -7,6 +7,8 @@ import { makeTenantContext } from "@/lib/tenant";
 import { listMembers } from "@/lib/queries/members";
 import { Rank } from "@/components/rank";
 import { L } from "@/components/l";
+import { MfdPanel } from "@/components/ui/mfd";
+import { Users } from "lucide-react";
 
 export default async function MembersPage({
   searchParams,
@@ -27,79 +29,114 @@ export default async function MembersPage({
   const canManageRanks = viewer ? hasTier(viewer.tier, "COMMAND") : false;
 
   return (
-    <main className="mx-auto max-w-3xl p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          <L k="memberPlural" fallback="Members" />
-        </h1>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+            <Users className="h-5 w-5" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-bold text-text-primary">
+              <L k="memberPlural" fallback="Members" />
+            </h1>
+            <p className="text-sm text-text-muted">
+              <span className="mfd-readout">{members.length}</span>
+              <span className="ml-1.5">personnel on record</span>
+            </p>
+          </div>
+        </div>
         {canManageRanks && (
           <a
             href="/admin/members"
-            className="rounded border border-border-light px-3 py-1.5 text-sm hover:border-primary"
+            className="mfd-label border border-border-light bg-surface-elevated px-3 py-1.5 text-xs hover:border-primary hover:text-primary transition-colors"
           >
-            Manage ranks
+            [ MANAGE RANKS ]
           </a>
         )}
       </div>
 
-      <form method="GET" className="mb-6">
-        <div className="flex gap-2">
-          <input
-            type="search"
-            name="q"
-            defaultValue={q ?? ""}
-            placeholder="Search members…"
-            className="flex-1 rounded border border-border-light bg-surface px-3 py-2 text-sm"
-          />
-          <button
-            type="submit"
-            className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
-          >
-            Search
-          </button>
-        </div>
-      </form>
+      {/* Search panel */}
+      <MfdPanel chassis="neutral" title={<span>[ SEARCH ]</span>} bodyPadding="sm">
+        <form method="GET">
+          <div className="flex gap-2">
+            <input
+              type="search"
+              name="q"
+              defaultValue={q ?? ""}
+              placeholder="Search members…"
+              className="flex-1 border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="border border-border-light bg-surface-elevated px-4 py-2 text-sm text-text-secondary hover:border-primary hover:text-primary transition-colors"
+            >
+              SCAN
+            </button>
+          </div>
+        </form>
+      </MfdPanel>
 
-      {members.length === 0 ? (
-        <p className="text-text-secondary">No members found.</p>
-      ) : (
-        <ul className="space-y-3">
-          {members.map((m) => (
-            <li key={m.id}>
-              <a
-                href={`/members/${m.username}`}
-                className="flex items-center gap-4 rounded border border-border p-4 hover:border-primary"
-              >
-                <div className="shrink-0">
-                  {m.avatarUrl && m.avatarUrl.startsWith("http") ? (
-                    <img
-                      src={m.avatarUrl}
-                      alt={m.displayName ?? m.username}
-                      className="h-10 w-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-elevated text-sm font-semibold uppercase">
-                      {(m.displayName ?? m.username).slice(0, 1)}
-                    </div>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold">{m.displayName ?? m.username}</p>
-                  <p className="text-sm text-text-secondary">@{m.username}</p>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-sm text-text-secondary">
-                    <Rank tier={m.tier} />
-                  </p>
-                  <p className="text-xs text-text-muted">
-                    Joined {m.createdAt.toISOString().slice(0, 10)}
-                  </p>
-                </div>
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+      {/* Roster panel */}
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ ROSTER ]</span>}
+        titleAside={
+          <span className="mfd-readout text-xs">{members.length}</span>
+        }
+        bodyPadding="none"
+      >
+        {members.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-text-muted">
+            <Users className="mb-3 h-10 w-10 opacity-40" />
+            <p className="mfd-label">NO PERSONNEL FOUND</p>
+          </div>
+        ) : (
+          <ul>
+            {members.map((m, idx) => (
+              <li key={m.id} className={idx !== 0 ? "border-t border-border/40" : ""}>
+                <a
+                  href={`/members/${m.username}`}
+                  className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-primary/5"
+                >
+                  {/* Avatar */}
+                  <div className="shrink-0">
+                    {m.avatarUrl && m.avatarUrl.startsWith("http") ? (
+                      <img
+                        src={m.avatarUrl}
+                        alt={m.displayName ?? m.username}
+                        className="h-9 w-9 object-cover border border-border-light"
+                      />
+                    ) : (
+                      <div className="flex h-9 w-9 items-center justify-center border border-border-light bg-surface-elevated text-sm font-semibold uppercase text-text-secondary mfd-cut-tl-br">
+                        {(m.displayName ?? m.username).slice(0, 1)}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Name + handle */}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-text-primary group-hover:text-primary transition-colors">
+                      {m.displayName ?? m.username}
+                    </p>
+                    <p className="mfd-label mt-0.5">@{m.username}</p>
+                  </div>
+
+                  {/* Rank + join date */}
+                  <div className="shrink-0 text-right">
+                    <p className="text-xs text-text-secondary">
+                      <Rank tier={m.tier} />
+                    </p>
+                    <p className="mfd-label mt-0.5">
+                      {m.createdAt.toISOString().slice(0, 10)}
+                    </p>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </MfdPanel>
+    </div>
   );
 }

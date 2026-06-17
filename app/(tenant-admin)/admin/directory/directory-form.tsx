@@ -77,7 +77,7 @@ export function DirectoryForm({ tenantId, initial }: Props) {
       <button
         type="submit"
         disabled={isPending}
-        className="rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-danger disabled:opacity-50"
+        className="rounded bg-danger px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-danger disabled:opacity-50"
       >
         {isPending ? "Saving…" : "Save"}
       </button>

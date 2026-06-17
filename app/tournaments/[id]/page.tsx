@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
+import { Trophy } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { getTournamentWithEntries } from "@/lib/queries/tournaments";
+import { MfdPanel } from "@/components/ui/mfd";
 import { RegisterButton } from "./register-button";
 import { ManageTournament } from "./manage-tournament";
 import { DeleteTournamentButton } from "./delete-tournament-button";
@@ -54,112 +56,114 @@ export default async function TournamentDetailPage({
   const statusClass = STATUS_CLASSES[tournament.status] ?? STATUS_CLASSES.DRAFT;
 
   return (
-    <main className="mx-auto max-w-4xl p-6">
-      <div className="mb-6">
-        <a
-          href="/tournaments"
-          className="text-sm text-text-secondary hover:text-text-primary"
-        >
-          &larr; Tournaments
-        </a>
-      </div>
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Back nav */}
+      <a href="/tournaments" className="mfd-label hover:text-text-primary">
+        &larr; Tournaments
+      </a>
 
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold">{tournament.name}</h1>
-            <span className={statusClass}>{statusLabel}</span>
-          </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-secondary">
-            {tournament.format && <span>{tournament.format}</span>}
-            {tournament.startsAt && (
-              <span>
-                {new Date(tournament.startsAt).toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+            <Trophy className="h-5 w-5" />
+          </span>
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-bold text-text-primary">{tournament.name}</h1>
+              <span className={statusClass}>{statusLabel}</span>
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              {tournament.format && <span className="text-text-secondary">{tournament.format}</span>}
+              {tournament.startsAt && (
+                <span className="text-text-secondary">
+                  {new Date(tournament.startsAt).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              )}
+            </div>
+            {tournament.description && (
+              <p className="mt-2 max-w-prose text-sm text-text-secondary whitespace-pre-wrap">
+                {tournament.description}
+              </p>
             )}
           </div>
-          {tournament.description && (
-            <p className="mt-3 max-w-prose text-sm text-text-secondary whitespace-pre-wrap">
-              {tournament.description}
-            </p>
-          )}
         </div>
-        {isCommand && (
-          <DeleteTournamentButton tournamentId={tournament.id} />
-        )}
+        {isCommand && <DeleteTournamentButton tournamentId={tournament.id} />}
       </div>
 
       {canRegister && (
-        <div className="mb-6">
+        <div>
           <RegisterButton tournamentId={tournament.id} />
         </div>
       )}
 
-      <h2 className="mb-3 font-semibold">
-        Entries{" "}
-        <span className="text-text-muted font-normal text-sm">
-          ({tournament.entries.length})
-        </span>
-      </h2>
-
-      {tournament.entries.length === 0 ? (
-        <p className="mb-8 text-sm text-text-secondary">No entries yet.</p>
-      ) : (
-        <div className="mb-8 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-text-muted">
-                <th className="pb-2 pr-4 font-normal">Place</th>
-                <th className="pb-2 pr-4 font-normal">Name</th>
-                <th className="pb-2 font-normal">Seed</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tournament.entries.map((entry) => (
-                <tr key={entry.id} className="border-b border-border hover:bg-surface-hover/40">
-                  <td className="py-2 pr-4 font-mono text-text-secondary">
-                    {entry.placement != null ? (
-                      entry.placement
-                    ) : (
-                      <span className="text-text-muted">&mdash;</span>
-                    )}
-                  </td>
-                  <td className="py-2 pr-4">
-                    <span className="font-medium">{entry.displayName}</span>
-                    {entry.participantMembershipId === viewer.id && (
-                      <span className="ml-2 rounded bg-surface-elevated px-1.5 py-0.5 text-xs text-text-secondary">
-                        you
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2 text-text-secondary">
-                    {entry.seed != null ? (
-                      entry.seed
-                    ) : (
-                      <span className="text-text-muted">&mdash;</span>
-                    )}
-                  </td>
+      <MfdPanel
+        chassis="neutral"
+        bodyPadding="none"
+        title={<><Trophy className="h-3 w-3 text-amber" /><span>[ ENTRIES ]</span></>}
+        titleAside={<span className="mfd-readout text-[10px]">{tournament.entries.length}</span>}
+      >
+        {tournament.entries.length === 0 ? (
+          <p className="px-4 py-3 text-sm text-text-muted">No entries yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-left mfd-label">
+                  <th className="px-4 py-2 font-normal">Place</th>
+                  <th className="px-4 py-2 font-normal">Name</th>
+                  <th className="px-4 py-2 font-normal">Seed</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {tournament.entries.map((entry) => (
+                  <tr
+                    key={entry.id}
+                    className={`border-b border-border/50 ${entry.participantMembershipId === viewer.id ? "bg-primary/10" : "hover:bg-surface-hover/40"}`}
+                  >
+                    <td className="px-4 py-2">
+                      {entry.placement != null ? (
+                        <span className="mfd-readout text-xs">{entry.placement}</span>
+                      ) : (
+                        <span className="text-text-muted">&mdash;</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2">
+                      <span className="font-medium text-text-primary">{entry.displayName}</span>
+                      {entry.participantMembershipId === viewer.id && (
+                        <span className="ml-2 border border-border px-1.5 py-0.5 text-xs mfd-label">
+                          you
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-text-secondary">
+                      {entry.seed != null ? (
+                        <span className="mfd-readout text-xs">{entry.seed}</span>
+                      ) : (
+                        <span className="text-text-muted">&mdash;</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </MfdPanel>
 
       {isOfficer && (
-        <div className="mt-6">
-          <h2 className="mb-4 font-semibold">Manage</h2>
+        <MfdPanel chassis="amber" bodyPadding="md" title={<span className="text-amber">[ MANAGE ]</span>}>
           <ManageTournament
             tournamentId={tournament.id}
             currentStatus={tournament.status}
             entries={tournament.entries}
           />
-        </div>
+        </MfdPanel>
       )}
-    </main>
+    </div>
   );
 }

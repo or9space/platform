@@ -4,6 +4,7 @@ import { useTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { acknowledgeHandbookAction } from "@/lib/actions/handbook";
 import type { ViewerAck } from "@/lib/queries/handbook";
+import { CheckCircle } from "lucide-react";
 
 interface Props {
   handbookId: string;
@@ -18,15 +19,17 @@ export function AcknowledgeButton({ handbookId, version, ack }: Props) {
 
   if (ack && !ack.isStale) {
     return (
-      <span className="text-sm text-text-secondary">
-        Acknowledged ✓ (v{ack.versionRead})
-      </span>
+      <div className="flex items-center gap-2 text-sm text-text-secondary">
+        <CheckCircle className="h-4 w-4 text-primary" />
+        <span className="mfd-label">ACKNOWLEDGED</span>
+        <span className="text-text-muted">(v{ack.versionRead})</span>
+      </div>
     );
   }
 
   const label = !ack
-    ? "Acknowledge"
-    : `Re-acknowledge (updated to v${version})`;
+    ? "ACKNOWLEDGE"
+    : `RE-ACKNOWLEDGE (UPDATED TO v${version})`;
 
   function handleClick() {
     setError(null);
@@ -41,13 +44,16 @@ export function AcknowledgeButton({ handbookId, version, ack }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
+      <p className="text-sm text-text-secondary">
+        Confirm you have read v{version}. Re-acknowledge after any update.
+      </p>
       <button
         onClick={handleClick}
         disabled={isPending}
-        className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary disabled:opacity-50"
+        className="mfd-label self-start rounded border border-primary bg-primary/10 px-4 py-2 text-sm text-primary hover:bg-primary/20 disabled:opacity-50 transition-colors"
       >
-        {isPending ? "Saving…" : label}
+        {isPending ? "SAVING…" : label}
       </button>
       {error && <p className="text-sm text-fg-red-light">{error}</p>}
     </div>

@@ -49,76 +49,73 @@ export function CreateItemForm() {
   }
 
   return (
-    <div className="rounded border border-border p-4">
-      <h2 className="mb-4 font-semibold">Add item</h2>
-      <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
-        {error && <p className="w-full text-sm text-fg-red-light">{error}</p>}
-        <label className="flex flex-col gap-1 text-sm flex-1 min-w-40">
-          Name
-          <input
-            name="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={pending}
-            placeholder="Item name…"
-            maxLength={200}
-            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          Category
-          <select
-            name="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value as InventoryCategory)}
-            disabled={pending}
-            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
-          >
-            {INVENTORY_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {CATEGORY_LABELS[c]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          Kind
-          <select
-            name="kind"
-            value={kind}
-            onChange={(e) => setKind(e.target.value as InventoryKind)}
-            disabled={pending}
-            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
-          >
-            {INVENTORY_KINDS.map((k) => (
-              <option key={k} value={k}>
-                {k === "UNIQUE" ? "Unique" : "Fungible"}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1 text-sm flex-1 min-w-48">
-          Description
-          <input
-            name="description"
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={pending}
-            placeholder="Optional description…"
-            maxLength={1000}
-            className="rounded border border-border-light bg-surface px-3 py-2 disabled:opacity-50"
-          />
-        </label>
-        <button
-          type="submit"
+    <form action={handleSubmit} className="flex flex-wrap gap-3 items-end">
+      {error && <p className="w-full text-xs text-fg-red-light mfd-label">{error}</p>}
+      <label className="flex flex-col gap-1 flex-1 min-w-40">
+        <span className="mfd-label text-text-muted">Name</span>
+        <input
+          name="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           disabled={pending}
-          className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50"
+          placeholder="Item name…"
+          maxLength={200}
+          className="border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none disabled:opacity-50"
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="mfd-label text-text-muted">Category</span>
+        <select
+          name="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value as InventoryCategory)}
+          disabled={pending}
+          className="border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none disabled:opacity-50"
         >
-          {pending ? "Adding…" : "Add"}
-        </button>
-      </form>
-    </div>
+          {INVENTORY_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {CATEGORY_LABELS[c]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="mfd-label text-text-muted">Kind</span>
+        <select
+          name="kind"
+          value={kind}
+          onChange={(e) => setKind(e.target.value as InventoryKind)}
+          disabled={pending}
+          className="border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-primary focus:outline-none disabled:opacity-50"
+        >
+          {INVENTORY_KINDS.map((k) => (
+            <option key={k} value={k}>
+              {k === "UNIQUE" ? "Unique" : "Fungible"}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col gap-1 flex-1 min-w-48">
+        <span className="mfd-label text-text-muted">Description</span>
+        <input
+          name="description"
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          disabled={pending}
+          placeholder="Optional description…"
+          maxLength={1000}
+          className="border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none disabled:opacity-50"
+        />
+      </label>
+      <button
+        type="submit"
+        disabled={pending}
+        className="border border-primary bg-primary/10 px-4 py-2 text-xs mfd-label text-primary hover:bg-primary/20 disabled:opacity-50"
+      >
+        {pending ? "ADDING…" : "ADD ITEM"}
+      </button>
+    </form>
   );
 }

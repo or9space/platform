@@ -42,7 +42,7 @@ export function DecideButtons({ pendingId }: { pendingId: string }) {
             window.location.reload();
           });
         }}
-        className="rounded bg-red-800 px-3 py-1 text-sm disabled:opacity-50">
+        className="rounded bg-danger px-3 py-1 text-sm disabled:opacity-50">
         Reject
       </button>
     </div>

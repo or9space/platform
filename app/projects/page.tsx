@@ -6,6 +6,8 @@ import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { listProjects } from "@/lib/queries/projects";
 import { ProjectCreateForm } from "@/components/projects/projects-client";
+import { MfdPanel } from "@/components/ui/mfd";
+import { ClipboardList } from "lucide-react";
 
 export default async function ProjectsPage() {
   const ctx = await getFullTenantContext();
@@ -17,25 +19,61 @@ export default async function ProjectsPage() {
   const projects = await listProjects(makeTenantContext(ctx.tenant.id));
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
-      <h1 className="text-2xl font-bold">Projects</h1>
-      {canManage && <ProjectCreateForm />}
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <ClipboardList className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">PROJECTS</h1>
+          <p className="text-sm text-text-muted">
+            <span className="mfd-readout">{projects.length}</span>
+            <span className="ml-1.5">active boards</span>
+          </p>
+        </div>
+      </div>
 
-      {projects.length === 0 ? (
-        <p className="text-sm text-text-muted">No boards yet.</p>
-      ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {projects.map((p) => (
-            <li key={p.id}>
-              <a href={`/projects/${p.id}`} className="block rounded border border-border p-4 transition-colors hover:border-primary">
-                <p className="font-medium text-text-primary">{p.name}</p>
-                {p.description && <p className="mt-1 text-sm text-text-secondary">{p.description}</p>}
-                <p className="mt-2 font-mono text-xs text-text-muted">{p.doneCount}/{p.ticketCount} done</p>
-              </a>
-            </li>
-          ))}
-        </ul>
+      {/* Create panel */}
+      {canManage && (
+        <MfdPanel chassis="primary" title={<span>[ NEW BOARD ]</span>} bodyPadding="md">
+          <ProjectCreateForm />
+        </MfdPanel>
       )}
-    </main>
+
+      {/* Projects list panel */}
+      <MfdPanel
+        chassis="neutral"
+        title={<span>[ PROJECTS ]</span>}
+        titleAside={<span className="mfd-readout text-xs">{projects.length}</span>}
+        bodyPadding={projects.length === 0 ? "md" : "none"}
+      >
+        {projects.length === 0 ? (
+          <p className="mfd-label text-center py-8">NO BOARDS ON RECORD</p>
+        ) : (
+          <ul className="grid sm:grid-cols-2">
+            {projects.map((p, idx) => (
+              <li key={p.id} className={idx !== 0 ? "border-t border-border/40 sm:border-t-0 sm:[&:nth-child(n+3)]:border-t sm:[&:nth-child(even)]:border-l border-border/40" : ""}>
+                <a
+                  href={`/projects/${p.id}`}
+                  className="group flex flex-col gap-1 px-4 py-3 transition-colors hover:bg-primary/5"
+                >
+                  <p className="font-semibold text-text-primary group-hover:text-primary transition-colors">{p.name}</p>
+                  {p.description && (
+                    <p className="text-xs text-text-secondary">{p.description}</p>
+                  )}
+                  <p className="mfd-label mt-0.5">
+                    <span className="mfd-readout text-xs">{p.doneCount}</span>
+                    <span className="mx-1">/</span>
+                    <span className="mfd-readout text-xs">{p.ticketCount}</span>
+                    <span className="ml-1">done</span>
+                  </p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </MfdPanel>
+    </div>
   );
 }

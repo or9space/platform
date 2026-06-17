@@ -3,6 +3,7 @@
 import { useTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteSectionAction } from "@/lib/actions/handbook";
+import { Trash2 } from "lucide-react";
 
 interface Props {
   sectionId: string;
@@ -31,9 +32,10 @@ export function DeleteSectionButton({ sectionId }: Props) {
       <button
         onClick={handleClick}
         disabled={isPending}
-        className="rounded border border-border-light px-3 py-1 text-xs text-fg-red-light hover:border-danger hover:text-fg-red-light disabled:opacity-50"
+        className="flex items-center gap-1.5 mfd-label rounded border border-border-light px-3 py-1 text-xs text-fg-red-light hover:border-danger disabled:opacity-50 transition-colors"
       >
-        {isPending ? "Deleting…" : "Delete"}
+        <Trash2 className="h-3 w-3" />
+        {isPending ? "DELETING…" : "DELETE"}
       </button>
       {error && <p className="text-xs text-fg-red-light">{error}</p>}
     </div>

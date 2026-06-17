@@ -6,6 +6,8 @@ import { makeTenantContext } from "@/lib/tenant";
 import { getMemberByUsername } from "@/lib/queries/members";
 import { Rank } from "@/components/rank";
 import { ProfileEdit } from "./profile-edit";
+import { MfdPanel } from "@/components/ui/mfd";
+import { Users, MessageSquare, BookOpen } from "lucide-react";
 
 export default async function MemberProfilePage({
   params,
@@ -28,72 +30,118 @@ export default async function MemberProfilePage({
   const isOwnProfile = viewer?.username === member.username;
 
   return (
-    <main className="mx-auto max-w-2xl p-6">
-      <div className="mb-4 text-sm">
-        <a href="/members" className="text-text-secondary hover:text-text-primary">
-          Members
+    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-1 text-xs text-text-muted">
+        <a href="/members" className="hover:text-primary transition-colors">
+          [ ROSTER ]
         </a>
-        <span className="mx-2 text-text-muted">/</span>
+        <span className="mx-1 text-border">/</span>
         <span className="text-text-secondary">{member.displayName ?? member.username}</span>
       </div>
 
-      <div className="rounded border border-border p-6">
-        <div className="flex items-start gap-4">
+      {/* Page header */}
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <Users className="h-5 w-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">
+            {member.displayName ?? member.username}
+          </h1>
+          <p className="text-sm text-text-muted">PERSONNEL FILE</p>
+        </div>
+      </div>
+
+      {/* Identity panel */}
+      <MfdPanel
+        chassis="primary"
+        title={<span>[ IDENTIFICATION ]</span>}
+        bodyPadding="md"
+      >
+        <div className="flex items-start gap-5">
+          {/* Avatar */}
           <div className="shrink-0">
             {member.avatarUrl && member.avatarUrl.startsWith("http") ? (
               <img
                 src={member.avatarUrl}
                 alt={member.displayName ?? member.username}
-                className="h-16 w-16 rounded-full object-cover"
+                className="h-16 w-16 border border-border-light object-cover"
               />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-elevated text-xl font-semibold uppercase">
+              <div className="flex h-16 w-16 items-center justify-center border border-border-light bg-surface-elevated text-2xl font-semibold uppercase text-text-secondary mfd-cut-tl-br">
                 {(member.displayName ?? member.username).slice(0, 1)}
               </div>
             )}
           </div>
 
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-bold">{member.displayName ?? member.username}</h1>
-            <p className="text-sm text-text-secondary">@{member.username}</p>
-            <p className="mt-1 text-sm text-text-secondary">
-              <Rank tier={member.tier} />
-            </p>
-            <p className="mt-1 text-xs text-text-muted">
-              Joined {member.createdAt.toISOString().slice(0, 10)}
-            </p>
+          {/* Identity fields */}
+          <div className="min-w-0 flex-1 space-y-2">
+            <div>
+              <p className="mfd-label">CALLSIGN</p>
+              <p className="font-bold text-text-primary">{member.displayName ?? member.username}</p>
+              <p className="mfd-label mt-0.5">@{member.username}</p>
+            </div>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <div>
+                <p className="mfd-label">RANK</p>
+                <p className="text-sm text-text-secondary">
+                  <Rank tier={member.tier} />
+                </p>
+              </div>
+              <div>
+                <p className="mfd-label">ENROLLED</p>
+                <p className="text-sm text-text-secondary">
+                  {member.createdAt.toISOString().slice(0, 10)}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
+      </MfdPanel>
 
-        <div className="mt-4 border-t border-border pt-4">
-          {member.bio ? (
-            <p className="whitespace-pre-wrap text-sm">{member.bio}</p>
-          ) : (
-            <p className="text-sm text-text-muted">No bio yet.</p>
-          )}
-        </div>
+      {/* Stats row */}
+      <div className="grid grid-cols-2 gap-3">
+        <MfdPanel
+          chassis="amber"
+          title={<><MessageSquare className="h-3.5 w-3.5" /><span>[ THREADS ]</span></>}
+          bodyPadding="sm"
+        >
+          <p className="mfd-readout text-2xl">{member.threadCount}</p>
+          <p className="mfd-label mt-0.5">{member.threadCount === 1 ? "thread" : "threads"} started</p>
+        </MfdPanel>
 
-        <div className="mt-4 flex gap-6 text-sm text-text-secondary">
-          <span>
-            <span className="font-semibold text-text-primary">{member.threadCount}</span>{" "}
-            {member.threadCount === 1 ? "thread" : "threads"}
-          </span>
-          <span>
-            <span className="font-semibold text-text-primary">{member.postCount}</span>{" "}
-            {member.postCount === 1 ? "post" : "posts"}
-          </span>
-        </div>
+        <MfdPanel
+          chassis="amber"
+          title={<><BookOpen className="h-3.5 w-3.5" /><span>[ POSTS ]</span></>}
+          bodyPadding="sm"
+        >
+          <p className="mfd-readout text-2xl">{member.postCount}</p>
+          <p className="mfd-label mt-0.5">{member.postCount === 1 ? "post" : "posts"} made</p>
+        </MfdPanel>
       </div>
 
+      {/* Bio panel */}
+      <MfdPanel chassis="neutral" title={<span>[ BIO ]</span>} bodyPadding="md">
+        {member.bio ? (
+          <p className="whitespace-pre-wrap text-sm text-text-secondary">{member.bio}</p>
+        ) : (
+          <p className="mfd-label">NO BIO ON FILE</p>
+        )}
+      </MfdPanel>
+
+      {/* Edit panel — own profile only */}
       {isOwnProfile && (
-        <ProfileEdit
-          initial={{
-            displayName: member.displayName,
-            bio: member.bio,
-            avatarUrl: member.avatarUrl,
-          }}
-        />
+        <MfdPanel chassis="neutral" title={<span>[ EDIT PROFILE ]</span>} bodyPadding="md">
+          <ProfileEdit
+            initial={{
+              displayName: member.displayName,
+              bio: member.bio,
+              avatarUrl: member.avatarUrl,
+            }}
+          />
+        </MfdPanel>
       )}
-    </main>
+    </div>
   );
 }

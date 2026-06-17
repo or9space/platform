@@ -35,9 +35,9 @@ export function CreateHandbookForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
+        className="mfd-label rounded border border-border-light px-4 py-2 text-sm text-text-secondary hover:border-primary hover:text-text-primary transition-colors"
       >
-        + New Handbook
+        + NEW HANDBOOK
       </button>
     );
   }
@@ -46,43 +46,42 @@ export function CreateHandbookForm() {
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="rounded border border-border-light p-4 space-y-3"
+      className="space-y-3"
     >
-      <p className="text-sm font-semibold">New Handbook</p>
       {error && <p className="text-sm text-fg-red-light">{error}</p>}
       <div className="space-y-2">
         <input
           name="slug"
           required
           placeholder="slug (e.g. onboarding)"
-          className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
+          className="w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none mfd-cut-tl-br"
         />
         <input
           name="title"
           required
           placeholder="Title"
-          className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
+          className="w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none mfd-cut-tl-br"
         />
         <input
           name="subtitle"
           placeholder="Subtitle (optional)"
-          className="w-full rounded border border-border-light bg-surface px-3 py-2 text-sm"
+          className="w-full border border-border-light bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none mfd-cut-tl-br"
         />
       </div>
       <div className="flex gap-2">
         <button
           type="submit"
           disabled={isPending}
-          className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary disabled:opacity-50"
+          className="mfd-label rounded border border-primary bg-primary/10 px-4 py-2 text-sm text-primary hover:bg-primary/20 disabled:opacity-50 transition-colors"
         >
-          {isPending ? "Creating…" : "Create"}
+          {isPending ? "CREATING…" : "CREATE"}
         </button>
         <button
           type="button"
           onClick={() => { setOpen(false); setError(null); }}
-          className="rounded border border-border-light px-4 py-2 text-sm hover:border-primary"
+          className="mfd-label rounded border border-border-light px-4 py-2 text-sm text-text-secondary hover:border-primary hover:text-text-primary transition-colors"
         >
-          Cancel
+          CANCEL
         </button>
       </div>
     </form>

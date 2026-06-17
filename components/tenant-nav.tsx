@@ -99,7 +99,7 @@ export async function TenantNav({ active }: { active?: string }) {
   items.push({ href: "/settings", label: "Settings", key: "settings" });
 
   return (
-    <header className="border-b border-neutral-800">
+    <header className="border-b border-border">
       <nav className="flex flex-wrap gap-4 p-4 text-sm">
         {items.map((it) => (
           <a
@@ -107,8 +107,8 @@ export async function TenantNav({ active }: { active?: string }) {
             href={it.href}
             className={
               it.key === active
-                ? "font-bold text-neutral-100"
-                : "text-neutral-400 hover:text-neutral-100"
+                ? "font-bold text-text-primary"
+                : "text-text-secondary hover:text-text-primary"
             }
           >
             {it.label}
