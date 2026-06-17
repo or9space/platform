@@ -56,7 +56,7 @@ body {
  * own --ink/--signal vars above and are unaffected. Per-tenant accent override
  * is injected at runtime via --color-primary on the .tenant-root element.
  * ═══════════════════════════════════════════════════════════════════════════ */
-@theme {
+@theme static {
   --color-fg-black: oklch(15% 0.008 25);
   --color-fg-gold: oklch(72% 0.16 75);
   --color-fg-gold-light: oklch(80% 0.18 75);
