@@ -246,10 +246,12 @@ model Alliance {
 model Award {
   id          String   @id @default(cuid())
   tenantId    String   @map("tenant_id")
-  name        String   @db.VarChar(120)
-  description String?  @db.Text
-  createdById String   @map("created_by_id")
-  createdAt   DateTime @default(now()) @map("created_at")
+  name        String    @db.VarChar(120)
+  description String?   @db.Text
+  kind        AwardKind @default(MEDAL)
+  icon        String?   @db.VarChar(60)
+  createdById String    @map("created_by_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
 
   tenant     Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   createdBy  Membership    @relation("awardCreator", fields: [createdById], references: [id], onDelete: Cascade)
@@ -286,13 +288,88 @@ enum ContractStatus {
   CANCELLED
 }
 
+enum ContractType {
+  GENERAL
+  ESCORT
+  MINING
+  COMBAT
+  SALVAGE
+  TRANSPORT
+  BOUNTY
+  RECON
+  MEDICAL
+  TRADE
+}
+
+enum AwardKind {
+  MEDAL
+  RIBBON
+  COMMENDATION
+  TROPHY
+  BADGE
+}
+
+/// Polymorphic comments on content surfaces (events, news, gallery, operations).
+enum CommentEntity {
+  EVENT
+  NEWS
+  GALLERY
+  OPERATION
+}
+
+model Comment {
+  id         String        @id @default(cuid())
+  tenantId   String        @map("tenant_id")
+  entityType CommentEntity
+  entityId   String        @map("entity_id")
+  body       String        @db.Text
+  authorId   String        @map("author_id")
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  tenant Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  author Membership @relation("commentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityType, entityId, createdAt])
+  @@map("comments")
+}
+
+enum NotificationType {
+  MESSAGE
+  AWARD
+  EVENT
+  PROMOTION
+  FORUM_REPLY
+  NEWS
+  SYSTEM
+}
+
+model Notification {
+  id           String           @id @default(cuid())
+  tenantId     String           @map("tenant_id")
+  membershipId String           @map("membership_id")
+  type         NotificationType @default(SYSTEM)
+  title        String           @db.VarChar(200)
+  body         String?          @db.VarChar(500)
+  href         String?          @db.VarChar(300)
+  readAt       DateTime?        @map("read_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  membership Membership @relation("notificationRecipient", fields: [membershipId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, membershipId, readAt])
+  @@map("notifications")
+}
+
 model Contract {
   id          String         @id @default(cuid())
   tenantId    String         @map("tenant_id")
   title       String         @db.VarChar(160)
   description String?        @db.Text
   reward      String?        @db.VarChar(160)
+  type        ContractType   @default(GENERAL)
   status      ContractStatus @default(OPEN)
+  expiresAt   DateTime?      @map("expires_at")
   claimedById String?        @map("claimed_by_id")
   createdById String         @map("created_by_id")
   createdAt   DateTime       @default(now()) @map("created_at")
@@ -524,6 +601,8 @@ model Tenant {
   projects     Project[]
   tickets      Ticket[]
   applications Application[]
+  comments     Comment[]
+  notifications Notification[]
   conversations Conversation[]
   conversationParticipants ConversationParticipant[]
   messages     Message[]
@@ -581,6 +660,8 @@ model Membership {
   applicationsReviewed Application[] @relation("applicationReviewer")
   conversationParticipations ConversationParticipant[] @relation("conversationParticipations")
   messagesSent     Message[]     @relation("messagesSent")
+  comments         Comment[]     @relation("commentAuthor")
+  notifications    Notification[] @relation("notificationRecipient")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])

@@ -7,6 +7,9 @@ import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { makeTenantContext } from "@/lib/tenant";
 import { getGalleryItem } from "@/lib/queries/gallery";
+import { listComments } from "@/lib/queries/comments";
+import { hasTier } from "@/lib/permissions";
+import { Comments } from "@/components/comments/comments";
 
 export default async function GalleryDetailPage({
   params,
@@ -21,8 +24,13 @@ export default async function GalleryDetailPage({
   const viewer = await getViewerMembership(ctx.tenant.id, await getSessionAccountId());
   if (!viewer) notFound();
 
-  const item = await getGalleryItem(makeTenantContext(ctx.tenant.id), id);
+  const tenantCtx = makeTenantContext(ctx.tenant.id);
+  const [item, comments] = await Promise.all([
+    getGalleryItem(tenantCtx, id),
+    listComments(tenantCtx, "GALLERY", id),
+  ]);
   if (!item) notFound();
+  const canModerate = hasTier(viewer.tier, "OFFICER");
 
   const formattedDate = item.createdAt.toLocaleDateString("en-US", {
     month: "short",
@@ -84,6 +92,15 @@ export default async function GalleryDetailPage({
           </div>
         </dl>
       </MfdPanel>
+
+      <Comments
+        entityType="GALLERY"
+        entityId={item.id}
+        path={`/gallery/${item.id}`}
+        comments={comments}
+        viewerMembershipId={viewer.id}
+        canModerate={canModerate}
+      />
     </div>
   );
 }

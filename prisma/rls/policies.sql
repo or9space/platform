@@ -292,3 +292,17 @@ DROP POLICY IF EXISTS tenant_isolation ON messages;
 CREATE POLICY tenant_isolation ON messages
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE comments FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON comments;
+CREATE POLICY tenant_isolation ON comments
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON notifications;
+CREATE POLICY tenant_isolation ON notifications
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

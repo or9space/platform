@@ -12,12 +12,25 @@ function requireOfficer(tier: RankTier): Result {
   return hasTier(tier, "OFFICER") ? { ok: true } : { ok: false, error: "Requires OFFICER+ in this org" };
 }
 
+const CONTRACT_TYPES = [
+  "GENERAL", "ESCORT", "MINING", "COMBAT", "SALVAGE",
+  "TRANSPORT", "BOUNTY", "RECON", "MEDICAL", "TRADE",
+] as const;
+
 const ContractSchema = z.object({
   title: z.string().min(2).max(160),
   description: z.string().max(5000).nullable().optional(),
   reward: z.string().max(160).nullable().optional(),
+  type: z.enum(CONTRACT_TYPES).optional().default("GENERAL"),
+  expiresAt: z.coerce.date().nullable().optional(),
 });
-export interface ContractInput { title: string; description?: string | null; reward?: string | null }
+export interface ContractInput {
+  title: string;
+  description?: string | null;
+  reward?: string | null;
+  type?: string;
+  expiresAt?: Date | string | null;
+}
 
 export async function createContractCore(
   tenantId: string, membershipId: string, tier: RankTier, input: ContractInput,
@@ -31,7 +44,15 @@ export async function createContractCore(
   const ctx = makeTenantContext(tenantId);
   const d = parsed.data;
   const c = await db(ctx).contract.create({
-    data: { tenantId, title: d.title, description: d.description ?? null, reward: d.reward ?? null, createdById: membershipId },
+    data: {
+      tenantId,
+      title: d.title,
+      description: d.description ?? null,
+      reward: d.reward ?? null,
+      type: d.type,
+      expiresAt: d.expiresAt ?? null,
+      createdById: membershipId,
+    },
     select: { id: true },
   });
   return { ok: true, id: c.id };

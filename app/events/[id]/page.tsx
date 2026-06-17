@@ -5,10 +5,12 @@ import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { getEvent, getMyRsvp } from "@/lib/queries/events";
+import { listComments } from "@/lib/queries/comments";
 import { formatDateTime } from "@/lib/format";
 import { EventTypeBadge } from "@/components/events/event-type-badge";
 import { RsvpButtons } from "@/components/events/rsvp-buttons";
 import { DeleteEventButton } from "@/components/events/delete-event-button";
+import { Comments } from "@/components/comments/comments";
 import { MfdPanel, MfdReadout } from "@/components/ui/mfd";
 import { PageHeader } from "@/components/ui/page-header";
 import { Calendar } from "lucide-react";
@@ -24,9 +26,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
   const { id } = await params;
   const tenantCtx = makeTenantContext(tenant.id);
-  const event = await getEvent(tenantCtx, id);
+  const [event, myRsvp, comments] = await Promise.all([
+    getEvent(tenantCtx, id),
+    getMyRsvp(tenantCtx, id, viewer.id),
+    listComments(tenantCtx, "EVENT", id),
+  ]);
   if (!event) notFound();
-  const myRsvp = await getMyRsvp(tenantCtx, id, viewer.id);
 
   const going = event.rsvps.filter((r) => r.status === "GOING");
   const maybe = event.rsvps.filter((r) => r.status === "MAYBE");
@@ -138,6 +143,15 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           )}
         </MfdPanel>
       </div>
+
+      <Comments
+        entityType="EVENT"
+        entityId={event.id}
+        path={`/events/${event.id}`}
+        comments={comments}
+        viewerMembershipId={viewer.id}
+        canModerate={canManage}
+      />
     </div>
   );
 }

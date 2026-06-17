@@ -6,9 +6,11 @@ import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
 import { getNews } from "@/lib/queries/news";
+import { listComments } from "@/lib/queries/comments";
 import { formatDateTime } from "@/lib/format";
 import { CategoryBadge } from "@/components/news/category-badge";
 import { DeleteNewsButton } from "@/components/news/delete-news-button";
+import { Comments } from "@/components/comments/comments";
 import { MfdPanel } from "@/components/ui/mfd";
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -19,7 +21,11 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
   const canManage = hasTier(viewer.tier, "OFFICER");
 
   const { id } = await params;
-  const post = await getNews(makeTenantContext(ctx.tenant.id), id);
+  const tenantCtx = makeTenantContext(ctx.tenant.id);
+  const [post, comments] = await Promise.all([
+    getNews(tenantCtx, id),
+    listComments(tenantCtx, "NEWS", id),
+  ]);
   if (!post) notFound();
 
   return (
@@ -85,6 +91,17 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
           </div>
         </MfdPanel>
       </article>
+
+      <div className="mx-auto max-w-3xl">
+        <Comments
+          entityType="NEWS"
+          entityId={post.id}
+          path={`/news/${post.id}`}
+          comments={comments}
+          viewerMembershipId={viewer.id}
+          canModerate={canManage}
+        />
+      </div>
     </div>
   );
 }

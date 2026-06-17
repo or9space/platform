@@ -1,6 +1,8 @@
 import { db } from "../db";
 import type { TenantContext } from "../tenant";
 
+export type AwardKind = "MEDAL" | "RIBBON" | "COMMENDATION" | "TROPHY" | "BADGE";
+
 export interface AwardRecipient {
   membershipId: string;
   name: string;
@@ -12,14 +14,16 @@ export interface AwardWithRecipients {
   id: string;
   name: string;
   description: string | null;
+  kind: AwardKind;
+  icon: string | null;
   recipients: AwardRecipient[];
 }
 
 export async function listAwardsWithRecipients(ctx: TenantContext): Promise<AwardWithRecipients[]> {
   const rows = await db(ctx).award.findMany({
-    orderBy: { name: "asc" },
+    orderBy: [{ kind: "asc" }, { name: "asc" }],
     select: {
-      id: true, name: true, description: true,
+      id: true, name: true, description: true, kind: true, icon: true,
       recipients: {
         orderBy: { awardedAt: "desc" },
         select: { membershipId: true, note: true, member: { select: { displayName: true, username: true } } },
@@ -28,6 +32,8 @@ export async function listAwardsWithRecipients(ctx: TenantContext): Promise<Awar
   });
   return rows.map((a) => ({
     id: a.id, name: a.name, description: a.description,
+    kind: a.kind as AwardKind,
+    icon: a.icon,
     recipients: a.recipients.map((r) => ({
       membershipId: r.membershipId,
       name: r.member?.displayName ?? r.member?.username ?? "Unknown",

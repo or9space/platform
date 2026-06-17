@@ -10,8 +10,16 @@ function requireOfficer(tier: RankTier): Result {
   return hasTier(tier, "OFFICER") ? { ok: true } : { ok: false, error: "Requires OFFICER+ in this org" };
 }
 
-const AwardSchema = z.object({ name: z.string().min(2).max(120), description: z.string().max(2000).nullable().optional() });
-export interface AwardInput { name: string; description?: string | null }
+const AWARD_KINDS = ["MEDAL", "RIBBON", "COMMENDATION", "TROPHY", "BADGE"] as const;
+type AwardKind = typeof AWARD_KINDS[number];
+
+const AwardSchema = z.object({
+  name: z.string().min(2).max(120),
+  description: z.string().max(2000).nullable().optional(),
+  kind: z.enum(AWARD_KINDS).default("MEDAL"),
+  icon: z.string().max(60).nullable().optional(),
+});
+export interface AwardInput { name: string; description?: string | null; kind?: AwardKind; icon?: string | null }
 
 export async function createAwardCore(
   tenantId: string, membershipId: string, tier: RankTier, input: AwardInput,
@@ -24,7 +32,14 @@ export async function createAwardCore(
   if (!allowed) return { ok: false, error: "Too many requests — slow down" };
   const ctx = makeTenantContext(tenantId);
   const a = await db(ctx).award.create({
-    data: { tenantId, name: parsed.data.name, description: parsed.data.description ?? null, createdById: membershipId },
+    data: {
+      tenantId,
+      name: parsed.data.name,
+      description: parsed.data.description ?? null,
+      kind: parsed.data.kind,
+      icon: parsed.data.icon ?? null,
+      createdById: membershipId,
+    },
     select: { id: true },
   });
   return { ok: true, id: a.id };

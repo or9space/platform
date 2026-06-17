@@ -35,7 +35,7 @@ function isActive(pathname: string, href: string): boolean {
 export interface TenantPalette { primary?: string; amber?: string; cream?: string; surface?: string }
 
 export function TenantShellChrome({
-  brandName, userName, profileHref, sections, logoUrl, palette, unread = 0, messagesEnabled = false, children,
+  brandName, userName, profileHref, sections, logoUrl, palette, unread = 0, children,
 }: {
   brandName: string;
   userName: string;
@@ -44,7 +44,6 @@ export function TenantShellChrome({
   logoUrl?: string | null;
   palette?: TenantPalette;
   unread?: number;
-  messagesEnabled?: boolean;
   children: ReactNode;
 }) {
   const pathname = usePathname() ?? "";
@@ -98,17 +97,15 @@ export function TenantShellChrome({
             <a href="/members" aria-label="Search members" className="rounded-md p-2 text-text-secondary hover:bg-surface-hover hover:text-text-primary">
               <Search className="h-5 w-5" />
             </a>
-            {/* Notifications → unread DMs */}
-            {messagesEnabled && (
-              <a href="/messages" aria-label="Messages" className="relative rounded-md p-2 text-text-secondary hover:bg-surface-hover hover:text-text-primary">
-                <Bell className="h-5 w-5" />
-                {unread > 0 && (
-                  <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-fg-cream">
-                    {unread > 99 ? "99+" : unread}
-                  </span>
-                )}
-              </a>
-            )}
+            {/* Notifications bell → /notifications page */}
+            <a href="/notifications" aria-label="Notifications" className="relative rounded-md p-2 text-text-secondary hover:bg-surface-hover hover:text-text-primary">
+              <Bell className="h-5 w-5" />
+              {unread > 0 && (
+                <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-fg-cream">
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              )}
+            </a>
           <div className="relative">
             <button
               onClick={() => setMenuOpen((v) => !v)}

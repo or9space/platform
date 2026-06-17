@@ -5,20 +5,35 @@ import { createAwardAction, deleteAwardAction, grantAwardAction, revokeAwardActi
 
 const field = "w-full rounded border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary";
 
+const AWARD_KIND_OPTIONS = [
+  { value: "MEDAL",        label: "Medal" },
+  { value: "RIBBON",       label: "Ribbon" },
+  { value: "COMMENDATION", label: "Commendation" },
+  { value: "TROPHY",       label: "Trophy" },
+  { value: "BADGE",        label: "Badge" },
+] as const;
+
 export function AwardCreateForm() {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
+
   function submit(fd: FormData) {
     if (pending) return;
     setError(null);
-    const input = { name: String(fd.get("name") ?? ""), description: String(fd.get("description") ?? "") || null };
+    const input = {
+      name: String(fd.get("name") ?? ""),
+      description: String(fd.get("description") ?? "") || null,
+      kind: String(fd.get("kind") ?? "MEDAL") as "MEDAL" | "RIBBON" | "COMMENDATION" | "TROPHY" | "BADGE",
+      icon: String(fd.get("icon") ?? "") || null,
+    };
     start(async () => {
       const r = await createAwardAction(input);
       if (!r.ok) { setError(r.error); return; }
       window.location.reload();
     });
   }
+
   if (!open) return (
     <button
       onClick={() => setOpen(true)}
@@ -27,6 +42,7 @@ export function AwardCreateForm() {
       + New Award
     </button>
   );
+
   return (
     <form action={submit} className="space-y-3">
       {error && <p className="mfd-label text-fg-red-light">{error}</p>}
@@ -35,8 +51,20 @@ export function AwardCreateForm() {
         <input name="name" required placeholder="Award name" maxLength={120} className={field} />
       </div>
       <div className="space-y-1">
+        <label className="mfd-label">KIND</label>
+        <select name="kind" defaultValue="MEDAL" className={field}>
+          {AWARD_KIND_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+      <div className="space-y-1">
         <label className="mfd-label">DESCRIPTION</label>
         <textarea name="description" rows={2} placeholder="Description (optional)" maxLength={2000} className={field} />
+      </div>
+      <div className="space-y-1">
+        <label className="mfd-label">ICON (optional, lucide name)</label>
+        <input name="icon" placeholder="e.g. shield, star" maxLength={60} className={field} />
       </div>
       <div className="flex gap-2">
         <button
@@ -62,6 +90,7 @@ export function GrantForm({ awardId }: { awardId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
+
   function submit(fd: FormData) {
     if (pending) return;
     setError(null);
@@ -72,6 +101,7 @@ export function GrantForm({ awardId }: { awardId: string }) {
       window.location.reload();
     });
   }
+
   if (!open) return (
     <button
       onClick={() => setOpen(true)}
@@ -80,6 +110,7 @@ export function GrantForm({ awardId }: { awardId: string }) {
       + GRANT
     </button>
   );
+
   return (
     <form action={submit} className="mt-3 flex flex-wrap items-center gap-2 border-t border-border/60 pt-3">
       <input

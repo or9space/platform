@@ -6,6 +6,11 @@ import {
   claimContractAction, unclaimContractAction,
 } from "@/lib/actions/contracts";
 
+const CONTRACT_TYPE_OPTIONS = [
+  "GENERAL", "ESCORT", "MINING", "COMBAT", "SALVAGE",
+  "TRANSPORT", "BOUNTY", "RECON", "MEDICAL", "TRADE",
+] as const;
+
 const field = "w-full rounded border border-border bg-surface p-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none";
 
 export function ContractCreateForm() {
@@ -15,7 +20,14 @@ export function ContractCreateForm() {
   function submit(fd: FormData) {
     if (pending) return;
     setError(null);
-    const input = { title: String(fd.get("title") ?? ""), reward: String(fd.get("reward") ?? "") || null, description: String(fd.get("description") ?? "") || null };
+    const expiresRaw = String(fd.get("expiresAt") ?? "").trim();
+    const input = {
+      title: String(fd.get("title") ?? ""),
+      reward: String(fd.get("reward") ?? "") || null,
+      description: String(fd.get("description") ?? "") || null,
+      type: String(fd.get("type") ?? "GENERAL") || "GENERAL",
+      expiresAt: expiresRaw ? new Date(expiresRaw) : null,
+    };
     start(async () => { const r = await createContractAction(input); if (!r.ok) { setError(r.error); return; } window.location.reload(); });
   }
   if (!open) return (
@@ -32,6 +44,20 @@ export function ContractCreateForm() {
       <div>
         <label className="mfd-label mb-1 block">TITLE</label>
         <input name="title" required placeholder="Contract title" maxLength={160} className={field} />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="mfd-label mb-1 block">TYPE</label>
+          <select name="type" defaultValue="GENERAL" className={field}>
+            {CONTRACT_TYPE_OPTIONS.map((t) => (
+              <option key={t} value={t}>{t.charAt(0) + t.slice(1).toLowerCase()}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="mfd-label mb-1 block">EXPIRES (optional)</label>
+          <input name="expiresAt" type="datetime-local" className={field} />
+        </div>
       </div>
       <div>
         <label className="mfd-label mb-1 block">REWARD</label>
