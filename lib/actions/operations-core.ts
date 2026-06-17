@@ -14,6 +14,8 @@ const OperationSchema = z.object({
   status: z.enum(STATUSES).optional(),
   scheduledAt: z.coerce.date().nullable().optional(),
   location: z.string().max(200).nullable().optional(),
+  objectives: z.array(z.string().max(400)).max(20).optional(),
+  aar: z.string().max(20000).nullable().optional(),
 });
 
 export interface OperationInput {
@@ -22,6 +24,8 @@ export interface OperationInput {
   status?: string;
   scheduledAt?: string | Date | null;
   location?: string | null;
+  objectives?: string[];
+  aar?: string | null;
 }
 
 function requireOfficer(tier: RankTier): Result {
@@ -49,6 +53,7 @@ export async function createOperationCore(
       status: d.status ?? "PLANNING",
       scheduledAt: d.scheduledAt ?? null,
       location: d.location ?? null,
+      objectives: d.objectives ?? [],
       createdById: membershipId,
     },
     select: { id: true },
@@ -71,6 +76,8 @@ export async function updateOperationCore(
     data: {
       title: d.title, description: d.description ?? null,
       status: d.status ?? "PLANNING", scheduledAt: d.scheduledAt ?? null, location: d.location ?? null,
+      objectives: d.objectives ?? [],
+      ...(d.aar !== undefined ? { aar: d.aar ?? null } : {}),
     },
   });
   if (res.count === 0) return { ok: false, error: "Operation not found" };
@@ -96,6 +103,19 @@ export async function deleteOperationCore(
   if (!g.ok) return g;
   const ctx = makeTenantContext(tenantId);
   const res = await db(ctx).operation.deleteMany({ where: { id: operationId } });
+  if (res.count === 0) return { ok: false, error: "Operation not found" };
+  return { ok: true };
+}
+
+export async function saveAarCore(
+  tenantId: string, _membershipId: string, tier: RankTier, operationId: string, aar: string,
+): Promise<Result> {
+  const g = requireOfficer(tier);
+  if (!g.ok) return g;
+  const parsed = z.string().max(20000).safeParse(aar);
+  if (!parsed.success) return { ok: false, error: "AAR too long (max 20 000 chars)" };
+  const ctx = makeTenantContext(tenantId);
+  const res = await db(ctx).operation.updateMany({ where: { id: operationId }, data: { aar: parsed.data } });
   if (res.count === 0) return { ok: false, error: "Operation not found" };
   return { ok: true };
 }

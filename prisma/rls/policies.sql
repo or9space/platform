@@ -306,3 +306,10 @@ DROP POLICY IF EXISTS tenant_isolation ON notifications;
 CREATE POLICY tenant_isolation ON notifications
   USING (tenant_id = current_setting('app.tenant_id', true))
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true));
+
+ALTER TABLE award_nominations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE award_nominations FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON award_nominations;
+CREATE POLICY tenant_isolation ON award_nominations
+  USING (tenant_id = current_setting('app.tenant_id', true))
+  WITH CHECK (tenant_id = current_setting('app.tenant_id', true));

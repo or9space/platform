@@ -47,6 +47,8 @@ export default async function EditOperationPage({ params }: { params: Promise<{ 
               status: op.status,
               scheduledAt: op.scheduledAt ? toLocalInputValue(op.scheduledAt) : "",
               location: op.location ?? "",
+              objectives: op.objectives,
+              aar: op.aar ?? "",
             }}
           />
         </MfdPanel>

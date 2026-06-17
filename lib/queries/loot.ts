@@ -105,3 +105,40 @@ export async function listMemberTransactions(ctx: TenantContext, lootMemberId: s
     select: { id: true, amountTenths: true, type: true, note: true, createdAt: true },
   }) as Promise<TxnRow[]>;
 }
+
+export interface RecentSpendRow {
+  id: string;
+  memberId: string;
+  displayName: string;
+  amountTenths: number;
+  note: string | null;
+  createdAt: Date;
+}
+
+/** Most recent SPEND transactions across all members, for the pile console feed. */
+export async function listRecentSpends(
+  ctx: TenantContext,
+  limit = 10,
+): Promise<RecentSpendRow[]> {
+  const rows = await db(ctx).lootTransaction.findMany({
+    where: { type: "SPEND" },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      memberId: true,
+      amountTenths: true,
+      note: true,
+      createdAt: true,
+      member: { select: { displayName: true } },
+    },
+  });
+  return rows.map((r) => ({
+    id: r.id,
+    memberId: r.memberId,
+    displayName: (r.member as { displayName: string } | null)?.displayName ?? "Unknown",
+    amountTenths: r.amountTenths,
+    note: r.note,
+    createdAt: r.createdAt,
+  }));
+}

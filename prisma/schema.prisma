@@ -145,6 +145,8 @@ model Operation {
   status      OperationStatus @default(PLANNING)
   scheduledAt DateTime?       @map("scheduled_at")
   location    String?         @db.VarChar(200)
+  objectives  Json?           // string[] of mission objectives
+  aar         String?         @db.Text  // after-action report
   createdById String          @map("created_by_id")
   createdAt   DateTime        @default(now()) @map("created_at")
   updatedAt   DateTime        @updatedAt @map("updated_at")
@@ -253,9 +255,10 @@ model Award {
   createdById String    @map("created_by_id")
   createdAt   DateTime  @default(now()) @map("created_at")
 
-  tenant     Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  createdBy  Membership    @relation("awardCreator", fields: [createdById], references: [id], onDelete: Cascade)
-  recipients MemberAward[]
+  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy   Membership    @relation("awardCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  recipients  MemberAward[]
+  nominations AwardNomination[]
 
   @@index([tenantId])
   @@map("awards")
@@ -307,6 +310,32 @@ enum AwardKind {
   COMMENDATION
   TROPHY
   BADGE
+}
+
+enum NominationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Peer nomination of a member for an award (OFFICER+ approves → grants).
+model AwardNomination {
+  id          String           @id @default(cuid())
+  tenantId    String           @map("tenant_id")
+  awardId     String           @map("award_id")
+  nomineeId   String           @map("nominee_id")
+  nominatorId String           @map("nominator_id")
+  reason      String           @db.VarChar(500)
+  status      NominationStatus @default(PENDING)
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  award     Award      @relation(fields: [awardId], references: [id], onDelete: Cascade)
+  nominee   Membership @relation("nomineeAwards", fields: [nomineeId], references: [id], onDelete: Cascade)
+  nominator Membership @relation("nominatorAwards", fields: [nominatorId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, awardId])
+  @@map("award_nominations")
 }
 
 /// Polymorphic comments on content surfaces (events, news, gallery, operations).
@@ -603,6 +632,7 @@ model Tenant {
   applications Application[]
   comments     Comment[]
   notifications Notification[]
+  awardNominations AwardNomination[]
   conversations Conversation[]
   conversationParticipants ConversationParticipant[]
   messages     Message[]
@@ -625,6 +655,10 @@ model Membership {
   displayName String?   @map("display_name") @db.VarChar(120)
   bio         String?   @db.VarChar(500)
   avatarUrl   String?   @map("avatar_url") @db.VarChar(500)
+  rsiHandle   String?   @map("rsi_handle") @db.VarChar(60)
+  timezone    String?   @db.VarChar(60)
+  socials     Json?     // { discord?, twitch?, youtube?, website? }
+  availability Json?    // weekly grid: { mon:[..], tue:[..], ... } of hour blocks
   tier        RankTier  @default(ENLISTED)
   createdAt   DateTime  @default(now()) @map("created_at")
 
@@ -662,6 +696,8 @@ model Membership {
   messagesSent     Message[]     @relation("messagesSent")
   comments         Comment[]     @relation("commentAuthor")
   notifications    Notification[] @relation("notificationRecipient")
+  nominationsReceived AwardNomination[] @relation("nomineeAwards")
+  nominationsMade  AwardNomination[] @relation("nominatorAwards")
 
   @@unique([tenantId, username])
   @@unique([accountId, tenantId])

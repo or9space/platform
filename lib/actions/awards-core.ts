@@ -94,3 +94,70 @@ export async function revokeAwardCore(
   await db(ctx).memberAward.deleteMany({ where: { awardId, membershipId: recipientMembershipId } });
   return { ok: true };
 }
+
+// ─── Nominations ────────────────────────────────────────────────────────────
+
+const NominateSchema = z.object({
+  awardId: z.string().min(1),
+  nomineeUsername: z.string().min(1).max(60),
+  reason: z.string().min(1).max(2000),
+});
+
+export async function nominateAwardCore(
+  tenantId: string,
+  nominatorMembershipId: string,
+  input: z.infer<typeof NominateSchema>,
+): Promise<Result<{ id: string }>> {
+  const parsed = NominateSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid" };
+  const { awardId, nomineeUsername, reason } = parsed.data;
+  const { allowed } = checkRateLimit(`nominate:${nominatorMembershipId}`, CONTENT_LIMIT.maxRequests, CONTENT_LIMIT.windowMs);
+  if (!allowed) return { ok: false, error: "Too many requests — slow down" };
+  const ctx = makeTenantContext(tenantId);
+  const award = await db(ctx).award.findFirst({ where: { id: awardId }, select: { id: true } });
+  if (!award) return { ok: false, error: "Award not found" };
+  const nominee = await db(ctx).membership.findFirst({ where: { username: nomineeUsername }, select: { id: true } });
+  if (!nominee) return { ok: false, error: `No member named "${nomineeUsername}"` };
+  const nom = await db(ctx).awardNomination.create({
+    data: {
+      tenantId,
+      awardId,
+      nomineeId: nominee.id,
+      nominatorId: nominatorMembershipId,
+      reason,
+      status: "PENDING",
+    },
+    select: { id: true },
+  });
+  return { ok: true, id: nom.id };
+}
+
+export async function resolveNominationCore(
+  tenantId: string,
+  membershipId: string,
+  tier: RankTier,
+  nominationId: string,
+  approve: boolean,
+): Promise<Result> {
+  const g = requireOfficer(tier);
+  if (!g.ok) return g;
+  const ctx = makeTenantContext(tenantId);
+  const nom = await db(ctx).awardNomination.findFirst({
+    where: { id: nominationId },
+    select: { id: true, awardId: true, nomineeId: true, status: true },
+  });
+  if (!nom) return { ok: false, error: "Nomination not found" };
+  if (nom.status !== "PENDING") return { ok: false, error: "Nomination already resolved" };
+  if (approve) {
+    await db(ctx).memberAward.upsert({
+      where: { awardId_membershipId: { awardId: nom.awardId, membershipId: nom.nomineeId } },
+      create: { tenantId, awardId: nom.awardId, membershipId: nom.nomineeId, note: null, awardedById: membershipId },
+      update: {},
+    });
+  }
+  await db(ctx).awardNomination.update({
+    where: { id: nominationId },
+    data: { status: approve ? "APPROVED" : "REJECTED" },
+  });
+  return { ok: true };
+}

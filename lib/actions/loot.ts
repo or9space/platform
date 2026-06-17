@@ -71,7 +71,10 @@ export async function spendLootAction(input: {
   const c = await ctx();
   if (!c) return { ok: false as const, error: "Sign in required" };
   const r = await spendLootCore(c.tenantId, c.membershipId, c.tier, input);
-  if (r.ok) revalidatePath("/loot");
+  if (r.ok) {
+    revalidatePath("/loot");
+    revalidatePath("/loot/pile");
+  }
   return r;
 }
 

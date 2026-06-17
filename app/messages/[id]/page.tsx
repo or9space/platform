@@ -3,10 +3,8 @@ import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { makeTenantContext } from "@/lib/tenant";
-import { getConversationThread } from "@/lib/queries/messages";
-import { markReadCore } from "@/lib/actions/messages-core";
-import { MessageComposer } from "@/components/messages/messages-client";
-import { MfdPanel } from "@/components/ui/mfd";
+import { listConversations, getConversationThread } from "@/lib/queries/messages";
+import { TwoPaneMessages } from "@/components/messages/two-pane-messages";
 import { MessageSquare } from "lucide-react";
 
 export default async function ConversationPage({ params }: { params: Promise<{ id: string }> }) {
@@ -16,52 +14,29 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
   const viewer = await getViewerMembership(ctx.tenant.id, await getSessionAccountId());
   if (!viewer) notFound();
 
-  const thread = await getConversationThread(makeTenantContext(ctx.tenant.id), viewer.id, id);
+  const tenantCtx = makeTenantContext(ctx.tenant.id);
+  const [convos, thread] = await Promise.all([
+    listConversations(tenantCtx, viewer.id),
+    getConversationThread(tenantCtx, viewer.id, id),
+  ]);
+
   if (!thread) notFound();
 
-  // Mark read on open (best-effort; ignore failure).
-  await markReadCore(ctx.tenant.id, viewer.id, id);
-
   return (
-    <div className="p-3 sm:p-6 animate-page-enter space-y-6">
-      {/* Page header */}
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
-          <MessageSquare className="h-5 w-5" />
+    <div className="flex h-[calc(100vh-4rem)] flex-col">
+      {/* page header */}
+      <div className="flex items-center gap-3 border-b border-border/60 px-4 py-3">
+        <span className="flex h-8 w-8 items-center justify-center border border-border bg-surface-elevated mfd-cut-tl-br text-primary">
+          <MessageSquare className="h-4 w-4" />
         </span>
         <div>
-          <a href="/messages" className="mfd-label text-xs text-text-muted hover:text-text-primary transition-colors">
-            ← MESSAGES
-          </a>
-          <h1 className="text-2xl font-bold text-text-primary">{thread.otherName}</h1>
+          <h1 className="text-base font-bold text-text-primary leading-tight">Messages</h1>
+          <p className="text-xs text-text-muted">Direct communications with org members</p>
         </div>
       </div>
 
-      {/* Thread panel */}
-      <MfdPanel
-        chassis="neutral"
-        title={<span>[ THREAD ]</span>}
-        bodyPadding="md"
-      >
-        <div className="space-y-2">
-          {thread.messages.length === 0 ? (
-            <p className="text-sm text-text-muted">No messages yet — say hello.</p>
-          ) : (
-            thread.messages.map((m) => (
-              <div key={m.id} className={m.mine ? "flex justify-end" : "flex justify-start"}>
-                <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${m.mine ? "bg-primary text-fg-cream" : "border border-border bg-surface text-text-primary"}`}>
-                  <p className="whitespace-pre-wrap">{m.body}</p>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </MfdPanel>
-
-      {/* Composer panel */}
-      <MfdPanel chassis="neutral" title={<span>[ COMPOSE ]</span>} bodyPadding="md">
-        <MessageComposer conversationId={thread.id} />
-      </MfdPanel>
+      {/* two-pane body — left list + right thread */}
+      <TwoPaneMessages conversations={convos} thread={thread} activeId={id} />
     </div>
   );
 }

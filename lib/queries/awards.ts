@@ -52,3 +52,45 @@ export async function listMemberAwards(ctx: TenantContext, membershipId: string)
   });
   return rows.map((r) => ({ name: r.award?.name ?? "Award", note: r.note, awardedAt: r.awardedAt }));
 }
+
+export interface NominationRow {
+  id: string;
+  awardId: string;
+  awardName: string;
+  nomineeName: string;
+  nomineeUsername: string;
+  nominatorName: string;
+  nominatorUsername: string;
+  reason: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  createdAt: Date;
+}
+
+/** List award nominations — PENDING first, then by createdAt desc. */
+export async function listNominations(ctx: TenantContext): Promise<NominationRow[]> {
+  const rows = await db(ctx).awardNomination.findMany({
+    orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+    select: {
+      id: true,
+      awardId: true,
+      reason: true,
+      status: true,
+      createdAt: true,
+      award: { select: { name: true } },
+      nominee: { select: { displayName: true, username: true } },
+      nominator: { select: { displayName: true, username: true } },
+    },
+  });
+  return rows.map((r) => ({
+    id: r.id,
+    awardId: r.awardId,
+    awardName: r.award?.name ?? "Award",
+    nomineeName: r.nominee?.displayName ?? r.nominee?.username ?? "Unknown",
+    nomineeUsername: r.nominee?.username ?? "",
+    nominatorName: r.nominator?.displayName ?? r.nominator?.username ?? "Unknown",
+    nominatorUsername: r.nominator?.username ?? "",
+    reason: r.reason,
+    status: r.status as "PENDING" | "APPROVED" | "REJECTED",
+    createdAt: r.createdAt,
+  }));
+}

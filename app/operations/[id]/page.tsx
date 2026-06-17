@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Swords, Users, Calendar, MapPin, User, FileText } from "lucide-react";
+import { Swords, Users, Calendar, MapPin, User, Target, FileText } from "lucide-react";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
@@ -10,6 +10,7 @@ import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/operations/status-badge";
 import { SignupControl } from "@/components/operations/signup-control";
 import { StatusControl } from "@/components/operations/status-control";
+import { AarEditor } from "@/components/operations/aar-editor";
 import { MfdPanel, MfdReadout } from "@/components/ui/mfd";
 import { PageHeader } from "@/components/ui/page-header";
 
@@ -101,6 +102,51 @@ export default async function OperationDetailPage({ params }: { params: Promise<
               )}
             </div>
           </MfdPanel>
+
+          {/* Objectives panel — only when objectives are set */}
+          {op.objectives.length > 0 && (
+            <MfdPanel
+              chassis="neutral"
+              title={
+                <span className="flex items-center gap-1.5">
+                  <Target className="h-3.5 w-3.5" aria-hidden="true" />
+                  [ OBJECTIVES ]
+                </span>
+              }
+              bodyPadding="md"
+            >
+              <ol className="space-y-2">
+                {op.objectives.map((obj, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-primary/40 font-mono text-xs text-primary">
+                      {i + 1}
+                    </span>
+                    {obj}
+                  </li>
+                ))}
+              </ol>
+            </MfdPanel>
+          )}
+
+          {/* After-Action Report — show when status is DEBRIEFING/COMPLETED/ARCHIVED, or when aar exists */}
+          {(op.aar || ["DEBRIEFING", "COMPLETED", "ARCHIVED"].includes(op.status)) && (
+            <MfdPanel
+              chassis="neutral"
+              title={
+                <span className="flex items-center gap-1.5">
+                  <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+                  [ AFTER-ACTION REPORT ]
+                </span>
+              }
+              bodyPadding="md"
+            >
+              <AarEditor
+                operationId={op.id}
+                initialAar={op.aar}
+                canManage={canManage}
+              />
+            </MfdPanel>
+          )}
 
           {/* Sign-up panel — neutral chassis, FG SignupButton equivalent */}
           <MfdPanel

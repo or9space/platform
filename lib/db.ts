@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 export type { TenantPlan } from "@prisma/client";
+export { Prisma } from "@prisma/client";
 import type { TenantContext } from "./tenant";
 import { withTenantRls } from "./rls";
 

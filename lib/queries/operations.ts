@@ -25,6 +25,8 @@ export interface OperationDetail {
   scheduledAt: Date | null;
   location: string | null;
   createdByName: string;
+  objectives: string[];
+  aar: string | null;
   signups: SignupEntry[];
 }
 
@@ -49,6 +51,7 @@ export async function getOperation(ctx: TenantContext, id: string): Promise<Oper
     where: { id },
     select: {
       id: true, title: true, description: true, status: true, scheduledAt: true, location: true,
+      objectives: true, aar: true,
       createdBy: { select: { displayName: true, username: true } },
       signups: {
         orderBy: { createdAt: "asc" },
@@ -60,6 +63,8 @@ export async function getOperation(ctx: TenantContext, id: string): Promise<Oper
   return {
     id: o.id, title: o.title, description: o.description, status: o.status,
     scheduledAt: o.scheduledAt, location: o.location,
+    objectives: Array.isArray(o.objectives) ? (o.objectives as string[]) : [],
+    aar: typeof o.aar === "string" ? o.aar : null,
     createdByName: o.createdBy?.displayName ?? o.createdBy?.username ?? "Unknown",
     signups: o.signups.map((s) => ({
       membershipId: s.membershipId,

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Coins, Grid3x3 } from "lucide-react";
+import { Coins, Grid3x3, ShoppingBag } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { getSessionAccountId } from "@/lib/auth";
@@ -60,13 +60,22 @@ export default async function LootPage() {
               Sessions
             </a>
             {isOfficer && (
-              <a
-                href="/loot/sessions/new"
-                className="inline-flex items-center gap-1.5 bg-primary px-3 py-1.5 text-xs text-fg-cream hover:bg-primary/80"
-              >
-                <Coins className="h-3.5 w-3.5" />
-                Run loot session
-              </a>
+              <>
+                <a
+                  href="/loot/pile"
+                  className="inline-flex items-center gap-1.5 bg-primary px-3 py-1.5 text-xs text-fg-cream hover:bg-primary/80"
+                >
+                  <ShoppingBag className="h-3.5 w-3.5" />
+                  Loot pile
+                </a>
+                <a
+                  href="/loot/sessions/new"
+                  className="inline-flex items-center gap-1.5 border border-border px-3 py-1.5 text-xs text-text-secondary hover:bg-surface-hover hover:text-text-primary"
+                >
+                  <Coins className="h-3.5 w-3.5" />
+                  Run loot session
+                </a>
+              </>
             )}
           </>
         }

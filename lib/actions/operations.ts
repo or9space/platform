@@ -6,7 +6,7 @@ import { getSessionAccountId } from "../auth";
 import { getViewerMembership } from "../authz";
 import {
   createOperationCore, updateOperationCore, setOperationStatusCore, deleteOperationCore,
-  signupOperationCore, withdrawOperationCore, type OperationInput,
+  signupOperationCore, withdrawOperationCore, saveAarCore, type OperationInput,
 } from "./operations-core";
 
 async function ctx() {
@@ -48,6 +48,14 @@ export async function deleteOperationAction(operationId: string) {
   if (!c) return { ok: false as const, error: "Sign in required" };
   const r = await deleteOperationCore(c.tenantId, c.membershipId, c.tier, operationId);
   if (r.ok) revalidatePath("/operations");
+  return r;
+}
+
+export async function saveAarAction(operationId: string, aar: string) {
+  const c = await ctx();
+  if (!c) return { ok: false as const, error: "Sign in required" };
+  const r = await saveAarCore(c.tenantId, c.membershipId, c.tier, operationId, aar);
+  if (r.ok) revalidatePath(`/operations/${operationId}`);
   return r;
 }
 

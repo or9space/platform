@@ -11,21 +11,37 @@ export interface OperationFormInitial {
   status: string;
   scheduledAt: string;
   location: string;
+  objectives: string[];
+  aar: string;
 }
 
 export function OperationForm({ operationId, initial }: { operationId?: string; initial?: OperationFormInitial }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
+  // Objectives: one line per objective in the textarea
+  const [objectivesText, setObjectivesText] = useState(
+    initial?.objectives?.join("\n") ?? ""
+  );
+
   function submit(fd: FormData) {
     if (pending) return;
     setError(null);
+
+    // Split non-empty lines into objectives array
+    const objectives = objectivesText
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+
     const input = {
       title: String(fd.get("title") ?? ""),
       description: String(fd.get("description") ?? "") || null,
       status: String(fd.get("status") ?? "PLANNING"),
       scheduledAt: String(fd.get("scheduledAt") ?? "") || null,
       location: String(fd.get("location") ?? "") || null,
+      objectives,
+      aar: operationId ? (String(fd.get("aar") ?? "") || null) : undefined,
     };
     start(async () => {
       const r = operationId ? await updateOperationAction(operationId, input) : await createOperationAction(input);
@@ -67,6 +83,29 @@ export function OperationForm({ operationId, initial }: { operationId?: string; 
         Briefing (optional)
         <textarea name="description" rows={5} defaultValue={i?.description ?? ""} maxLength={10000} className={field} />
       </label>
+      <label className="block text-sm">
+        Objectives (optional — one per line)
+        <textarea
+          rows={4}
+          value={objectivesText}
+          onChange={(e) => setObjectivesText(e.target.value)}
+          placeholder={"Neutralize primary target\nSecure extraction point"}
+          className={field}
+        />
+      </label>
+      {operationId && (
+        <label className="block text-sm">
+          After-Action Report (optional)
+          <textarea
+            name="aar"
+            rows={6}
+            defaultValue={i?.aar ?? ""}
+            maxLength={20000}
+            placeholder="Outcomes, lessons learned, recommendations…"
+            className={field}
+          />
+        </label>
+      )}
       <button type="submit" disabled={pending}
         className="rounded bg-primary px-4 py-2 text-sm font-semibold text-fg-cream disabled:opacity-50">
         {pending ? "Saving…" : operationId ? "Save changes" : "Create operation"}

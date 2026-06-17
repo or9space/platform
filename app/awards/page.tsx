@@ -6,9 +6,9 @@ import { getSessionAccountId } from "@/lib/auth";
 import { getViewerMembership } from "@/lib/authz";
 import { hasTier } from "@/lib/permissions";
 import { makeTenantContext } from "@/lib/tenant";
-import { listAwardsWithRecipients, type AwardKind } from "@/lib/queries/awards";
+import { listAwardsWithRecipients, listNominations, type AwardKind } from "@/lib/queries/awards";
 import { MfdPanel } from "@/components/ui/mfd";
-import { AwardCreateForm, GrantForm, DeleteAwardButton, RevokeButton } from "@/components/awards/awards-client";
+import { AwardCreateForm, GrantForm, DeleteAwardButton, RevokeButton, NominateButton, NominationsPanelClient } from "@/components/awards/awards-client";
 import type { ElementType } from "react";
 
 const KIND_ORDER: AwardKind[] = ["MEDAL", "RIBBON", "COMMENDATION", "TROPHY", "BADGE"];
@@ -27,7 +27,9 @@ export default async function AwardsPage() {
   const viewer = await getViewerMembership(ctx.tenant.id, await getSessionAccountId());
   const canManage = viewer ? hasTier(viewer.tier, "OFFICER") : false;
 
-  const awards = await listAwardsWithRecipients(makeTenantContext(ctx.tenant.id));
+  const tenantCtx = makeTenantContext(ctx.tenant.id);
+  const awards = await listAwardsWithRecipients(tenantCtx);
+  const nominations = canManage ? await listNominations(tenantCtx) : [];
 
   // Group by kind, preserving KIND_ORDER
   const grouped = KIND_ORDER.map((kind) => ({
@@ -43,6 +45,17 @@ export default async function AwardsPage() {
       {canManage && (
         <MfdPanel chassis="primary" title={<span>[ NEW AWARD ]</span>} bodyPadding="md">
           <AwardCreateForm />
+        </MfdPanel>
+      )}
+
+      {/* Pending nominations panel for officers */}
+      {canManage && (
+        <MfdPanel
+          chassis="primary"
+          title={<span>[ PENDING NOMINATIONS ] <span className="mfd-readout ml-1">{nominations.filter((n) => n.status === "PENDING").length}</span></span>}
+          bodyPadding="none"
+        >
+          <NominationsPanelClient nominations={nominations} />
         </MfdPanel>
       )}
 
@@ -117,6 +130,7 @@ export default async function AwardsPage() {
                       </div>
                     )}
 
+                    {viewer && <div className="ml-6"><NominateButton awardId={a.id} /></div>}
                     {canManage && <div className="ml-6"><GrantForm awardId={a.id} /></div>}
                   </div>
                 ))}
