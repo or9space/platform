@@ -1,29 +1,29 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getFullTenantContext } from "@/lib/server/get-tenant-config-full";
 import { isFeatureEnabled } from "@/lib/features";
-import { ApplyForm } from "@/components/recruitment/recruitment-client";
+import { TenantPublicNav } from "@/components/tenant/public-nav";
+import { RecruitTerminal } from "@/components/recruitment/recruit-terminal";
+
+export const metadata: Metadata = { title: "Enlist" };
 
 /**
- * PUBLIC apply form — no auth required. Anonymous visitors submit an
+ * PUBLIC apply page — no auth required. Anonymous visitors submit an
  * application that OFFICER+ reviews at /recruitment. Self-gates on the
- * `recruitment` feature flag.
+ * `recruitment` feature flag. Ported to the Freedom Guards recruit layout.
  */
 export default async function ApplyPage() {
   const ctx = await getFullTenantContext();
   if (!ctx || !isFeatureEnabled(ctx.features, "recruitment")) notFound();
   const orgName = ctx.config.branding?.name ?? ctx.tenant.name;
+  const discordEnabled = !!process.env.AUTH_DISCORD_ID;
 
   return (
-    <main className="tenant-root bg-tactical-grid flex items-center justify-center p-6">
-      <div className="w-full max-w-xl border border-border bg-surface mfd-cut-tl-br space-y-6 p-6">
-        <div>
-          <h1 className="text-stencil text-2xl text-text-primary">Join {orgName}</h1>
-          <p className="mt-1 text-sm text-text-secondary">
-            Fill out the form below to apply. Leadership will review your application.
-          </p>
-        </div>
-        <ApplyForm orgName={orgName} />
-      </div>
-    </main>
+    <div className="tenant-root">
+      <TenantPublicNav brandName={ctx.config.branding.name} logoUrl={ctx.config.branding.logoUrl} />
+      <main>
+        <RecruitTerminal orgName={orgName} logoUrl={ctx.config.branding.logoUrl} discordEnabled={discordEnabled} />
+      </main>
+    </div>
   );
 }

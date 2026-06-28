@@ -14,6 +14,7 @@ const PaletteSchema = z.object({
 const BrandingSchema = z.object({
   name: z.string().min(1).max(120),
   tagline: z.string().max(200).nullable().default(null),
+  description: z.string().max(600).nullable().default(null),
   logoUrl: z.string().nullable().default(null),
   palette: PaletteSchema.optional().default({}),
   preset: z.enum(["tactical-dark", "tactical-light", "racing-red", "indigo-noir"]).default("tactical-dark"),

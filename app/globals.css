@@ -51,7 +51,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * TENANT THEME — "MFD" tactical-dark system ported from the Freedom Guards site.
- * These @theme tokens generate the surface/primary/text-*/border/tier/amber
+ * These @theme tokens generate the surface/primary/text/border/tier/amber
  * Tailwind utilities the tenant chrome + pages use. Marketing pages use their
  * own --ink/--signal vars above and are unaffected. Per-tenant accent override
  * is injected at runtime via --color-primary on the .tenant-root element.
